@@ -158,3 +158,9 @@ LOGGING = {
         },
     },
 }
+
+
+# DRF config
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "student_voting_portal.utils.exceptions.exception_handler",
+}
