@@ -25,7 +25,7 @@ python -m pip install -r requirements.txt
 
 ```shell
 # Sync database
-python manage.py makemigration
+python manage.py makemigrations
 python manage.py migrate
 ```
 
