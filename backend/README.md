@@ -3,7 +3,7 @@
 
 ## Run
 
-### Run venv and install dependencies
+### Activate venv and install dependencies
 ```shell
 # activate venv
 python -m venv venv
@@ -24,14 +24,17 @@ python -m pip install -r requirements.txt
   - In `DATABASES`, comment `mysql` part and uncomment `sqlite3` part
 
 ```shell
-# Sync database
 python manage.py makemigrations
 python manage.py migrate
 ```
 
+### Test
+```shell
+python manage.py test
+```
+
 ### Run the server
 ```shell
-# Run the server
 python manage.py runserver
 ```
 
@@ -39,4 +42,3 @@ python manage.py runserver
 ```shell
 deactivate
 ```
-
