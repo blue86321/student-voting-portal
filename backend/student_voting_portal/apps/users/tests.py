@@ -40,19 +40,19 @@ class UserTestCase(APITestCase):
 
     def test_api_create_login_user(self):
         # Create user
-        response = self.client.post('/users/',
+        register_response = self.client.post('/users/',
                                     {**self.new_user_data, "password_confirm": self.new_user_data.get("password")},
                                     format='json')
-        res_json = response.json()
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        register_json = register_response.json()
+        self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(username=self.new_user_data.get("username"))
         self.assertEqual(user.username, self.new_user_data.get("username"))
-        self.assertEqual(user.username, res_json.get("username"))
+        self.assertEqual(user.username, register_json.get("username"))
         self.assertTrue(
-            "token" in res_json and
-            "access" in res_json.get("token") and
-            "refresh" in res_json.get("token")
+            "token" in register_json and
+            "access" in register_json.get("token") and
+            "refresh" in register_json.get("token")
         )
 
         # Login user
@@ -62,12 +62,22 @@ class UserTestCase(APITestCase):
         }
         login_response = self.client.post('/authentication/', auth_data, format='json')
         login_json = login_response.json()
-        self.assertTrue("refresh" in login_json and "access" in login_json)
+        self.assertTrue(
+            "token" in login_json and
+            "refresh" in login_json.get("token")
+            and "access" in login_json.get("token")
+        )
+        self.assertTrue("username" in login_json)
 
         # Refresh token
-        refresh_data = {"refresh": login_json.get("refresh")}
+        refresh_data = {"refresh": login_json.get("token").get("refresh")}
         refresh_response = self.client.post('/authentication/refresh/', refresh_data, format='json')
         refresh_json = refresh_response.json()
         self.assertTrue("access" in refresh_json)
+
+        # Response of register == login
+        del register_json["token"]
+        del login_json["token"]
+        self.assertDictEqual(register_json, login_json)
 
         user.delete()

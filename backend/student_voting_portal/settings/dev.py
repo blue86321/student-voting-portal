@@ -189,5 +189,5 @@ AUTH_USER_MODEL = "users.User"
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
+    "TOKEN_OBTAIN_SERIALIZER": "users.utils.CustomTokenObtainPairSerializer",
 }
-
