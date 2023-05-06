@@ -38,7 +38,8 @@ class UserTestCase(APITestCase):
 
         User.objects.get(username=self.new_user_data.get("username")).delete()
 
-    def test_api_create_user(self):
+    def test_api_create_login_user(self):
+        # Create user
         response = self.client.post('/users/',
                                     {**self.new_user_data, "password_confirm": self.new_user_data.get("password")},
                                     format='json')
@@ -53,5 +54,20 @@ class UserTestCase(APITestCase):
             "access" in res_json.get("token") and
             "refresh" in res_json.get("token")
         )
+
+        # Login user
+        auth_data = {
+            "username": self.new_user_data.get("username"),
+            "password": self.new_user_data.get("password"),
+        }
+        login_response = self.client.post('/authentication/', auth_data, format='json')
+        login_json = login_response.json()
+        self.assertTrue("refresh" in login_json and "access" in login_json)
+
+        # Refresh token
+        refresh_data = {"refresh": login_json.get("refresh")}
+        refresh_response = self.client.post('/authentication/refresh/', refresh_data, format='json')
+        refresh_json = refresh_response.json()
+        self.assertTrue("access" in refresh_json)
 
         user.delete()
