@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Any
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
 
@@ -12,10 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
     remove_on_create_fields = ["password_confirm"]
 
     password_confirm = serializers.CharField(write_only=True)
+    token = serializers.JSONField(read_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "username", "password", "password_confirm", "university_id"]
+        fields = ["id", "username", "password", "password_confirm", "university_id", "token"]
 
         # edit column labels
         extra_kwargs = {
@@ -65,4 +67,15 @@ class UserSerializer(serializers.ModelSerializer):
 
         # save to database
         user.save()
+
+        # set jwt token
+        user.token = self.generate_jwt(user)
         return user
+
+    @staticmethod
+    def generate_jwt(user: UserSerializer.Meta.model) -> Dict[str, str]:
+        refresh = RefreshToken.for_user(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }

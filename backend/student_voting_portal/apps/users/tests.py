@@ -34,6 +34,7 @@ class UserTestCase(APITestCase):
         user_serializer = serializer.save()
         user_models = User.objects.get(username=self.new_user_data.get("username"))
         self.assertEqual(user_serializer, user_models)
+        self.assertTrue(hasattr(user_serializer, "token"))
 
         User.objects.get(username=self.new_user_data.get("username")).delete()
 
@@ -41,9 +42,16 @@ class UserTestCase(APITestCase):
         response = self.client.post('/users/',
                                     {**self.new_user_data, "password_confirm": self.new_user_data.get("password")},
                                     format='json')
+        res_json = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(username=self.new_user_data.get("username"))
         self.assertEqual(user.username, self.new_user_data.get("username"))
+        self.assertEqual(user.username, res_json.get("username"))
+        self.assertTrue(
+            "token" in res_json and
+            "access" in res_json.get("token") and
+            "refresh" in res_json.get("token")
+        )
 
         user.delete()
