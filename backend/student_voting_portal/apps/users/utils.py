@@ -2,6 +2,8 @@ from typing import Dict
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from users.models import University
+
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs: Dict[str, str]) -> Dict[str, str]:
@@ -14,7 +16,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return {
             "id": self.user.pk,
             "username": self.user.get_username(),
-            "university_id": self.user.university_id,
+            "university": University.objects.get(pk=self.user.university_id).name,
             "token": {
                 "access": data.get("access"),
                 "refresh": data.get("refresh"),

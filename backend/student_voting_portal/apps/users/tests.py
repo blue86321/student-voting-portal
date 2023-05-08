@@ -1,6 +1,6 @@
 from rest_framework import serializers, status
 
-from users.models import User
+from users.models import User, University
 from users.serializers import UserSerializer
 from rest_framework.test import APITestCase
 
@@ -12,6 +12,8 @@ class UserTestCase(APITestCase):
             "password": "test_password",
             "university_id": 1,
         }
+        self.new_university = {"id": 1, "name": "Santa Clara University"}
+        University.objects.create(**self.new_university).save()
 
     def test_user_models(self):
         User.objects.create(**self.new_user_data)
@@ -40,9 +42,10 @@ class UserTestCase(APITestCase):
 
     def test_api_create_login_user(self):
         # Create user
-        register_response = self.client.post('/users/',
-                                    {**self.new_user_data, "password_confirm": self.new_user_data.get("password")},
-                                    format='json')
+        register_response = self.client.post("/users/",
+                                             {**self.new_user_data,
+                                              "password_confirm": self.new_user_data.get("password")},
+                                             format="json")
         register_json = register_response.json()
         self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
@@ -60,7 +63,7 @@ class UserTestCase(APITestCase):
             "username": self.new_user_data.get("username"),
             "password": self.new_user_data.get("password"),
         }
-        login_response = self.client.post('/authentication/', auth_data, format='json')
+        login_response = self.client.post("/authentication/", auth_data, format="json")
         login_json = login_response.json()
         self.assertTrue(
             "token" in login_json and
@@ -69,9 +72,17 @@ class UserTestCase(APITestCase):
         )
         self.assertTrue("username" in login_json)
 
+        # Retrieve user info
+        retrieve_response = self.client.get(
+            "/user/",
+            headers={"Authorization": "Bearer " + login_json.get("token").get("access")},
+            format="json")
+        retrieve_json = retrieve_response.json()
+        self.assertEqual(retrieve_json.get("username"), self.new_user_data.get("username"))
+
         # Refresh token
         refresh_data = {"refresh": login_json.get("token").get("refresh")}
-        refresh_response = self.client.post('/authentication/refresh/', refresh_data, format='json')
+        refresh_response = self.client.post("/authentication/refresh/", refresh_data, format="json")
         refresh_json = refresh_response.json()
         self.assertTrue("access" in refresh_json)
 
