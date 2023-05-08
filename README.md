@@ -7,9 +7,9 @@
   ```sh
   git clone https://github.com/blue86321/student-voting-portal.git
   ```
-- Check to another branch
+- Checkout to another branch
   ```sh
-  git branch -b NEW_BRANCH_NAME
+  git checkout -b NEW_BRANCH_NAME
   ```
 - Start developing
   - Multiple small commits are preferred
