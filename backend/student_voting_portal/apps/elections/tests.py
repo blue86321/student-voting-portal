@@ -41,10 +41,11 @@ class ElectionTestCase(APITestCase):
 
         self.new_user_pwd = "test_password"
         new_user = {
-            "username": "test_username",
+            "email": "test_email@scu.edu",
             "password": self.new_user_pwd,
             "password_confirm": self.new_user_pwd,
             "university_id": self.new_university.id,
+            "dob": "1990-01-01",
         }
         new_user_json = self.client.post("/users/", data=new_user).json()
         self.new_user = User.objects.get(id=new_user_json.get("id"))
@@ -60,10 +61,11 @@ class ElectionTestCase(APITestCase):
 
         self.new_admin_pwd = "test_admin"
         new_admin = {
-            "username": "test_admin",
+            "email": "test_admin@scu.edu",
             "password": self.new_admin_pwd,
             "password_confirm": self.new_admin_pwd,
             "university_id": self.new_university.id,
+            "dob": "1980-01-01",
         }
         new_admin_json = self.client.post("/users/", data=new_admin).json()
         self.new_admin = User.objects.get(id=new_admin_json.get("id"))
@@ -135,11 +137,11 @@ class ElectionTestCase(APITestCase):
         # no login
         no_login_res = callback(*args, **kwargs)
         # normal user
-        self.client.login(username=self.new_user.username, password=self.new_user_pwd)
+        self.client.login(email=self.new_user.email, password=self.new_user_pwd)
         normal_user_res = callback(*args, **kwargs)
         self.client.logout()
         # admin
-        self.client.login(username=self.new_admin.username, password=self.new_admin_pwd)
+        self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         admin_res = callback(*args, **kwargs)
         self.client.logout()
         return DiffUserRes(no_login_res, normal_user_res, admin_res)
