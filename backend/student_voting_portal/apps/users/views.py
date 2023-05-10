@@ -1,17 +1,17 @@
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from student_voting_portal.apps.users.serializers import UserSerializer, UserDetailSerializer
-from users.models import User, University
+from student_voting_portal.utils.BaseViewSet import BaseViewSet
+from users.models import University
 
 
-class UserView(CreateAPIView):
+class UserView(BaseViewSet, CreateAPIView):
     """UserView for create a new user"""
     serializer_class = UserSerializer
 
 
-class UserDetailView(RetrieveAPIView):
+class UserDetailView(BaseViewSet, RetrieveAPIView):
     serializer_class = UserDetailSerializer
 
     # only authenticated (login) user can access
