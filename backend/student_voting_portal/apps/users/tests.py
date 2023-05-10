@@ -7,20 +7,13 @@ from rest_framework.test import APITestCase
 
 class UserTestCase(APITestCase):
     def setUp(self):
+        self.new_university = University.objects.create(**{"name": "Santa Clara University"})
+        self.new_user_pwd = "test_password"
         self.new_user_data = {
             "username": "test_username",
-            "password": "test_password",
-            "university_id": 1,
+            "password": self.new_user_pwd,
+            "university_id": self.new_university.id,
         }
-        self.new_university = {"id": 1, "name": "Santa Clara University"}
-        University.objects.create(**self.new_university).save()
-
-    def test_user_models(self):
-        User.objects.create(**self.new_user_data)
-        user = User.objects.get(username=self.new_user_data.get("username"))
-        self.assertEqual(user.username, self.new_user_data.get("username"))
-
-        user.delete()
 
     def test_user_serializer(self):
         # no `password_confirm`, should raise `ValidationError`
@@ -38,53 +31,67 @@ class UserTestCase(APITestCase):
         self.assertEqual(user_serializer, user_models)
         self.assertTrue(hasattr(user_serializer, "token"))
 
-        User.objects.get(username=self.new_user_data.get("username")).delete()
+        user_models.delete()
 
-    def test_api_create_login_user(self):
-        # Create user
-        register_response = self.client.post("/users/",
-                                             {**self.new_user_data,
-                                              "password_confirm": self.new_user_data.get("password")},
-                                             format="json")
+    def test_api_post_user(self, delete=True):
+        new_user_data = {
+            **self.new_user_data,
+            "password_confirm": self.new_user_pwd,
+        }
+        register_response = self.client.post("/users/", new_user_data)
         register_json = register_response.json()
         self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(username=self.new_user_data.get("username"))
         self.assertEqual(user.username, self.new_user_data.get("username"))
         self.assertEqual(user.username, register_json.get("username"))
-        self.assertTrue(
-            "token" in register_json and
-            "access" in register_json.get("token") and
-            "refresh" in register_json.get("token")
-        )
+        if delete:
+            user.delete()
+        return user, register_json
 
-        # Login user
+    def login_user(self, user):
         auth_data = {
-            "username": self.new_user_data.get("username"),
-            "password": self.new_user_data.get("password"),
+            "username": user.username,
+            "password": self.new_user_pwd,
         }
-        login_response = self.client.post("/authentication/", auth_data, format="json")
+        login_response = self.client.post("/authentication/", auth_data)
         login_json = login_response.json()
+        return login_json
+
+    def test_api_login_user(self):
+        user, register_json = self.test_api_post_user(delete=False)
+        login_json = self.login_user(user)
         self.assertTrue(
             "token" in login_json and
             "refresh" in login_json.get("token")
             and "access" in login_json.get("token")
         )
         self.assertTrue("username" in login_json)
+        user.delete()
 
-        # Retrieve user info
-        retrieve_response = self.client.get(
-            "/user/",
-            headers={"Authorization": "Bearer " + login_json.get("token").get("access")},
-            format="json")
-        retrieve_json = retrieve_response.json()
-        self.assertEqual(retrieve_json.get("username"), self.new_user_data.get("username"))
+    def test_jwt(self):
+        def check_process(res_json):
+            access_token = res_json.get("token").get("access")
+            refresh_token = res_json.get("token").get("refresh")
+            self.assertIsNotNone(access_token)
+            self.assertIsNotNone(refresh_token)
+            # Retrieve
+            retrieve_res = self.client.get("/user/", headers={"Authorization": "Bearer " + access_token})
+            retrieve_json = retrieve_res.json()
+            self.assertEqual(retrieve_json.get("username"), user.username)
+            # Refresh
+            refresh_data = {"refresh": refresh_token}
+            refresh_res = self.client.post("/authentication/refresh/", refresh_data)
+            refresh_json = refresh_res.json()
+            self.assertIsNotNone(refresh_json.get("access"))
 
-        # Refresh token
-        refresh_data = {"refresh": login_json.get("token").get("refresh")}
-        refresh_response = self.client.post("/authentication/refresh/", refresh_data, format="json")
-        refresh_json = refresh_response.json()
-        self.assertTrue("access" in refresh_json)
+        # Register
+        user, register_json = self.test_api_post_user(delete=False)
+        check_process(register_json)
+
+        # Login
+        login_json = self.login_user(user)
+        check_process(login_json)
 
         # Response of register == login
         del register_json["token"]
