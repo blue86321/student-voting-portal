@@ -130,3 +130,5 @@ class ElectionTestCase(APITestCase):
         deleted_election = Election.objects.get(id=self.new_election.id)
         self.assertTrue(deleted_election.delete_time)
         self.client.logout()
+
+    # TODO: test cases for positions/candidates/vote
