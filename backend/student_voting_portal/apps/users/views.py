@@ -19,5 +19,5 @@ class UserDetailView(BaseViewSet, RetrieveAPIView):
 
     def get_object(self):
         """Override get_object() to improve efficiency """
-        self.request.user.university = University.objects.get(pk=self.request.user.university_id).name
+        self.request.user.university = University.objects.get(pk=self.request.user.university_id)
         return self.request.user

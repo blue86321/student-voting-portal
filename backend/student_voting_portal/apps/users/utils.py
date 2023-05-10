@@ -15,8 +15,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         return {
             "id": self.user.pk,
-            "username": self.user.get_username(),
+            self.user.USERNAME_FIELD: self.user.get_username(),
             "university": University.objects.get(pk=self.user.university_id).name,
+            "dob": self.user.dob,
             "token": {
                 "access": data.get("access"),
                 "refresh": data.get("refresh"),

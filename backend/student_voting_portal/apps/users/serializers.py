@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import Dict, Any
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -11,26 +12,19 @@ class UserSerializer(serializers.ModelSerializer):
     # write_only: only for serializing (data -> instance)
     # read_only: only for de-serializing (instance -> data)
     remove_on_create_fields = ["password_confirm"]
-
-    university_id = serializers.IntegerField(write_only=True)
     password_confirm = serializers.CharField(write_only=True)
     token = serializers.JSONField(read_only=True)
-    university = serializers.CharField(max_length=64, read_only=True)
+    university_id = serializers.PrimaryKeyRelatedField(queryset=University.objects.all(), source="university",
+                                                       write_only=True)
+    university = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "username", "password", "password_confirm", "university_id", "university", "token"]
+        # exclude = ["create_time", "update_time", "delete_time"]
+        fields = ["id", "email", "password", "password_confirm", "university_id", "university", "dob", "token"]
 
         # edit column labels
         extra_kwargs = {
-            "username": {
-                "min_length": 6,
-                "max_length": 32,
-                "error_messages": {
-                    "min_length": "username length need be to 6-32",
-                    "max_length": "username length need be to 6-32",
-                }
-            },
             "password": {
                 "write_only": True,
                 "min_length": 8,
@@ -53,6 +47,14 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("passwords do not match")
         return attrs
 
+    def validate_dob(self, value: datetime.date):
+        dob = value
+        today = datetime.date.today()
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if age < 18:
+            raise serializers.ValidationError("age < 18")
+        return value
+
     def create(self, validated_data: Dict[str, Any]) -> UserSerializer.Meta.model:
         """
         Override `create` method, because `password` need to be encrypted
@@ -72,16 +74,14 @@ class UserSerializer(serializers.ModelSerializer):
 
         # set jwt token
         user.token = self.generate_jwt(user)
-        # set university
-        user.university = University.objects.get(pk=user.university_id).name
         return user
 
     @staticmethod
     def generate_jwt(user: UserSerializer.Meta.model) -> Dict[str, str]:
         refresh = RefreshToken.for_user(user)
         return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
         }
 
 
@@ -90,4 +90,4 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "university"]
+        fields = ["id", "email", "university"]
