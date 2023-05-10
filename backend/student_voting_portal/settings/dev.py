@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "rest_framework",
 
     # apps
-    "users.apps.UsersConfig",
+    "users",
+    "elections",
 ]
 
 MIDDLEWARE = [
@@ -181,6 +182,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 
 # Django default auth user model
