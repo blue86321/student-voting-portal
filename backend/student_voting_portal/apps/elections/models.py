@@ -35,5 +35,5 @@ class Vote(BaseModel, models.Model):
     user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     election = models.ForeignKey(Election, on_delete=models.DO_NOTHING)
     position = models.ForeignKey(Position, on_delete=models.DO_NOTHING)
-    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
+    candidate = models.ForeignKey(Candidate, on_delete=models.DO_NOTHING)
     vote_count = models.IntegerField(default=1)
