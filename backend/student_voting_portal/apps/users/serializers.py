@@ -20,7 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        # exclude = ["create_time", "update_time", "delete_time"]
         fields = ["id", "email", "password", "password_confirm", "university_id", "university", "dob", "token"]
 
         # edit column labels
