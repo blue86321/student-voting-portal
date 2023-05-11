@@ -2,15 +2,15 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.viewsets import ModelViewSet
 
 from elections.models import Election, Position, Vote, Candidate
-from elections.permissions import ElectionPermission
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer, VoteSerializer
 from student_voting_portal.utils.BaseViewSet import BaseViewSet
+from student_voting_portal.utils.permissions import GetOrAdmin
 
 
 class ElectionView(BaseViewSet, ModelViewSet):
     serializer_class = ElectionSerializer
     queryset = Election.objects.all()
-    permission_classes = [ElectionPermission]
+    permission_classes = [GetOrAdmin]
 
 
 class PositionView(BaseViewSet, ModelViewSet):

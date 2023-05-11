@@ -29,27 +29,27 @@ class ElectionTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-        new_election = {
+        new_election_data = {
             "election_name": "SCU student council election",
             "desc": "desc for SCU student council election",
             "start_time": timezone.now(),
             "end_time": timezone.now(),
         }
-        cls.new_election = Election.objects.create(**new_election)
+        cls.new_election = Election.objects.create(**new_election_data)
 
-        new_position = {
+        new_position_data = {
             "election_id": cls.new_election.id,
             "position_name": "SCU student council president",
             "desc": "desc for SCU student council president",
             "max_votes_total": 1,
             "max_votes_per_candidate": 1,
         }
-        cls.new_position = Position.objects.create(**new_position)
+        cls.new_position = Position.objects.create(**new_position_data)
 
-        new_university = {"name": "Santa Clara University"}
-        cls.new_university = University.objects.create(**new_university)
+        new_university_data = {"name": "Santa Clara University"}
+        cls.new_university = University.objects.create(**new_university_data)
 
-        new_user = {
+        new_user_data = {
             "email": "test_email@scu.edu",
             "password": cls.new_user_pwd,
             "password_confirm": cls.new_user_pwd,
@@ -57,20 +57,20 @@ class ElectionTestCase(APITestCase):
             "dob": "1990-01-01",
         }
         # new_user_json = cls.client.post("/users/", data=new_user).json()
-        serializer = UserSerializer(data=new_user)
+        serializer = UserSerializer(data=new_user_data)
         serializer.is_valid(raise_exception=True)
         cls.new_user = serializer.save()
 
-        new_candidate = {
+        new_candidate_data = {
             "user_id": cls.new_user.id,
             "election_id": cls.new_election.id,
             "position_id": cls.new_position.id,
             "candidate_name": "John Miller",
             "desc": "desc for candidates",
         }
-        cls.new_candidate = Candidate.objects.create(**new_candidate)
+        cls.new_candidate = Candidate.objects.create(**new_candidate_data)
 
-        new_admin = {
+        new_admin_data = {
             "email": "test_admin@scu.edu",
             "password": cls.new_admin_pwd,
             "password_confirm": cls.new_admin_pwd,
@@ -78,7 +78,7 @@ class ElectionTestCase(APITestCase):
             "dob": "1980-01-01",
             "is_staff": 1,
         }
-        serializer = UserSerializer(data=new_admin)
+        serializer = UserSerializer(data=new_admin_data)
         serializer.is_valid()
         cls.new_admin = serializer.save()
 
