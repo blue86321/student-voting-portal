@@ -29,4 +29,3 @@ class User(BaseModel, AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
-

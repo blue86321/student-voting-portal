@@ -7,7 +7,8 @@ from rest_framework.test import APITestCase
 
 from elections.models import Election, Position, Candidate
 from elections.serializers import ElectionSerializer
-from users.models import User, University
+from users.models import University
+from users.serializers import UserSerializer
 
 
 class DiffUserRes:
@@ -18,60 +19,68 @@ class DiffUserRes:
 
 
 class ElectionTestCase(APITestCase):
-    def setUp(self):
+    new_admin_pwd = "test_admin"
+    new_admin = None
+    new_user = None
+    new_user_pwd = "test_password"
+    new_position = None
+    new_university = None
+    new_election = None
+
+    @classmethod
+    def setUpTestData(cls):
         new_election = {
             "election_name": "SCU student council election",
             "desc": "desc for SCU student council election",
             "start_time": timezone.now(),
             "end_time": timezone.now(),
         }
-        self.new_election = Election.objects.create(**new_election)
+        cls.new_election = Election.objects.create(**new_election)
 
         new_position = {
-            "election_id": self.new_election.id,
+            "election_id": cls.new_election.id,
             "position_name": "SCU student council president",
             "desc": "desc for SCU student council president",
             "max_votes_total": 1,
             "max_votes_per_candidate": 1,
         }
-        self.new_position = Position.objects.create(**new_position)
+        cls.new_position = Position.objects.create(**new_position)
 
         new_university = {"name": "Santa Clara University"}
-        self.new_university = University.objects.create(**new_university)
+        cls.new_university = University.objects.create(**new_university)
 
-        self.new_user_pwd = "test_password"
         new_user = {
             "email": "test_email@scu.edu",
-            "password": self.new_user_pwd,
-            "password_confirm": self.new_user_pwd,
-            "university_id": self.new_university.id,
+            "password": cls.new_user_pwd,
+            "password_confirm": cls.new_user_pwd,
+            "university_id": cls.new_university.id,
             "dob": "1990-01-01",
         }
-        new_user_json = self.client.post("/users/", data=new_user).json()
-        self.new_user = User.objects.get(id=new_user_json.get("id"))
+        # new_user_json = cls.client.post("/users/", data=new_user).json()
+        serializer = UserSerializer(data=new_user)
+        serializer.is_valid(raise_exception=True)
+        cls.new_user = serializer.save()
 
         new_candidate = {
-            "user_id": self.new_user.id,
-            "election_id": self.new_election.id,
-            "position_id": self.new_position.id,
+            "user_id": cls.new_user.id,
+            "election_id": cls.new_election.id,
+            "position_id": cls.new_position.id,
             "candidate_name": "John Miller",
             "desc": "desc for candidates",
         }
-        self.new_candidate = Candidate.objects.create(**new_candidate)
+        cls.new_candidate = Candidate.objects.create(**new_candidate)
 
-        self.new_admin_pwd = "test_admin"
         new_admin = {
             "email": "test_admin@scu.edu",
-            "password": self.new_admin_pwd,
-            "password_confirm": self.new_admin_pwd,
-            "university_id": self.new_university.id,
+            "password": cls.new_admin_pwd,
+            "password_confirm": cls.new_admin_pwd,
+            "university_id": cls.new_university.id,
             "dob": "1980-01-01",
+            "is_staff": 1,
         }
-        new_admin_json = self.client.post("/users/", data=new_admin).json()
-        self.new_admin = User.objects.get(id=new_admin_json.get("id"))
-        self.new_admin.is_staff = True
-        self.new_admin.is_superuser = True
-        self.new_admin.save()
+        serializer = UserSerializer(data=new_admin)
+        serializer.is_valid()
+        cls.new_admin = serializer.save()
 
     def test_api_get_elections(self):
         existing_election = ElectionSerializer(instance=self.new_election).data

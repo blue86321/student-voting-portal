@@ -6,14 +6,17 @@ from rest_framework.test import APITestCase
 
 
 class UserTestCase(APITestCase):
-    def setUp(self):
-        self.new_university = University.objects.create(**{"name": "Santa Clara University"})
-        self.new_user_pwd = "test_password"
-        self.new_user_data = {
+    new_university = None
+    new_user_pwd = "test_password"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.new_university = University.objects.create(**{"name": "Santa Clara University"})
+        cls.new_user_data = {
             "email": "test_email@scu.edu",
-            "password": self.new_user_pwd,
+            "password": cls.new_user_pwd,
             "dob": "1995-01-01",
-            "university_id": self.new_university.id,
+            "university_id": cls.new_university.id,
         }
 
     def test_user_serializer(self):
