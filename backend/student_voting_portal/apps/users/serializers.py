@@ -20,7 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "password", "password_confirm", "university_id", "university", "dob", "token"]
+        fields = ["id", "email", "password", "password_confirm", "university_id", "university", "dob", "token",
+                  "is_staff"]
 
         # edit column labels
         extra_kwargs = {
@@ -89,4 +90,4 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "university", "dob"]
+        fields = ["id", "email", "university", "dob", "is_staff"]
