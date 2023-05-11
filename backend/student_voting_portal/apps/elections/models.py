@@ -33,7 +33,7 @@ class Candidate(BaseModel, models.Model):
 class Vote(BaseModel, models.Model):
     """users' vote for candidates in an election for a position"""
     user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    election_id = models.ForeignKey(Election, on_delete=models.DO_NOTHING)
-    position_id = models.ForeignKey(Position, on_delete=models.DO_NOTHING)
-    candidate_id = models.ForeignKey(Candidate, on_delete=models.CASCADE)
+    election = models.ForeignKey(Election, on_delete=models.DO_NOTHING)
+    position = models.ForeignKey(Position, on_delete=models.DO_NOTHING)
+    candidate = models.ForeignKey(Candidate, on_delete=models.DO_NOTHING)
     vote_count = models.IntegerField(default=1)

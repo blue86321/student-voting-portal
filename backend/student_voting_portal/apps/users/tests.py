@@ -6,20 +6,35 @@ from rest_framework.test import APITestCase
 
 
 class UserTestCase(APITestCase):
-    def setUp(self):
-        self.new_university = University.objects.create(**{"name": "Santa Clara University"})
-        self.new_user_pwd = "test_password"
-        self.new_user_data = {
-            "username": "test_username",
-            "password": self.new_user_pwd,
-            "university_id": self.new_university.id,
+    new_university = None
+    new_user_pwd = "test_password"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.new_university = University.objects.create(**{"name": "Santa Clara University"})
+        cls.new_user_data = {
+            "email": "test_email@scu.edu",
+            "password": cls.new_user_pwd,
+            "dob": "1995-01-01",
+            "university_id": cls.new_university.id,
         }
 
     def test_user_serializer(self):
         # no `password_confirm`, should raise `ValidationError`
-        with self.assertRaises(serializers.ValidationError):
+        with self.assertRaises(serializers.ValidationError) as pwd_error:
             serializer = UserSerializer(data=self.new_user_data)
             serializer.is_valid(raise_exception=True)
+        self.assertIsNotNone(pwd_error.exception.detail.get("password_confirm"))
+
+        # age < 18
+        with self.assertRaises(serializers.ValidationError) as age_error:
+            serializer = UserSerializer(data={
+                **self.new_user_data,
+                "password_confirm": self.new_user_data.get("password"),
+                "dob": "2015-01-01",
+            })
+            serializer.is_valid(raise_exception=True)
+        self.assertIsNotNone(age_error.exception.detail.get("dob"))
 
         # validation
         serializer = UserSerializer(data={**self.new_user_data, "password_confirm": self.new_user_data.get("password")})
@@ -27,7 +42,7 @@ class UserTestCase(APITestCase):
 
         # save
         user_serializer = serializer.save()
-        user_models = User.objects.get(username=self.new_user_data.get("username"))
+        user_models = User.objects.get(email=self.new_user_data.get("email"))
         self.assertEqual(user_serializer, user_models)
         self.assertTrue(hasattr(user_serializer, "token"))
 
@@ -42,16 +57,16 @@ class UserTestCase(APITestCase):
         register_json = register_response.json()
         self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
-        user = User.objects.get(username=self.new_user_data.get("username"))
-        self.assertEqual(user.username, self.new_user_data.get("username"))
-        self.assertEqual(user.username, register_json.get("username"))
+        user = User.objects.get(email=self.new_user_data.get("email"))
+        self.assertEqual(user.email, self.new_user_data.get("email"))
+        self.assertEqual(user.email, register_json.get("email"))
         if delete:
             user.delete()
         return user, register_json
 
     def login_user(self, user):
         auth_data = {
-            "username": user.username,
+            "email": user.email,
             "password": self.new_user_pwd,
         }
         login_response = self.client.post("/authentication/", auth_data)
@@ -66,7 +81,7 @@ class UserTestCase(APITestCase):
             "refresh" in login_json.get("token")
             and "access" in login_json.get("token")
         )
-        self.assertTrue("username" in login_json)
+        self.assertTrue("email" in login_json)
         user.delete()
 
     def test_jwt(self):
@@ -78,7 +93,7 @@ class UserTestCase(APITestCase):
             # Retrieve
             retrieve_res = self.client.get("/user/", headers={"Authorization": "Bearer " + access_token})
             retrieve_json = retrieve_res.json()
-            self.assertEqual(retrieve_json.get("username"), user.username)
+            self.assertEqual(retrieve_json.get("email"), user.email)
             # Refresh
             refresh_data = {"refresh": refresh_token}
             refresh_res = self.client.post("/authentication/refresh/", refresh_data)

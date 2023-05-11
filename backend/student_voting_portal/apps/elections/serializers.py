@@ -8,7 +8,7 @@ from elections.models import Election, Position, Vote
 class PositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Position
-        exclude = ["create_time", "update_time"]
+        exclude = ["create_time", "update_time", "delete_time"]
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -27,7 +27,7 @@ class PositionSerializer(serializers.ModelSerializer):
 class CandidateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Position
-        exclude = ["create_time", "update_time"]
+        exclude = ["create_time", "update_time", "delete_time"]
 
 
 class ElectionSerializer(serializers.ModelSerializer):
@@ -36,10 +36,10 @@ class ElectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Election
-        exclude = ["create_time", "update_time"]
+        exclude = ["create_time", "update_time", "delete_time"]
 
 
 class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
-        exclude = ["create_time", "update_time"]
+        exclude = ["create_time", "update_time", "delete_time"]
