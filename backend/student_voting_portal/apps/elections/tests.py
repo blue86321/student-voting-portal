@@ -402,26 +402,26 @@ class VoteTestCase(AbstractTestCase):
         }
 
         # no login
-        res = self.client.post("/vote/", data=vote_data)
+        res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
-        res_json = self.client.post("/vote/", data=vote_data).json()
+        res_json = self.client.post("/votes/", data=vote_data).json()
         del res_json["id"]
         self.assertDictEqual(res_json, vote_data)
         # post again
-        res = self.client.post("/vote/", data=vote_data)
+        res = self.client.post("/votes/", data=vote_data)
         self.assertTrue(res.exception)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         # another university
-        res = self.client.post("/vote/", data=another_vote_data)
+        res = self.client.post("/votes/", data=another_vote_data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
 
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
-        res = self.client.post("/vote/", data=vote_data)
+        res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
         return res.json()

@@ -11,5 +11,5 @@ router.register("candidates", CandidateView)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("vote/", VoteView.as_view()),
+    path("votes/", VoteView.as_view()),
 ]
