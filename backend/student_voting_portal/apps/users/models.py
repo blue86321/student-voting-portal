@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -14,7 +16,7 @@ class University(BaseModel, models.Model):
         db_table = "university"
 
     def __str__(self):
-        return self.name
+        return json.dumps({"id": self.id, "name": self.name})
 
 
 class User(BaseModel, AbstractUser):

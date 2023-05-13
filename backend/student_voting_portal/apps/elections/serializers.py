@@ -2,13 +2,16 @@ from typing import Dict, Any
 
 from rest_framework import serializers
 
-from elections.models import Election, Position, Vote
+from elections.models import Election, Position, Vote, Candidate
+from users.models import University, User
 
 
 class PositionSerializer(serializers.ModelSerializer):
+    election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
+
     class Meta:
         model = Position
-        exclude = ["create_time", "update_time", "delete_time"]
+        exclude = ["create_time", "update_time", "delete_time", "election"]
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -27,14 +30,21 @@ class PositionSerializer(serializers.ModelSerializer):
 
 
 class CandidateSerializer(serializers.ModelSerializer):
+    election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
+    position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
+
     class Meta:
-        model = Position
-        exclude = ["create_time", "update_time", "delete_time"]
+        model = Candidate
+        exclude = ["create_time", "update_time", "delete_time", "election", "position", "user"]
 
 
 class ElectionSerializer(serializers.ModelSerializer):
-    positions = PositionSerializer(read_only=True)
-    candidates = CandidateSerializer(read_only=True)
+    positions = PositionSerializer(many=True, read_only=True)
+    candidates = CandidateSerializer(many=True, read_only=True)
+    university_id = serializers.PrimaryKeyRelatedField(queryset=University.objects.all(), source="university",
+                                                       write_only=True)
+    university = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Election
