@@ -1,11 +1,12 @@
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAdminUser
+from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
 from elections.models import Election, Position, Vote, Candidate
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer, VoteSerializer
 from student_voting_portal.utils.views import BaseViewSet
-from student_voting_portal.utils.permissions import IsOwnerOrAdmin, NormalUserPost, Get, IsSameUniversity
+from student_voting_portal.utils.permissions import IsOwnerOrAdmin, VotePermission, Get, IsSameUniversity
 
 
 class ElectionView(BaseViewSet, ModelViewSet):
@@ -29,4 +30,8 @@ class CandidateView(BaseViewSet, ModelViewSet):
 class VoteView(BaseViewSet, CreateAPIView):
     serializer_class = VoteSerializer
     queryset = Vote.objects.all()
-    permission_classes = [NormalUserPost]
+    permission_classes = [VotePermission]
+
+    def create(self, request: Request, *args, **kwargs):
+        request.data["user_id"] = request.user.id
+        return super().create(request, args, kwargs)
