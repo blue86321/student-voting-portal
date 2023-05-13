@@ -1,10 +1,10 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.viewsets import ModelViewSet
 
 from elections.models import Election, Position, Vote, Candidate
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer, VoteSerializer
 from student_voting_portal.utils.BaseViewSet import BaseViewSet
-from student_voting_portal.utils.permissions import GetOrAdmin
+from student_voting_portal.utils.permissions import GetOrAdmin, IsOwnerOrAdmin, NormalUserPost
 
 
 class ElectionView(BaseViewSet, ModelViewSet):
@@ -16,20 +16,25 @@ class ElectionView(BaseViewSet, ModelViewSet):
 class PositionView(BaseViewSet, ModelViewSet):
     serializer_class = PositionSerializer
     queryset = Position.objects.all()
-    # TODO: only admin can create/update/delete (post/put/patch/delete)
-    # permission_classes = []
+    permission_classes = [GetOrAdmin]
 
 
 class CandidateView(BaseViewSet, ModelViewSet):
     serializer_class = CandidateSerializer
     queryset = Candidate.objects.all()
-    # TODO: only admin or owner user can create/update/delete (post/put/patch/delete)
-    # permission_classes = []
+    permission_classes = [GetOrAdmin | IsOwnerOrAdmin]
+
+    # def get_queryset(self):
+    #     """Admin can only see users in the same university"""
+    #     queryset = self.queryset
+    #     if isinstance(queryset, QuerySet):
+    #         Election.objects
+    #         queryset = queryset.filter(university_id=self.request.user.university_id)
+    #     return queryset
 
 
-class VoteView(BaseViewSet, CreateAPIView, RetrieveAPIView):
+class VoteView(BaseViewSet, CreateAPIView):
     serializer_class = VoteSerializer
     queryset = Vote.objects.all()
-    # TODO: only normal user can create (post)
-    # TODO: everyone can retrieve (get)
-    # permission_classes = []
+    permission_classes = [NormalUserPost]
+

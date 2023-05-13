@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from student_voting_portal.apps.users.serializers import UserSerializer, UserDetailSerializer
 from users.models import University, User
-from student_voting_portal.utils.permissions import IsOwnerOrAdmin, PostOrAdmin
+from student_voting_portal.utils.permissions import IsPkOrAdmin, PostOrAdmin
 
 
 class UserView(CreateAPIView, ListAPIView):
@@ -39,4 +39,4 @@ class UserDetailView(RetrieveAPIView):
     """Use case: for admin to access a user detail"""
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
-    permission_classes = [IsOwnerOrAdmin]
+    permission_classes = [IsPkOrAdmin]
