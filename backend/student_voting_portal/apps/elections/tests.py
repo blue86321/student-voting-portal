@@ -158,8 +158,8 @@ class ElectionTestCase(AbstractTestCase):
                 "university_id": json.loads(existing_election.get("university")).get("id")
             }
         )
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
         self.assertEqual(election_count + 1, Election.objects.count())
@@ -175,8 +175,8 @@ class ElectionTestCase(AbstractTestCase):
                 "university_id": json.loads(modified_election.get("university")).get("id")
             }
         )
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
         put_json = res.admin.json()
@@ -192,9 +192,9 @@ class ElectionTestCase(AbstractTestCase):
                 "university_id": json.loads(modified_election.get("university")).get("id")
             }
         )
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
-        self.assertTrue(res.admin.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.admin.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_elections_patch(self):
         existing_election = ElectionSerializer(instance=self.new_election).data
@@ -202,8 +202,8 @@ class ElectionTestCase(AbstractTestCase):
         patch_data = {"desc": "ANOTHER_DESC"}
         modified_election.update(patch_data)
         res = self.diff_user_call(self.client.patch, f"/elections/{self.new_election.id}/", data=patch_data)
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
         patch_json = res.admin.json()
@@ -212,8 +212,8 @@ class ElectionTestCase(AbstractTestCase):
     def test_api_elections_delete(self):
         new_election_data = self.test_api_elections_post()
         res = self.diff_user_call(self.client.delete, f"/elections/{new_election_data['id']}/")
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
         with self.assertRaises(ObjectDoesNotExist):
@@ -225,9 +225,13 @@ class PositionTestCase(AbstractTestCase):
         position_count = Position.objects.count()
         existing_position = PositionSerializer(instance=self.new_position).data
         res = self.diff_user_call(self.client.post, "/positions/", data=existing_position)
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
-        self.assertFalse(res.admin.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
+        # admin
+        res_json = {**res.admin.json()}
+        del res_json["id"]
+        del existing_position["id"]
+        self.assertDictEqual(res_json, existing_position)
         self.assertEqual(position_count + 1, Position.objects.count())
         return res.admin.json()
 
@@ -240,28 +244,25 @@ class PositionTestCase(AbstractTestCase):
         # List
         position_count = Position.objects.count()
         list_res = self.client.get("/positions/")
-        list_json = list_res.json()
-        self.assertEqual(len(list_json), position_count)
+        self.assertEqual(len(list_res.json()), position_count)
 
     def test_api_positions_put(self):
         modified_position = PositionSerializer(instance=self.new_position).data
         modified_position["desc"] = "NEW_DESC"
         modified_position["max_votes_total"] = 2
         res = self.diff_user_call(self.client.put, f"/positions/{self.new_position.id}/", data=modified_position)
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
-        self.assertFalse(res.admin.exception)
-        put_json = res.admin.json()
-        self.assertDictEqual(put_json, modified_position)
+        self.assertDictEqual(res.admin.json(), modified_position)
 
         # another university
         modified_position = PositionSerializer(instance=self.another_position).data
         modified_position["desc"] = "NEW_DESC"
         res = self.diff_user_call(self.client.put, f"/positions/{self.another_position.id}/", data=modified_position)
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
-        self.assertTrue(res.admin.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.admin.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_positions_patch(self):
         existing_position = PositionSerializer(instance=self.new_position).data
@@ -269,18 +270,15 @@ class PositionTestCase(AbstractTestCase):
         patch_data = {"desc": "ANOTHER_DESC"}
         modified_position.update(patch_data)
         res = self.diff_user_call(self.client.patch, f"/positions/{self.new_position.id}/", data=patch_data)
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
-        # admin
-        self.assertFalse(res.admin.exception)
-        patch_json = res.admin.json()
-        self.assertDictEqual(patch_json, modified_position)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertDictEqual(res.admin.json(), modified_position)
 
     def test_api_positions_delete(self):
         new_position_data = self.test_api_positions_post()
         res = self.diff_user_call(self.client.delete, f"/positions/{new_position_data['id']}/")
-        self.assertTrue(res.no_login.exception)
-        self.assertTrue(res.normal_user.exception)
+        self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
         with self.assertRaises(ObjectDoesNotExist):
@@ -304,7 +302,8 @@ class CandidateTestCase(AbstractTestCase):
         res = self.client.post("/candidates/", data=new_candidate)
         self.assertFalse(res.exception)
         # post again
-        self.assertTrue(self.client.post("/candidates/", data=new_candidate).exception)
+        res_again = self.client.post("/candidates/", data=new_candidate)
+        self.assertTrue(res_again.status_code, status.HTTP_400_BAD_REQUEST)
         Candidate.objects.get(id=res.json().get("id")).delete()
         # another university
         self.client.logout()
@@ -312,7 +311,10 @@ class CandidateTestCase(AbstractTestCase):
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         res = self.client.post("/candidates/", data=new_candidate)
-        self.assertFalse(res.exception)
+        res_json = {**res.json()}
+        del res_json["id"]
+        del new_candidate["id"]
+        self.assertDictEqual(res_json, new_candidate)
         self.assertEqual(candidate_count + 1, Candidate.objects.count())
         self.client.logout()
         return res.json()
@@ -343,7 +345,8 @@ class CandidateTestCase(AbstractTestCase):
         res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json()
         self.assertDictEqual(res_json, modified_candidate)
         # normal user (put another candidate in the same university)
-        self.assertTrue(self.client.put(f"/candidates/{another_candidate['id']}/", data=another_candidate).exception)
+        res = self.client.put(f"/candidates/{another_candidate['id']}/", data=another_candidate)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
         Candidate.objects.get(id=another_candidate.get("id")).delete()
 
@@ -356,18 +359,20 @@ class CandidateTestCase(AbstractTestCase):
         modified_candidate = CandidateSerializer(instance=self.another_candidate).data
         modified_candidate["desc"] = "ADMIN_NEW_DESC"
         res = self.client.put(f"/candidates/{self.another_candidate.id}/", data=modified_candidate)
-        self.assertTrue(res.exception)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
 
     def test_api_candidates_delete(self):
         existing_candidate = CandidateSerializer(instance=self.new_candidate).data
         # no login
-        self.assertTrue(self.client.delete(f"/candidates/{self.new_candidate.id}/").exception)
+        res = self.client.delete(f"/candidates/{self.new_candidate.id}/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
         self.assertFalse(self.client.delete(f"/candidates/{self.new_candidate.id}/").exception)
         # diff university
-        self.assertTrue(self.client.delete(f"/candidates/{self.another_candidate.id}/").exception)
+        res = self.client.delete(f"/candidates/{self.another_candidate.id}/")
+        self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
         new_candidate = Candidate.objects.create(**existing_candidate)
 
@@ -375,7 +380,8 @@ class CandidateTestCase(AbstractTestCase):
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         self.assertFalse(self.client.delete(f"/candidates/{new_candidate.id}/").exception)
         # diff university
-        self.assertTrue(self.client.delete(f"/candidates/{self.another_candidate.id}/").exception)
+        res = self.client.delete(f"/candidates/{self.another_candidate.id}/")
+        self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
 
 
