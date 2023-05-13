@@ -17,10 +17,11 @@ class UserView(CreateAPIView, ListAPIView):
     permission_classes = [PostOrAdmin]
 
     def get_queryset(self):
-        """Admin can only see users in the same university"""
+        """Non-superuser can only see users in the same university"""
         queryset = self.queryset
-        if isinstance(queryset, QuerySet):
-            queryset = queryset.filter(university_id=self.request.user.university_id)
+        user = self.request.user
+        if isinstance(queryset, QuerySet) and not user.is_superuser:
+            queryset = queryset.filter(university_id=user.university_id)
         return queryset
 
 
