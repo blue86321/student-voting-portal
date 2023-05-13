@@ -1,3 +1,4 @@
+import json
 from typing import Callable
 
 from django.utils import timezone
@@ -6,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
 from elections.models import Election, Position, Candidate
-from elections.serializers import ElectionSerializer
+from elections.serializers import ElectionSerializer, PositionSerializer
 from users.models import University
 from users.serializers import UserSerializer
 
@@ -29,7 +30,11 @@ class ElectionTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
+        new_university_data = {"name": "Santa Clara University"}
+        cls.new_university = University.objects.create(**new_university_data)
+
         new_election_data = {
+            "university_id": cls.new_university.id,
             "election_name": "SCU student council election",
             "desc": "desc for SCU student council election",
             "start_time": timezone.now(),
@@ -46,9 +51,6 @@ class ElectionTestCase(APITestCase):
         }
         cls.new_position = Position.objects.create(**new_position_data)
 
-        new_university_data = {"name": "Santa Clara University"}
-        cls.new_university = University.objects.create(**new_university_data)
-
         new_user_data = {
             "email": "test_email@scu.edu",
             "password": cls.new_user_pwd,
@@ -56,7 +58,6 @@ class ElectionTestCase(APITestCase):
             "university_id": cls.new_university.id,
             "dob": "1990-01-01",
         }
-        # new_user_json = cls.client.post("/users/", data=new_user).json()
         serializer = UserSerializer(data=new_user_data)
         serializer.is_valid(raise_exception=True)
         cls.new_user = serializer.save()
@@ -91,29 +92,37 @@ class ElectionTestCase(APITestCase):
     def test_api_post_elections(self):
         election_count = Election.objects.count()
         existing_election = ElectionSerializer(instance=self.new_election).data
-        res = self.diff_user_call(self.client.post, "/elections/", data=existing_election)
-        # no login
+        res = self.diff_user_call(
+            self.client.post, "/elections/",
+            data={
+                **existing_election,
+                "university_id": json.loads(existing_election.get("university")).get("id")
+            }
+        )
         self.assertTrue(res.no_login.exception)
-        # normal user
         self.assertTrue(res.normal_user.exception)
         # admin
         self.assertFalse(res.admin.exception)
         self.assertEqual(election_count + 1, Election.objects.count())
+        return res.admin.json()
 
     def test_api_put_elections(self):
         existing_election = ElectionSerializer(instance=self.new_election).data
         modified_election = existing_election
         modified_election["desc"] = "NEW_DESC"
-        res = self.diff_user_call(self.client.put, f"/elections/{self.new_election.id}/", data=modified_election)
-        # no login
+        res = self.diff_user_call(
+            self.client.put, f"/elections/{self.new_election.id}/",
+            data={
+                **modified_election,
+                "university_id": json.loads(modified_election.get("university")).get("id")
+            }
+        )
         self.assertTrue(res.no_login.exception)
-        # normal user
         self.assertTrue(res.normal_user.exception)
         # admin
         self.assertFalse(res.admin.exception)
         put_json = res.admin.json()
         self.assertDictEqual(put_json, modified_election)
-        self.client.logout()
 
     def test_api_patch_elections(self):
         existing_election = ElectionSerializer(instance=self.new_election).data
@@ -121,9 +130,7 @@ class ElectionTestCase(APITestCase):
         patch_data = {"desc": "ANOTHER_DESC"}
         modified_election.update(patch_data)
         res = self.diff_user_call(self.client.patch, f"/elections/{self.new_election.id}/", data=patch_data)
-        # no login
         self.assertTrue(res.no_login.exception)
-        # normal user
         self.assertTrue(res.normal_user.exception)
         # admin
         self.assertFalse(res.admin.exception)
@@ -131,15 +138,72 @@ class ElectionTestCase(APITestCase):
         self.assertDictEqual(patch_json, modified_election)
 
     def test_api_delete_elections(self):
-        res = self.diff_user_call(self.client.delete, f"/elections/{self.new_election.id}/")
-        # no login
+        new_election_data = self.test_api_post_elections()
+        res = self.diff_user_call(self.client.delete, f"/elections/{new_election_data['id']}/")
         self.assertTrue(res.no_login.exception)
-        # normal user
         self.assertTrue(res.normal_user.exception)
         # admin
         self.assertFalse(res.admin.exception)
-        deleted_election = Election.objects.get(id=self.new_election.id)
+        deleted_election = Election.objects.get(id=new_election_data['id'])
         self.assertTrue(deleted_election.delete_time)
+
+    def test_api_post_positions(self):
+        position_count = Position.objects.count()
+        existing_position = PositionSerializer(instance=self.new_position).data
+        res = self.diff_user_call(self.client.post, "/positions/", data=existing_position)
+        self.assertTrue(res.no_login.exception)
+        self.assertTrue(res.normal_user.exception)
+        self.assertFalse(res.admin.exception)
+        self.assertEqual(position_count + 1, Position.objects.count())
+        return res.admin.json()
+
+    def test_api_get_positions(self):
+        # Detail
+        get_res = self.client.get(f"/positions/{self.new_position.id}/")
+        get_json = get_res.json()
+        existing_position = PositionSerializer(instance=self.new_position).data
+        self.assertDictEqual(get_json, existing_position)
+        # List
+        position_count = Position.objects.count()
+        list_res = self.client.get("/positions/")
+        list_json = list_res.json()
+        self.assertEqual(len(list_json), position_count)
+
+    def test_api_put_positions(self):
+        existing_position = PositionSerializer(instance=self.new_position).data
+        modified_position = existing_position
+        modified_position["desc"] = "NEW_DESC"
+        modified_position["max_votes_total"] = 2
+        res = self.diff_user_call(self.client.put, f"/positions/{self.new_position.id}/", data=modified_position)
+        self.assertTrue(res.no_login.exception)
+        self.assertTrue(res.normal_user.exception)
+        # admin
+        self.assertFalse(res.admin.exception)
+        put_json = res.admin.json()
+        self.assertDictEqual(put_json, modified_position)
+
+    def test_api_patch_positions(self):
+        existing_position = PositionSerializer(instance=self.new_position).data
+        modified_position = existing_position
+        patch_data = {"desc": "ANOTHER_DESC"}
+        modified_position.update(patch_data)
+        res = self.diff_user_call(self.client.patch, f"/positions/{self.new_position.id}/", data=patch_data)
+        self.assertTrue(res.no_login.exception)
+        self.assertTrue(res.normal_user.exception)
+        # admin
+        self.assertFalse(res.admin.exception)
+        patch_json = res.admin.json()
+        self.assertDictEqual(patch_json, modified_position)
+
+    def test_api_delete_positions(self):
+        new_position_data = self.test_api_post_positions()
+        res = self.diff_user_call(self.client.delete, f"/positions/{new_position_data['id']}/")
+        self.assertTrue(res.no_login.exception)
+        self.assertTrue(res.normal_user.exception)
+        # admin
+        self.assertFalse(res.admin.exception)
+        deleted_position = Position.objects.get(id=new_position_data["id"])
+        self.assertTrue(deleted_position.delete_time)
 
     def diff_user_call(self, callback: Callable, *args, **kwargs):
         """Call `callback` function based on different users, including `no login`, `normal user`, `admin`"""
