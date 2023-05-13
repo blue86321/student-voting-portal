@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from rest_framework import serializers
 
 from student_voting_portal.utils.exceptions import DeleteError
 

@@ -1,6 +1,6 @@
 from django.db import models
 
-from student_voting_portal.utils.BaseModel import BaseModel
+from student_voting_portal.utils.models import BaseModel
 from users.models import User, University
 
 

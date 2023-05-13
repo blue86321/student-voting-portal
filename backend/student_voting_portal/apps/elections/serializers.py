@@ -11,7 +11,7 @@ class PositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Position
-        exclude = ["create_time", "update_time", "delete_time", "election"]
+        exclude = ["create_time", "update_time", "election"]
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -36,7 +36,7 @@ class CandidateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Candidate
-        exclude = ["create_time", "update_time", "delete_time", "election", "position", "user"]
+        exclude = ["create_time", "update_time", "election", "position", "user"]
 
 
 class ElectionSerializer(serializers.ModelSerializer):
@@ -48,10 +48,10 @@ class ElectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Election
-        exclude = ["create_time", "update_time", "delete_time"]
+        exclude = ["create_time", "update_time"]
 
 
 class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
-        exclude = ["create_time", "update_time", "delete_time"]
+        exclude = ["create_time", "update_time"]

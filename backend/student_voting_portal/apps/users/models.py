@@ -3,7 +3,7 @@ import json
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from student_voting_portal.utils.BaseModel import BaseModel
+from student_voting_portal.utils.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 
 
