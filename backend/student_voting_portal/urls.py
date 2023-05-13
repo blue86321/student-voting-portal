@@ -16,15 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
-from elections.views import ElectionView
-
-router = DefaultRouter()
-router.register("elections", ElectionView)
 
 urlpatterns = [
     path("", include("users.urls")),
-    path("", include(router.urls)),
+    path("", include("elections.urls")),
     path("admin/", admin.site.urls),
 ]
