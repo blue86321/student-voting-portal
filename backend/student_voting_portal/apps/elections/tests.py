@@ -1,12 +1,14 @@
 import json
 from typing import Callable
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.response import Response
 
 from rest_framework.test import APITestCase
 
-from elections.models import Election, Position, Candidate
+from elections.models import Election, Position, Candidate, Vote
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer
 from users.models import University
 from users.serializers import UserSerializer
@@ -194,7 +196,6 @@ class ElectionTestCase(AbstractTestCase):
         self.assertTrue(res.normal_user.exception)
         self.assertTrue(res.admin.exception)
 
-
     def test_api_elections_patch(self):
         existing_election = ElectionSerializer(instance=self.new_election).data
         modified_election = existing_election
@@ -215,8 +216,8 @@ class ElectionTestCase(AbstractTestCase):
         self.assertTrue(res.normal_user.exception)
         # admin
         self.assertFalse(res.admin.exception)
-        deleted_election = Election.objects.get(id=new_election_data['id'])
-        self.assertTrue(deleted_election.delete_time)
+        with self.assertRaises(ObjectDoesNotExist):
+            Election.objects.get(id=new_election_data['id'])
 
 
 class PositionTestCase(AbstractTestCase):
@@ -282,8 +283,8 @@ class PositionTestCase(AbstractTestCase):
         self.assertTrue(res.normal_user.exception)
         # admin
         self.assertFalse(res.admin.exception)
-        deleted_position = Position.objects.get(id=new_position_data["id"])
-        self.assertTrue(deleted_position.delete_time)
+        with self.assertRaises(ObjectDoesNotExist):
+            Position.objects.get(id=new_position_data["id"])
 
 
 class CandidateTestCase(AbstractTestCase):
@@ -377,4 +378,44 @@ class CandidateTestCase(AbstractTestCase):
         self.assertTrue(self.client.delete(f"/candidates/{self.another_candidate.id}/").exception)
         self.client.logout()
 
-    # TODO: test cases for positions/candidates/vote
+
+class VoteTestCase(AbstractTestCase):
+
+    def test_api_vote_post(self):
+        vote_data = {
+            "election_id": self.new_election.id,
+            "position_id": self.new_position.id,
+            "candidate_id": self.new_candidate.id,
+            "vote_count": 1,
+        }
+        another_vote_data = {
+            "election_id": self.another_election.id,
+            "position_id": self.another_position.id,
+            "candidate_id": self.another_candidate.id,
+            "vote_count": 1,
+        }
+
+        # no login
+        res = self.client.post("/vote/", data=vote_data)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # normal user
+        self.client.login(email=self.new_user.email, password=self.new_user_pwd)
+        res_json = self.client.post("/vote/", data=vote_data).json()
+        del res_json["id"]
+        self.assertDictEqual(res_json, vote_data)
+        # post again
+        res = self.client.post("/vote/", data=vote_data)
+        self.assertTrue(res.exception)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # another university
+        res = self.client.post("/vote/", data=another_vote_data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.client.logout()
+
+        # admin
+        self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
+        res = self.client.post("/vote/", data=vote_data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.client.logout()
+        return res.json()
