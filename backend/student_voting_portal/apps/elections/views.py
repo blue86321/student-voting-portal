@@ -24,17 +24,8 @@ class CandidateView(BaseViewSet, ModelViewSet):
     queryset = Candidate.objects.all()
     permission_classes = [GetOrAdmin | IsOwnerOrAdmin]
 
-    # def get_queryset(self):
-    #     """Admin can only see users in the same university"""
-    #     queryset = self.queryset
-    #     if isinstance(queryset, QuerySet):
-    #         Election.objects
-    #         queryset = queryset.filter(university_id=self.request.user.university_id)
-    #     return queryset
-
 
 class VoteView(BaseViewSet, CreateAPIView):
     serializer_class = VoteSerializer
     queryset = Vote.objects.all()
     permission_classes = [NormalUserPost]
-
