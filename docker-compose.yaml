@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  django:
+    container_name: django
+    build: backend
+    networks:
+      - local
+    environment:
+      - DB_HOST=database
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./backend/student_voting_portal/:/app/student_voting_portal/
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+  react:
+    container_name: react
+    build: frontend
+    networks:
+      - local
+    volumes:
+      - ./frontend/:/app/src/
+    ports:
+      - 3000:3000
+    depends_on:
+      - django
+  database:
+    container_name: mysql
+    image: mysql:8.0.33-debian
+    platform: linux/amd64
+    restart: always
+    networks:
+      - local
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=root_123
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_HOST=%
+    volumes:
+      - v_mysql:/var/lib/mysql
+      - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 3s
+      retries: 5
+      start_period: 30s
+
+networks:
+  local:
+    driver: bridge
+
+volumes:
+  v_mysql:
