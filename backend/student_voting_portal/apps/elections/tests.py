@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 from typing import Callable
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -46,7 +47,7 @@ class AbstractTestCase(APITestCase):
             "election_name": "SCU student council election",
             "desc": "desc for SCU student council election",
             "start_time": timezone.now(),
-            "end_time": timezone.now(),
+            "end_time": timezone.now() + timedelta(days=1),
         }
         cls.new_election = Election.objects.create(**new_election_data)
         another_election_data = {
@@ -54,7 +55,7 @@ class AbstractTestCase(APITestCase):
             "election_name": "SJSU student council election",
             "desc": "desc for SJSU student council election",
             "start_time": timezone.now(),
-            "end_time": timezone.now(),
+            "end_time": timezone.now() + timedelta(days=1),
         }
         cls.another_election = Election.objects.create(**another_election_data)
 
@@ -407,6 +408,24 @@ class VoteTestCase(AbstractTestCase):
 
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
+        # expired election
+        election = Election.objects.get(id=self.new_election.id)
+        election.end_time = timezone.now()
+        election.save()
+        res = self.client.post("/votes/", data=vote_data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # not yet started election
+        election = Election.objects.get(id=self.new_election.id)
+        election.start_time = timezone.now() + timedelta(days=2)
+        election.end_time = timezone.now()
+        election.save()
+        res = self.client.post("/votes/", data=vote_data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # normal vote
+        election = Election.objects.get(id=self.new_election.id)
+        election.start_time = timezone.now()
+        election.end_time = timezone.now() + timedelta(days=2)
+        election.save()
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # post again

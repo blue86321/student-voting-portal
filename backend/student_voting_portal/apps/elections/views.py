@@ -1,7 +1,10 @@
 from django.db.models import QuerySet
+from django.utils import timezone
+from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from elections.models import Election, Position, Vote, Candidate
@@ -33,6 +36,13 @@ class VoteView(CreateAPIView, ListAPIView):
     permission_classes = [VotePermission]
 
     def create(self, request: Request, *args, **kwargs):
+        # check time between `start_time` and `end_time`
+        election = Election.objects.get(id=request.data.get("election_id"))
+        now = timezone.now()
+        valid_time = election.start_time <= now <= election.end_time
+        if not valid_time:
+            return Response("election not yet starts or already ends", status=status.HTTP_400_BAD_REQUEST)
+
         request.data["user_id"] = request.user.id
         return super().create(request, args, kwargs)
 
