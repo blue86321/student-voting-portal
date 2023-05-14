@@ -8,6 +8,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import User, University
 
 
+class UniversitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = University
+        fields = ["id", "name"]
+
+
 class UserSerializer(serializers.ModelSerializer):
     # write_only: only for serializing (data -> instance)
     # read_only: only for de-serializing (instance -> data)
@@ -16,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
     token = serializers.JSONField(read_only=True)
     university_id = serializers.PrimaryKeyRelatedField(queryset=University.objects.all(), source="university",
                                                        write_only=True)
-    university = serializers.StringRelatedField(read_only=True)
+    university = UniversitySerializer(read_only=True)
 
     class Meta:
         model = User
@@ -86,7 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    university = serializers.CharField(max_length=64, read_only=True)
+    university = UniversitySerializer(read_only=True)
 
     class Meta:
         model = User

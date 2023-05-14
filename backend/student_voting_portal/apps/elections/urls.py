@@ -1,10 +1,15 @@
-from django.urls import path
+from django.urls import path, include
 
 from elections.views import ElectionView, PositionView, CandidateView, VoteView
 
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register("elections", ElectionView)
+router.register("positions", PositionView)
+router.register("candidates", CandidateView)
+
 urlpatterns = [
-    path("elections/", ElectionView.as_view()),
-    path("positions/", PositionView.as_view()),
-    path("candidates/", CandidateView.as_view()),
-    path("vote/", VoteView.as_view()),
+    path("", include(router.urls)),
+    path("votes/", VoteView.as_view()),
 ]

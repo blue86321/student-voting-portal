@@ -75,7 +75,7 @@ class UserTestCase(APITestCase):
 
         user_models.delete()
 
-    def test_api_post_user(self, delete=True):
+    def test_api_user_post(self, delete=True):
         new_user_data = {
             **self.new_user_data,
             "password_confirm": self.new_user_pwd,
@@ -99,8 +99,8 @@ class UserTestCase(APITestCase):
         login_json = login_response.json()
         return login_json
 
-    def test_api_login_user(self):
-        user, register_json = self.test_api_post_user(delete=False)
+    def test_api_user_login(self):
+        user, register_json = self.test_api_user_post(delete=False)
         login_json = self.login_user(user)
         self.assertTrue(
             "token" in login_json and
@@ -127,7 +127,7 @@ class UserTestCase(APITestCase):
             self.assertIsNotNone(refresh_json.get("access"))
 
         # Register
-        user, register_json = self.test_api_post_user(delete=False)
+        user, register_json = self.test_api_user_post(delete=False)
         check_process(register_json)
 
         # Login
@@ -143,7 +143,7 @@ class UserTestCase(APITestCase):
 
     def test_user_detail(self):
         # normal user
-        user, _ = self.test_api_post_user(delete=False)
+        user, _ = self.test_api_user_post(delete=False)
         self.client.login(email=user.email, password=self.new_user_pwd)
         normal_user_res = self.client.get(f"/users/{self.new_admin.pk}")
         self.assertEqual(normal_user_res.status_code, status.HTTP_403_FORBIDDEN)
@@ -161,7 +161,7 @@ class UserTestCase(APITestCase):
 
     def test_list_user(self):
         # normal user
-        user, _ = self.test_api_post_user(delete=False)
+        user, _ = self.test_api_user_post(delete=False)
         self.client.login(email=user.email, password=self.new_user_pwd)
         normal_user_res = self.client.get("/users/")
         self.assertEqual(normal_user_res.status_code, status.HTTP_403_FORBIDDEN)

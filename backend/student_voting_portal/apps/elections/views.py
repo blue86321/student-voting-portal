@@ -1,35 +1,63 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from django.db import transaction
+from django.db.models import QuerySet
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.permissions import IsAdminUser
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from elections.models import Election, Position, Vote, Candidate
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer, VoteSerializer
-from student_voting_portal.utils.BaseViewSet import BaseViewSet
-from student_voting_portal.utils.permissions import GetOrAdmin
+from student_voting_portal.utils.permissions import IsOwnerOrAdmin, VotePermission, Get, IsSameUniversity
 
 
-class ElectionView(BaseViewSet, ModelViewSet):
+class ElectionView(ModelViewSet):
     serializer_class = ElectionSerializer
     queryset = Election.objects.all()
-    permission_classes = [GetOrAdmin]
+    permission_classes = [Get | (IsAdminUser & IsSameUniversity)]
 
 
-class PositionView(BaseViewSet, ModelViewSet):
+class PositionView(ModelViewSet):
     serializer_class = PositionSerializer
     queryset = Position.objects.all()
-    # TODO: only admin can create/update/delete (post/put/patch/delete)
-    # permission_classes = []
+    permission_classes = [Get | (IsAdminUser & IsSameUniversity)]
 
 
-class CandidateView(BaseViewSet, ModelViewSet):
+class CandidateView(ModelViewSet):
     serializer_class = CandidateSerializer
     queryset = Candidate.objects.all()
-    # TODO: only admin or owner user can create/update/delete (post/put/patch/delete)
-    # permission_classes = []
+    permission_classes = [Get | (IsOwnerOrAdmin & IsSameUniversity)]
 
 
-class VoteView(BaseViewSet, CreateAPIView, RetrieveAPIView):
+class VoteView(CreateAPIView, ListAPIView):
     serializer_class = VoteSerializer
     queryset = Vote.objects.all()
-    # TODO: only normal user can create (post)
-    # TODO: everyone can retrieve (get)
-    # permission_classes = []
+    permission_classes = [VotePermission]
+
+    @transaction.atomic
+    def create(self, request: Request, *args, **kwargs):
+        request.data["user_id"] = request.user.id
+
+        # check time between `start_time` and `end_time`
+        election = Election.objects.get(id=request.data.get("election_id"))
+        now = timezone.now()
+        valid_time = election.start_time <= now <= election.end_time
+        if not valid_time:
+            return Response("election not yet starts or already ends", status=status.HTTP_400_BAD_REQUEST)
+
+        # increment candidate `vote_count`
+        candidate = Candidate.objects.get(id=request.data.get("candidate_id"))
+        candidate.vote_count += 1
+        candidate.save()
+
+        # create `vote`
+        return super().create(request, args, kwargs)
+
+    def get_queryset(self):
+        """user can only see his votes"""
+        queryset = self.queryset
+        if isinstance(queryset, QuerySet):
+            queryset = queryset.filter(user_id=self.request.user.id)
+        return queryset

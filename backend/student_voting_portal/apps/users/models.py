@@ -1,7 +1,9 @@
+import json
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from student_voting_portal.utils.BaseModel import BaseModel
+from student_voting_portal.utils.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 
 
@@ -12,9 +14,6 @@ class University(BaseModel, models.Model):
 
     class Meta:
         db_table = "university"
-
-    def __str__(self):
-        return self.name
 
 
 class User(BaseModel, AbstractUser):
