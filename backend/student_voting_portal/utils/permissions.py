@@ -63,8 +63,11 @@ class VotePermission(permissions.IsAuthenticated):
     def has_permission(self, request: Request, view: views.View):
         """Only normal user can vote for elections in the same university"""
         authenticated = super().has_permission(request, view)
-        if request.method == "POST" and authenticated:
-            request_election = Election.objects.get(id=request.data["election_id"])
-            same_university = request.user.university_id == request_election.university_id
-            return not request.user.is_staff and same_university
+        if authenticated:
+            if request.method == "POST":
+                request_election = Election.objects.get(id=request.data["election_id"])
+                same_university = request.user.university_id == request_election.university_id
+                return not request.user.is_staff and same_university
+            if request.method == "GET":
+                return True
         return False

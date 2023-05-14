@@ -1,4 +1,5 @@
-from rest_framework.generics import CreateAPIView
+from django.db.models import QuerySet
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
@@ -26,7 +27,7 @@ class CandidateView(ModelViewSet):
     permission_classes = [Get | (IsOwnerOrAdmin & IsSameUniversity)]
 
 
-class VoteView(CreateAPIView):
+class VoteView(CreateAPIView, ListAPIView):
     serializer_class = VoteSerializer
     queryset = Vote.objects.all()
     permission_classes = [VotePermission]
@@ -34,3 +35,10 @@ class VoteView(CreateAPIView):
     def create(self, request: Request, *args, **kwargs):
         request.data["user_id"] = request.user.id
         return super().create(request, args, kwargs)
+
+    def get_queryset(self):
+        """user can only see his votes"""
+        queryset = self.queryset
+        if isinstance(queryset, QuerySet):
+            queryset = queryset.filter(user_id=self.request.user.id)
+        return queryset

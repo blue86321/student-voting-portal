@@ -407,9 +407,8 @@ class VoteTestCase(AbstractTestCase):
 
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
-        res_json = self.client.post("/votes/", data=vote_data).json()
-        del res_json["id"]
-        self.assertDictEqual(res_json, vote_data)
+        res = self.client.post("/votes/", data=vote_data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # post again
         res = self.client.post("/votes/", data=vote_data)
         self.assertTrue(res.exception)
@@ -424,4 +423,21 @@ class VoteTestCase(AbstractTestCase):
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
-        return res.json()
+        return vote_data
+
+    def test_api_vote_get(self):
+        self.test_api_vote_post()
+        # no login
+        self.assertEqual(self.client.get("/votes/").status_code, status.HTTP_401_UNAUTHORIZED)
+        # normal user
+        self.client.login(email=self.new_user.email, password=self.new_user_pwd)
+        res = self.client.get("/votes/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.json()), len(Vote.objects.filter(user_id=self.new_user.id)))
+        self.client.logout()
+        # admin
+        self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
+        res = self.client.get("/votes/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.json()), 0)  # admin cannot vote
+        self.client.logout()

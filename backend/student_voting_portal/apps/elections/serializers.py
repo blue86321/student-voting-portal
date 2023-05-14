@@ -52,11 +52,18 @@ class ElectionSerializer(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.ModelSerializer):
-    election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
-    position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
-    candidate_id = serializers.PrimaryKeyRelatedField(queryset=Candidate.objects.all(), source="candidate")
+    election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election",
+                                                     write_only=True)
+    position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position",
+                                                     write_only=True)
+    candidate_id = serializers.PrimaryKeyRelatedField(queryset=Candidate.objects.all(), source="candidate",
+                                                      write_only=True)
     user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user", write_only=True)
+
+    election = ElectionSerializer(read_only=True)
+    position = PositionSerializer(read_only=True)
+    candidate = CandidateSerializer(read_only=True)
 
     class Meta:
         model = Vote
-        exclude = ["create_time", "update_time", "election", "position", "candidate", "user"]
+        exclude = ["create_time", "update_time", "user"]
