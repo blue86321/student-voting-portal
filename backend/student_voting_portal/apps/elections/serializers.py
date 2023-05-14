@@ -34,6 +34,7 @@ class CandidateSerializer(serializers.ModelSerializer):
     election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
     position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
     user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
+    vote_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Candidate

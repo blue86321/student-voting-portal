@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 from rest_framework import status
@@ -35,7 +36,10 @@ class VoteView(CreateAPIView, ListAPIView):
     queryset = Vote.objects.all()
     permission_classes = [VotePermission]
 
+    @transaction.atomic
     def create(self, request: Request, *args, **kwargs):
+        request.data["user_id"] = request.user.id
+
         # check time between `start_time` and `end_time`
         election = Election.objects.get(id=request.data.get("election_id"))
         now = timezone.now()
@@ -43,7 +47,12 @@ class VoteView(CreateAPIView, ListAPIView):
         if not valid_time:
             return Response("election not yet starts or already ends", status=status.HTTP_400_BAD_REQUEST)
 
-        request.data["user_id"] = request.user.id
+        # increment candidate `vote_count`
+        candidate = Candidate.objects.get(id=request.data.get("candidate_id"))
+        candidate.vote_count += 1
+        candidate.save()
+
+        # create `vote`
         return super().create(request, args, kwargs)
 
     def get_queryset(self):

@@ -30,6 +30,7 @@ class Candidate(BaseModel, models.Model):
     candidate_name = models.CharField(default="", max_length=255)
     desc = models.TextField(default="", blank=True)
     photo_url = models.CharField(default="", max_length=255, blank=True)
+    vote_count = models.IntegerField(default=0, blank=True)
 
     class Meta:
         unique_together = [("user", "election", "position")]

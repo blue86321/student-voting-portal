@@ -422,12 +422,14 @@ class VoteTestCase(AbstractTestCase):
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         # normal vote
+        candidate = Candidate.objects.get(id=self.new_candidate.id)
         election = Election.objects.get(id=self.new_election.id)
         election.start_time = timezone.now()
         election.end_time = timezone.now() + timedelta(days=2)
         election.save()
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(candidate.vote_count + 1, res.json().get("candidate").get("vote_count"))
         # post again
         res = self.client.post("/votes/", data=vote_data)
         self.assertTrue(res.exception)
