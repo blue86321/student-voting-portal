@@ -1,5 +1,25 @@
 # student-voting-portal
 
+## Docker
+
+### Run
+```shell
+# env is setup, no need to change
+cp .env.example .env
+# Ctrl-C to stop
+docker compose up
+```
+
+### Visit
+- frontend: http://localhost:3000
+- backend: http://localhost:8000
+
+### Destroy
+```shell
+# destroy docker container
+docker compose down
+```
+
 ## Develop Guidelines
 - Branch name / commit message can follow [commitizen](https://github.com/commitizen/cz-cli) format. ([summary](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13))
 ### Branch
