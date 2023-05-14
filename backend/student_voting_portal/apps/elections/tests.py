@@ -155,7 +155,7 @@ class ElectionTestCase(AbstractTestCase):
             self.client.post, "/elections/",
             data={
                 **existing_election,
-                "university_id": json.loads(existing_election.get("university")).get("id")
+                "university_id": existing_election.get("university").get("id")
             }
         )
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -172,7 +172,7 @@ class ElectionTestCase(AbstractTestCase):
             self.client.put, f"/elections/{self.new_election.id}/",
             data={
                 **modified_election,
-                "university_id": json.loads(modified_election.get("university")).get("id")
+                "university_id": modified_election.get("university").get("id")
             }
         )
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -189,7 +189,7 @@ class ElectionTestCase(AbstractTestCase):
             self.client.put, f"/elections/{self.another_election.id}/",
             data={
                 **modified_election,
-                "university_id": json.loads(modified_election.get("university")).get("id")
+                "university_id": modified_election.get("university").get("id")
             }
         )
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)

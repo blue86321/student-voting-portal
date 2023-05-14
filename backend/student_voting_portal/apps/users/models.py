@@ -15,9 +15,6 @@ class University(BaseModel, models.Model):
     class Meta:
         db_table = "university"
 
-    def __str__(self):
-        return json.dumps({"id": self.id, "name": self.name})
-
 
 class User(BaseModel, AbstractUser):
     """Custom user model"""

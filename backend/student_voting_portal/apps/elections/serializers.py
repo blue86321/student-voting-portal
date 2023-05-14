@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from elections.models import Election, Position, Vote, Candidate
 from users.models import University, User
+from users.serializers import UniversitySerializer
 
 
 class PositionSerializer(serializers.ModelSerializer):
@@ -44,7 +45,7 @@ class ElectionSerializer(serializers.ModelSerializer):
     candidates = CandidateSerializer(many=True, read_only=True)
     university_id = serializers.PrimaryKeyRelatedField(queryset=University.objects.all(), source="university",
                                                        write_only=True)
-    university = serializers.StringRelatedField(read_only=True)
+    university = UniversitySerializer(read_only=True)
 
     class Meta:
         model = Election
