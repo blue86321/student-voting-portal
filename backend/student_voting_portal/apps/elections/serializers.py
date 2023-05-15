@@ -15,7 +15,7 @@ class PositionSerializer(serializers.HyperlinkedModelSerializer):
         model = Position
         exclude = ["create_time", "update_time", "election"]
 
-    def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
+    def validate(self, attrs: Dict[str, Any]):
         """
         Validate attributes
         :param attrs: raw attributes
@@ -69,6 +69,24 @@ class VoteSerializer(serializers.HyperlinkedModelSerializer):
     election = ElectionSerializer(read_only=True)
     position = PositionSerializer(read_only=True)
     candidate = CandidateSerializer(read_only=True)
+
+    def validate(self, attrs: Dict[str, Any]):
+        vote_count: int = attrs.get("vote_count")
+        position: Position = attrs.get("position")
+        if position.max_votes_per_candidate < vote_count:
+            raise serializers.ValidationError("vote count exceeds")
+        return attrs
+
+    def validate_election_id(self, model: Election):
+        # get user
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        # check university
+        if user.university_id != model.university.id:
+            raise serializers.ValidationError("user can only vote for his/her university elections")
+        return model
 
     class Meta:
         model = Vote

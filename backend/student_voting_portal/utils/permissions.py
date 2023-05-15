@@ -48,13 +48,7 @@ class VotePermission(permissions.IsAuthenticated):
         authenticated = super().has_permission(request, view)
         if authenticated:
             if request.method == "POST":
-                election_id = request.data.get("election_id")
-                if not election_id:
-                    return False
-
-                request_election = Election.objects.get(id=election_id)
-                same_university = request.user.university_id == request_election.university_id
-                return not request.user.is_staff and same_university
+                return not request.user.is_staff
             if request.method == "GET":
                 return True
         return False
