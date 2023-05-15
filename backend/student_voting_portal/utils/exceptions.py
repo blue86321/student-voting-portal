@@ -2,6 +2,9 @@ from django.db import DatabaseError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
+import logging
+
+logger = logging.getLogger()
 
 
 def exception_handler(exc, context):
@@ -16,6 +19,6 @@ def exception_handler(exc, context):
         view = context['view']
         # Add Database error
         if isinstance(exc, DatabaseError):
-            # logger.error()
+            logger.error(exc.args)
             response = Response({"message": "database error"}, status=status.HTTP_507_INSUFFICIENT_STORAGE)
     return response

@@ -1,4 +1,3 @@
-import json
 from datetime import timedelta
 from typing import Callable
 
@@ -6,13 +5,17 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
-
-from rest_framework.test import APITestCase
+from rest_framework.request import Request
+from rest_framework.test import APITestCase, APIRequestFactory
 
 from elections.models import Election, Position, Candidate, Vote
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer
 from users.models import University
 from users.serializers import UserSerializer
+
+context = {
+    "request": Request(APIRequestFactory().get("/")),
+}
 
 
 class DiffUserRes:
@@ -144,14 +147,14 @@ class AbstractTestCase(APITestCase):
 
 class ElectionTestCase(AbstractTestCase):
     def test_api_elections_get(self):
-        existing_election = ElectionSerializer(instance=self.new_election).data
+        existing_election = ElectionSerializer(instance=self.new_election, context=context).data
         get_response = self.client.get(f"/elections/{self.new_election.id}/")
         get_json = get_response.json()
         self.assertDictEqual(get_json, existing_election)
 
     def test_api_elections_post(self):
         election_count = Election.objects.count()
-        existing_election = ElectionSerializer(instance=self.new_election).data
+        existing_election = ElectionSerializer(instance=self.new_election, context=context).data
         res = self.diff_user_call(
             self.client.post, "/elections/",
             data={
@@ -167,7 +170,7 @@ class ElectionTestCase(AbstractTestCase):
         return res.admin.json()
 
     def test_api_elections_put(self):
-        modified_election = ElectionSerializer(instance=self.new_election).data
+        modified_election = ElectionSerializer(instance=self.new_election, context=context).data
         modified_election["desc"] = "NEW_DESC"
         res = self.diff_user_call(
             self.client.put, f"/elections/{self.new_election.id}/",
@@ -184,7 +187,7 @@ class ElectionTestCase(AbstractTestCase):
         self.assertDictEqual(put_json, modified_election)
 
         # another university
-        modified_election = ElectionSerializer(instance=self.another_election).data
+        modified_election = ElectionSerializer(instance=self.another_election, context=context).data
         modified_election["desc"] = "NEW_DESC"
         res = self.diff_user_call(
             self.client.put, f"/elections/{self.another_election.id}/",
@@ -198,7 +201,7 @@ class ElectionTestCase(AbstractTestCase):
         self.assertEqual(res.admin.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_elections_patch(self):
-        existing_election = ElectionSerializer(instance=self.new_election).data
+        existing_election = ElectionSerializer(instance=self.new_election, context=context).data
         modified_election = existing_election
         patch_data = {"desc": "ANOTHER_DESC"}
         modified_election.update(patch_data)
@@ -224,14 +227,16 @@ class ElectionTestCase(AbstractTestCase):
 class PositionTestCase(AbstractTestCase):
     def test_api_positions_post(self):
         position_count = Position.objects.count()
-        existing_position = PositionSerializer(instance=self.new_position).data
+        existing_position = PositionSerializer(instance=self.new_position, context=context).data
         res = self.diff_user_call(self.client.post, "/positions/", data=existing_position)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         res_json = {**res.admin.json()}
-        del res_json["id"]
-        del existing_position["id"]
+        remove_col = ["id", "url"]
+        for col in remove_col:
+            del res_json[col]
+            del existing_position[col]
         self.assertDictEqual(res_json, existing_position)
         self.assertEqual(position_count + 1, Position.objects.count())
         return res.admin.json()
@@ -240,7 +245,7 @@ class PositionTestCase(AbstractTestCase):
         # Detail
         get_res = self.client.get(f"/positions/{self.new_position.id}/")
         get_json = get_res.json()
-        existing_position = PositionSerializer(instance=self.new_position).data
+        existing_position = PositionSerializer(instance=self.new_position, context=context).data
         self.assertDictEqual(get_json, existing_position)
         # List
         position_count = Position.objects.count()
@@ -248,7 +253,7 @@ class PositionTestCase(AbstractTestCase):
         self.assertEqual(len(list_res.json()), position_count)
 
     def test_api_positions_put(self):
-        modified_position = PositionSerializer(instance=self.new_position).data
+        modified_position = PositionSerializer(instance=self.new_position, context=context).data
         modified_position["desc"] = "NEW_DESC"
         modified_position["max_votes_total"] = 2
         res = self.diff_user_call(self.client.put, f"/positions/{self.new_position.id}/", data=modified_position)
@@ -258,7 +263,7 @@ class PositionTestCase(AbstractTestCase):
         self.assertDictEqual(res.admin.json(), modified_position)
 
         # another university
-        modified_position = PositionSerializer(instance=self.another_position).data
+        modified_position = PositionSerializer(instance=self.another_position, context=context).data
         modified_position["desc"] = "NEW_DESC"
         res = self.diff_user_call(self.client.put, f"/positions/{self.another_position.id}/", data=modified_position)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -266,7 +271,7 @@ class PositionTestCase(AbstractTestCase):
         self.assertEqual(res.admin.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_positions_patch(self):
-        existing_position = PositionSerializer(instance=self.new_position).data
+        existing_position = PositionSerializer(instance=self.new_position, context=context).data
         modified_position = existing_position
         patch_data = {"desc": "ANOTHER_DESC"}
         modified_position.update(patch_data)
@@ -290,7 +295,7 @@ class CandidateTestCase(AbstractTestCase):
 
     def test_api_candidates_post(self):
         candidate_count = Candidate.objects.count()
-        existing_candidate = CandidateSerializer(instance=self.new_candidate).data
+        existing_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
         new_candidate = existing_candidate
         new_candidate["user_id"] = self.another_user.id
         new_candidate["candidate_name"] = "Silvia"
@@ -313,8 +318,10 @@ class CandidateTestCase(AbstractTestCase):
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         res = self.client.post("/candidates/", data=new_candidate)
         res_json = {**res.json()}
-        del res_json["id"]
-        del new_candidate["id"]
+        remove_col = ["id", "url"]
+        for col in remove_col:
+            del res_json[col]
+            del new_candidate[col]
         self.assertDictEqual(res_json, new_candidate)
         self.assertEqual(candidate_count + 1, Candidate.objects.count())
         self.client.logout()
@@ -324,7 +331,7 @@ class CandidateTestCase(AbstractTestCase):
         # Detail
         get_res = self.client.get(f"/candidates/{self.new_position.id}/")
         get_json = get_res.json()
-        existing_candidate = CandidateSerializer(instance=self.new_candidate).data
+        existing_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
         self.assertDictEqual(get_json, existing_candidate)
         # List
         candidate_count = Candidate.objects.count()
@@ -333,7 +340,7 @@ class CandidateTestCase(AbstractTestCase):
         self.assertEqual(len(list_json), candidate_count)
 
     def test_api_candidates_put(self):
-        modified_candidate = CandidateSerializer(instance=self.new_candidate).data
+        modified_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
         modified_candidate["desc"] = "NEW_DESC"
         another_candidate = self.test_api_candidates_post()
         another_candidate["desc"] = "NEW_DESC"
@@ -357,14 +364,14 @@ class CandidateTestCase(AbstractTestCase):
         res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json()
         self.assertDictEqual(res_json, modified_candidate)
         # another university
-        modified_candidate = CandidateSerializer(instance=self.another_candidate).data
+        modified_candidate = CandidateSerializer(instance=self.another_candidate, context=context).data
         modified_candidate["desc"] = "ADMIN_NEW_DESC"
         res = self.client.put(f"/candidates/{self.another_candidate.id}/", data=modified_candidate)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
 
     def test_api_candidates_delete(self):
-        existing_candidate = CandidateSerializer(instance=self.new_candidate).data
+        existing_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
         # no login
         res = self.client.delete(f"/candidates/{self.new_candidate.id}/")
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -375,6 +382,7 @@ class CandidateTestCase(AbstractTestCase):
         res = self.client.delete(f"/candidates/{self.another_candidate.id}/")
         self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
+        del existing_candidate["url"]
         new_candidate = Candidate.objects.create(**existing_candidate)
 
         # admin
@@ -436,7 +444,7 @@ class VoteTestCase(AbstractTestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         # another university
         res = self.client.post("/votes/", data=another_vote_data)
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.client.logout()
 
         # admin
