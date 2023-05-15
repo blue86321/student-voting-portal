@@ -7,7 +7,8 @@ from users.models import University, User
 from users.serializers import UniversitySerializer
 
 
-class PositionSerializer(serializers.ModelSerializer):
+class PositionSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
 
     class Meta:
@@ -30,7 +31,8 @@ class PositionSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class CandidateSerializer(serializers.ModelSerializer):
+class CandidateSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
     position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
     user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
@@ -41,7 +43,8 @@ class CandidateSerializer(serializers.ModelSerializer):
         exclude = ["create_time", "update_time", "election", "position", "user"]
 
 
-class ElectionSerializer(serializers.ModelSerializer):
+class ElectionSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     positions = PositionSerializer(many=True, read_only=True)
     candidates = CandidateSerializer(many=True, read_only=True)
     university_id = serializers.PrimaryKeyRelatedField(queryset=University.objects.all(), source="university",
@@ -53,7 +56,8 @@ class ElectionSerializer(serializers.ModelSerializer):
         exclude = ["create_time", "update_time"]
 
 
-class VoteSerializer(serializers.ModelSerializer):
+class VoteSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election",
                                                      write_only=True)
     position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position",

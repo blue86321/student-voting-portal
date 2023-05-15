@@ -8,13 +8,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import User, University
 
 
-class UniversitySerializer(serializers.ModelSerializer):
+class UniversitySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = University
-        fields = ["id", "name"]
+        fields = ["id", "url", "name"]
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     # write_only: only for serializing (data -> instance)
     # read_only: only for de-serializing (instance -> data)
     remove_on_create_fields = ["password_confirm"]
@@ -26,7 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "password", "password_confirm", "university_id", "university", "dob", "token",
+        fields = ["id", "url", "email", "password", "password_confirm", "university_id", "university", "dob", "token",
                   "is_staff"]
 
         # edit column labels
@@ -96,4 +96,4 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "university", "dob", "is_staff"]
+        fields = ["id", "url", "email", "university", "dob", "is_staff"]
