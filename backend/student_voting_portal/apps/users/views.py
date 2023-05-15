@@ -1,10 +1,10 @@
 from django.db.models import QuerySet
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from student_voting_portal.apps.users.serializers import UserSerializer, UserDetailSerializer
 from users.models import University, User
-from student_voting_portal.utils.permissions import IsPkOrAdmin, PostOrAdmin
+from student_voting_portal.utils.permissions import Post, IsOwnerOrAdmin
 
 
 class UserView(CreateAPIView, ListAPIView):
@@ -14,7 +14,7 @@ class UserView(CreateAPIView, ListAPIView):
     """
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = [PostOrAdmin]
+    permission_classes = [Post | IsAdminUser]
 
     def get_queryset(self):
         """Non-superuser can only see users in the same university"""
@@ -40,4 +40,4 @@ class UserDetailView(RetrieveAPIView):
     """Use case: for admin to access a user detail"""
     serializer_class = UserDetailSerializer
     queryset = User.objects.all()
-    permission_classes = [IsPkOrAdmin]
+    permission_classes = [IsOwnerOrAdmin]
