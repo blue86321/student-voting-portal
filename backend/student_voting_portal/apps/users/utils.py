@@ -14,7 +14,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         :return: enhanced attrs
         """
         data = super().validate(attrs)
-        serializer = UserSerializer(instance=self.user)
+        serializer = UserSerializer(instance=self.user, context=self.context)
         return {
             **serializer.data,
             "token": {

@@ -2,11 +2,11 @@ from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from elections.models import Election, Position, Vote, Candidate
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer, VoteSerializer
@@ -31,13 +31,15 @@ class CandidateView(ModelViewSet):
     permission_classes = [Get | (IsOwnerOrAdmin & IsSameUniversity)]
 
 
-class VoteView(CreateAPIView, ListAPIView):
+class VoteView(CreateAPIView, ListAPIView, RetrieveAPIView, GenericViewSet):
     serializer_class = VoteSerializer
     queryset = Vote.objects.all()
     permission_classes = [VotePermission]
 
     @transaction.atomic
     def create(self, request: Request, *args, **kwargs):
+        if hasattr(request.data, "_mutable"):
+            request.data._mutable = True
         request.data["user_id"] = request.user.id
 
         # check time between `start_time` and `end_time`

@@ -16,9 +16,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from elections.views import ElectionView, PositionView, CandidateView, VoteView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from users.views import UserView, UserOwnerView, UniversityView
+from student_voting_portal.views import HybridRouter
+
+router = HybridRouter()
+
+# users
+router.register("university", UniversityView)
+router.register("users", UserView)
+router.add_api_view("me", path("me/", UserOwnerView.as_view(), name="me"))
+router.add_api_view("auth", path("authentication/", TokenObtainPairView.as_view(), name="auth"))
+router.add_api_view("auth-refresh", path("authentication/refresh/", TokenRefreshView.as_view(), name="auth-refresh"))
+
+# elections
+router.register("elections", ElectionView)
+router.register("positions", PositionView)
+router.register("candidates", CandidateView)
+router.register("votes", VoteView)
 
 urlpatterns = [
-    path("", include("users.urls")),
-    path("", include("elections.urls")),
+    path("", include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path("admin/", admin.site.urls),
 ]

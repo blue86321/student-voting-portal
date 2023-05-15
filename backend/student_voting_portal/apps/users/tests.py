@@ -2,7 +2,12 @@ from rest_framework import serializers, status
 
 from users.models import User, University
 from users.serializers import UserSerializer
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework.request import Request
+
+context = {
+    "request": Request(APIRequestFactory().get("/")),
+}
 
 
 class UserTestCase(APITestCase):
@@ -30,7 +35,7 @@ class UserTestCase(APITestCase):
             "dob": "1995-01-01",
             "university_id": another_university.id,
         }
-        user_serializer = UserSerializer(data=another_user_data)
+        user_serializer = UserSerializer(data=another_user_data, context=context)
         user_serializer.is_valid(raise_exception=True)
         user_serializer.save()
 
@@ -42,14 +47,14 @@ class UserTestCase(APITestCase):
             "dob": "1980-01-01",
             "is_staff": 1,
         }
-        admin_serializer = UserSerializer(data=new_admin_data)
+        admin_serializer = UserSerializer(data=new_admin_data, context=context)
         admin_serializer.is_valid()
         cls.new_admin: User = admin_serializer.save()
 
     def test_user_serializer(self):
         # no `password_confirm`, should raise `ValidationError`
         with self.assertRaises(serializers.ValidationError) as pwd_error:
-            serializer = UserSerializer(data=self.new_user_data)
+            serializer = UserSerializer(data=self.new_user_data, context=context)
             serializer.is_valid(raise_exception=True)
         self.assertIsNotNone(pwd_error.exception.detail.get("password_confirm"))
 
@@ -59,12 +64,13 @@ class UserTestCase(APITestCase):
                 **self.new_user_data,
                 "password_confirm": self.new_user_data.get("password"),
                 "dob": "2015-01-01",
-            })
+            }, context=context)
             serializer.is_valid(raise_exception=True)
         self.assertIsNotNone(age_error.exception.detail.get("dob"))
 
         # validation
-        serializer = UserSerializer(data={**self.new_user_data, "password_confirm": self.new_user_data.get("password")})
+        serializer = UserSerializer(data={**self.new_user_data, "password_confirm": self.new_user_data.get("password")},
+                                    context=context)
         self.assertEqual(serializer.is_valid(), True)
 
         # save
@@ -117,7 +123,7 @@ class UserTestCase(APITestCase):
             self.assertIsNotNone(access_token)
             self.assertIsNotNone(refresh_token)
             # Retrieve
-            retrieve_res = self.client.get("/users/me/", headers={"Authorization": "Bearer " + access_token})
+            retrieve_res = self.client.get("/me/", headers={"Authorization": "Bearer " + access_token})
             retrieve_json = retrieve_res.json()
             self.assertEqual(retrieve_json.get("email"), user.email)
             # Refresh
@@ -145,13 +151,13 @@ class UserTestCase(APITestCase):
         # normal user
         user, _ = self.test_api_user_post(delete=False)
         self.client.login(email=user.email, password=self.new_user_pwd)
-        normal_user_res = self.client.get(f"/users/{self.new_admin.pk}")
+        normal_user_res = self.client.get(f"/users/{self.new_admin.pk}/")
         self.assertEqual(normal_user_res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
 
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
-        admin_res = self.client.get(f"/users/{user.pk}")
+        admin_res = self.client.get(f"/users/{user.pk}/")
         self.assertEqual(admin_res.status_code, status.HTTP_200_OK)
         retrieve_json = admin_res.json()
         self.assertEqual(retrieve_json.get("id"), user.pk)
