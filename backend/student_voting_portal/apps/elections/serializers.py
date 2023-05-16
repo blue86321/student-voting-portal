@@ -27,8 +27,6 @@ class PositionSerializer(serializers.HyperlinkedModelSerializer):
         max_votes_total = attrs.get("max_votes_total") or self.instance.max_votes_total
         if max_votes_total < max_votes_per_candidate:
             raise serializers.ValidationError("`max_votes_total` cannot be less than `max_votes_per_candidate`")
-        if max_votes_total % max_votes_per_candidate != 0:
-            raise serializers.ValidationError("`max_votes_total` must be divided by `max_votes_per_candidate`")
         return attrs
 
 
