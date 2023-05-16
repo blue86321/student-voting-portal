@@ -123,15 +123,15 @@ class VoteCandidateView(APIView):
         ret = self.serialize_vote_list(queryset)
         return Response(ret, status.HTTP_200_OK)
 
-    def serialize_vote_list(self, vote_list: List[Vote]) -> List[Dict[str, Any]]:
+    def serialize_vote_list(self, vote_list: List[Vote]) -> Dict[str, List[Dict[str, Any]]]:
         election_idx_map = {}
         position_idx_map = {}
-        ret = []
+        formatted_list = []
         for vote in vote_list:
             if vote.election.id not in election_idx_map:
-                election_idx_map[vote.election.id] = len(ret)
+                election_idx_map[vote.election.id] = len(formatted_list)
                 position_idx_map[vote.position.id] = 0
-                ret.append({
+                formatted_list.append({
                     "election": {
                         "id": vote.election.id,
                         "election_name": vote.election.election_name,
@@ -150,8 +150,8 @@ class VoteCandidateView(APIView):
             else:
                 election_idx = election_idx_map.get(vote.election.id)
                 if vote.position.id not in position_idx_map:
-                    position_idx_map[vote.position.id] = len(ret[election_idx]["votes"])
-                    ret[election_idx]["votes"].append({
+                    position_idx_map[vote.position.id] = len(formatted_list[election_idx]["votes"])
+                    formatted_list[election_idx]["votes"].append({
                         "position": PositionSerializer(vote.position, context={"request": self.request}).data,
                         "candidates": [{
                             "candidate": CandidateSerializer(vote.candidate, context={"request": self.request}).data,
@@ -160,8 +160,8 @@ class VoteCandidateView(APIView):
                     })
                 else:
                     position_idx = position_idx_map[vote.position.id]
-                    ret[election_idx]["votes"][position_idx]["candidates"].append({
+                    formatted_list[election_idx]["votes"][position_idx]["candidates"].append({
                         "candidate": CandidateSerializer(vote.candidate, context={"request": self.request}).data,
                         "vote_count": vote.vote_count,
                     })
-        return ret
+        return {"result": formatted_list}

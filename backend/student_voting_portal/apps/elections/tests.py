@@ -458,7 +458,7 @@ class VoteTestCase(AbstractTestCase):
         election.save()
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(candidate.vote_count + 1, res.json()[0]["votes"][0]["candidates"][0]["vote_count"])
+        self.assertEqual(candidate.vote_count + 1, res.json()["result"][0]["votes"][0]["candidates"][0]["vote_count"])
         # post again
         res = self.client.post("/votes/", data=vote_data)
         self.assertTrue(res.exception)
