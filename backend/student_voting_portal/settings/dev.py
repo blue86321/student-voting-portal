@@ -181,6 +181,10 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "DEFAULT_RENDERER_CLASSES": (
+        "student_voting_portal.utils.renderer.JSONResponseRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    )
 }
 
 # Django default auth user model

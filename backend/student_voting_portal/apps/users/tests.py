@@ -87,7 +87,7 @@ class UserTestCase(APITestCase):
             "password_confirm": self.new_user_pwd,
         }
         register_response = self.client.post("/users/", new_user_data)
-        register_json = register_response.json()
+        register_json = register_response.json().get("data")
         self.assertEqual(register_response.status_code, status.HTTP_201_CREATED)
         user = User.objects.get(email=self.new_user_data.get("email"))
         self.assertEqual(user.email, self.new_user_data.get("email"))
@@ -102,7 +102,7 @@ class UserTestCase(APITestCase):
             "password": self.new_user_pwd,
         }
         login_response = self.client.post("/authentication/", auth_data)
-        login_json = login_response.json()
+        login_json = login_response.json().get("data")
         return login_json
 
     def test_api_user_login(self):
@@ -124,12 +124,12 @@ class UserTestCase(APITestCase):
             self.assertIsNotNone(refresh_token)
             # Retrieve
             retrieve_res = self.client.get("/me/", headers={"Authorization": "Bearer " + access_token})
-            retrieve_json = retrieve_res.json()
+            retrieve_json = retrieve_res.json().get("data")
             self.assertEqual(retrieve_json.get("email"), user.email)
             # Refresh
             refresh_data = {"refresh": refresh_token}
             refresh_res = self.client.post("/authentication/refresh/", refresh_data)
-            refresh_json = refresh_res.json()
+            refresh_json = refresh_res.json().get("data")
             self.assertIsNotNone(refresh_json.get("access"))
 
         # Register
@@ -159,7 +159,7 @@ class UserTestCase(APITestCase):
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         admin_res = self.client.get(f"/users/{user.pk}/")
         self.assertEqual(admin_res.status_code, status.HTTP_200_OK)
-        retrieve_json = admin_res.json()
+        retrieve_json = admin_res.json().get("data")
         self.assertEqual(retrieve_json.get("id"), user.pk)
         self.client.logout()
 
@@ -177,7 +177,7 @@ class UserTestCase(APITestCase):
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         admin_res = self.client.get("/users/")
         self.assertEqual(admin_res.status_code, status.HTTP_200_OK)
-        retrieve_json = admin_res.json()
+        retrieve_json = admin_res.json().get("data")
         self.assertEqual(len(retrieve_json), len(User.objects.filter(university_id=self.new_admin.university_id)))
         self.client.logout()
 

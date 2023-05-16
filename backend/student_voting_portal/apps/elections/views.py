@@ -53,13 +53,13 @@ class VoteCandidateView(APIView):
     @transaction.atomic
     def post(self, request: Request):
         if not request.data:
-            return Response("data cannot be empty", status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "data cannot be empty"}, status.HTTP_400_BAD_REQUEST)
         data = request.data
         user_id = request.user.id
         election_id: int = data.get("election_id")
         votes: List[Dict[str, Any]] = data.get("votes")
         if not election_id or not votes:
-            return Response("invalid data", status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "invalid data"}, status.HTTP_400_BAD_REQUEST)
 
         vote_serializer_list: List[VoteSerializer] = []
         for vote_position in votes:
@@ -67,7 +67,7 @@ class VoteCandidateView(APIView):
             position_id = vote_position.get("position_id")
             candidates = vote_position.get("candidates")
             if not position_id or not candidates:
-                return Response("invalid data", status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "invalid data"}, status.HTTP_400_BAD_REQUEST)
 
             position = Position.objects.get(id=position_id)
             serializer_list_for_position: List[VoteSerializer] = []
@@ -76,7 +76,7 @@ class VoteCandidateView(APIView):
                 candidate_id = vote_candidate.get("candidate_id")
                 vote_count = vote_candidate.get("vote_count")
                 if not candidate_id or not vote_count:
-                    return Response("invalid data", status.HTTP_400_BAD_REQUEST)
+                    return Response({"detail": "invalid data"}, status.HTTP_400_BAD_REQUEST)
 
                 vote_serializer = VoteSerializer(
                     data={
@@ -95,7 +95,8 @@ class VoteCandidateView(APIView):
             # check total vote count
             total_vote_count = sum([s.validated_data.get("vote_count") for s in serializer_list_for_position])
             if position.max_votes_total < total_vote_count:
-                return Response(f"max total vote exceeds for position {position.id}", status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": f"max total vote exceeds for position {position.id}"},
+                                status.HTTP_400_BAD_REQUEST)
             # add to total list
             vote_serializer_list.extend(serializer_list_for_position)
 
