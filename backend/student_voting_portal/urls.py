@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from elections.views import ElectionView, PositionView, CandidateView, VoteView
+from elections.views import ElectionView, PositionView, CandidateView, VoteCandidateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from users.views import UserView, UserOwnerView, UniversityView
@@ -35,7 +35,7 @@ router.add_api_view("auth-refresh", path("authentication/refresh/", TokenRefresh
 router.register("elections", ElectionView)
 router.register("positions", PositionView)
 router.register("candidates", CandidateView)
-router.register("votes", VoteView)
+router.add_api_view("votes", path("votes/", VoteCandidateView.as_view(), name="votes"))
 
 urlpatterns = [
     path("", include(router.urls)),

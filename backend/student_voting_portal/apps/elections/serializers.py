@@ -1,6 +1,7 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from rest_framework import serializers
+from django.utils import timezone
 
 from elections.models import Election, Position, Vote, Candidate
 from users.models import University, User
@@ -71,22 +72,21 @@ class VoteSerializer(serializers.HyperlinkedModelSerializer):
     candidate = CandidateSerializer(read_only=True)
 
     def validate(self, attrs: Dict[str, Any]):
+        # check time
+        election: Union[Election, None] = attrs.get("election")
+        valid_time = election.start_time <= timezone.now() <= election.end_time
+        if not valid_time:
+            raise serializers.ValidationError("election not yet starts or already ends")
+        # check university
+        user: Union[User, None] = attrs.get("user")
+        if not user or not election or user.university_id != election.university.id:
+            raise serializers.ValidationError("user can only vote for his/her university elections")
+        # check vote_count
         vote_count: int = attrs.get("vote_count")
-        position: Position = attrs.get("position")
-        if position.max_votes_per_candidate < vote_count:
+        position: Union[Position, None] = attrs.get("position")
+        if position and position.max_votes_per_candidate < vote_count:
             raise serializers.ValidationError("vote count exceeds")
         return attrs
-
-    def validate_election_id(self, model: Election):
-        # get user
-        user = None
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-        # check university
-        if user.university_id != model.university.id:
-            raise serializers.ValidationError("user can only vote for his/her university elections")
-        return model
 
     class Meta:
         model = Vote
