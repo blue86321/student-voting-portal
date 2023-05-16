@@ -33,10 +33,19 @@ python manage.py migrate
 python manage.py test
 ```
 
+### Create superuser
+```shell
+python manage.py createsuperuser --email test@scu.edu
+# Then set password for superuser
+```
+
 ### Run the server
 ```shell
 python manage.py runserver
 ```
+
+- visit API Root page: http://localhost:8000
+- Login with superuser to have full permission in API Root page
 
 ### Exit venv
 ```shell
