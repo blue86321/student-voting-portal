@@ -154,7 +154,7 @@ class ElectionTestCase(AbstractTestCase):
     def test_api_elections_get(self):
         existing_election = ElectionSerializer(instance=self.new_election, context=context).data
         get_response = self.client.get(f"/elections/{self.new_election.id}/")
-        get_json = get_response.json()
+        get_json = get_response.json().get("data")
         self.assertDictEqual(get_json, existing_election)
 
     def test_api_elections_post(self):
@@ -172,7 +172,7 @@ class ElectionTestCase(AbstractTestCase):
         # admin
         self.assertFalse(res.admin.exception)
         self.assertEqual(election_count + 1, Election.objects.count())
-        return res.admin.json()
+        return res.admin.json().get("data")
 
     def test_api_elections_put(self):
         modified_election = ElectionSerializer(instance=self.new_election, context=context).data
@@ -188,7 +188,7 @@ class ElectionTestCase(AbstractTestCase):
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
-        put_json = res.admin.json()
+        put_json = res.admin.json().get("data")
         self.assertDictEqual(put_json, modified_election)
 
         # another university
@@ -215,7 +215,7 @@ class ElectionTestCase(AbstractTestCase):
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         self.assertFalse(res.admin.exception)
-        patch_json = res.admin.json()
+        patch_json = res.admin.json().get("data")
         self.assertDictEqual(patch_json, modified_election)
 
     def test_api_elections_delete(self):
@@ -237,25 +237,25 @@ class PositionTestCase(AbstractTestCase):
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
-        res_json = {**res.admin.json()}
+        res_json = {**res.admin.json().get("data")}
         remove_col = ["id", "url"]
         for col in remove_col:
             del res_json[col]
             del existing_position[col]
         self.assertDictEqual(res_json, existing_position)
         self.assertEqual(position_count + 1, Position.objects.count())
-        return res.admin.json()
+        return res.admin.json().get("data")
 
     def test_api_positions_get(self):
         # Detail
         get_res = self.client.get(f"/positions/{self.new_position.id}/")
-        get_json = get_res.json()
+        get_json = get_res.json().get("data")
         existing_position = PositionSerializer(instance=self.new_position, context=context).data
         self.assertDictEqual(get_json, existing_position)
         # List
         position_count = Position.objects.count()
         list_res = self.client.get("/positions/")
-        self.assertEqual(len(list_res.json()), position_count)
+        self.assertEqual(len(list_res.json().get("data")), position_count)
 
     def test_api_positions_put(self):
         modified_position = PositionSerializer(instance=self.new_position, context=context).data
@@ -265,7 +265,7 @@ class PositionTestCase(AbstractTestCase):
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
-        self.assertDictEqual(res.admin.json(), modified_position)
+        self.assertDictEqual(res.admin.json().get("data"), modified_position)
 
         # another university
         modified_position = PositionSerializer(instance=self.another_position, context=context).data
@@ -283,7 +283,7 @@ class PositionTestCase(AbstractTestCase):
         res = self.diff_user_call(self.client.patch, f"/positions/{self.new_position.id}/", data=patch_data)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertDictEqual(res.admin.json(), modified_position)
+        self.assertDictEqual(res.admin.json().get("data"), modified_position)
 
     def test_api_positions_delete(self):
         new_position_data = self.test_api_positions_post()
@@ -315,14 +315,14 @@ class CandidateTestCase(AbstractTestCase):
         # post again
         res_again = self.client.post("/candidates/", data=new_candidate)
         self.assertTrue(res_again.status_code, status.HTTP_400_BAD_REQUEST)
-        Candidate.objects.get(id=res.json().get("id")).delete()
+        Candidate.objects.get(id=res.json().get("data").get("id")).delete()
         # another university
         self.client.logout()
 
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         res = self.client.post("/candidates/", data=new_candidate)
-        res_json = {**res.json()}
+        res_json = {**res.json().get("data")}
         remove_col = ["id", "url"]
         for col in remove_col:
             del res_json[col]
@@ -330,18 +330,18 @@ class CandidateTestCase(AbstractTestCase):
         self.assertDictEqual(res_json, new_candidate)
         self.assertEqual(candidate_count + 1, Candidate.objects.count())
         self.client.logout()
-        return res.json()
+        return res.json().get("data")
 
     def test_api_candidates_get(self):
         # Detail
         get_res = self.client.get(f"/candidates/{self.new_position.id}/")
-        get_json = get_res.json()
+        get_json = get_res.json().get("data")
         existing_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
         self.assertDictEqual(get_json, existing_candidate)
         # List
         candidate_count = Candidate.objects.count()
         list_res = self.client.get("/candidates/")
-        list_json = list_res.json()
+        list_json = list_res.json().get("data")
         self.assertEqual(len(list_json), candidate_count)
 
     def test_api_candidates_put(self):
@@ -355,7 +355,7 @@ class CandidateTestCase(AbstractTestCase):
 
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
-        res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json()
+        res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json().get("data")
         self.assertDictEqual(res_json, modified_candidate)
         # normal user (put another candidate in the same university)
         res = self.client.put(f"/candidates/{another_candidate['id']}/", data=another_candidate)
@@ -366,7 +366,7 @@ class CandidateTestCase(AbstractTestCase):
         # admin
         modified_candidate["desc"] = "ADMIN_NEW_DESC"
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
-        res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json()
+        res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json().get("data")
         self.assertDictEqual(res_json, modified_candidate)
         # another university
         modified_candidate = CandidateSerializer(instance=self.another_candidate, context=context).data
@@ -461,7 +461,7 @@ class VoteTestCase(AbstractTestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             candidate.vote_count + vote_count,
-            res.json()["result"][0]["votes"][0]["candidates"][0]["vote_count"],
+            res.json().get("data")["result"][0]["votes"][0]["candidates"][0]["vote_count"],
         )
         # post again
         res = self.client.post("/votes/", data=vote_data)
@@ -494,7 +494,7 @@ class VoteTestCase(AbstractTestCase):
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         res = self.client.get("/votes/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.json()), 0)  # admin cannot vote
+        self.assertEqual(len(res.json().get("data")), 0)  # admin cannot vote
         self.client.logout()
 
     def test_api_vote_multiple_candidates(self):
