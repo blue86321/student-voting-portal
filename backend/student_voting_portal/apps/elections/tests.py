@@ -66,7 +66,7 @@ class AbstractTestCase(APITestCase):
             "election_id": cls.new_election.id,
             "position_name": "SCU student council president",
             "desc": "desc for SCU student council president",
-            "max_votes_total": 1,
+            "max_votes_total": 2,
             "max_votes_per_candidate": 1,
         }
         cls.new_position = Position.objects.create(**new_position_data)
@@ -89,6 +89,11 @@ class AbstractTestCase(APITestCase):
         serializer = UserSerializer(data=new_user_data)
         serializer.is_valid(raise_exception=True)
         cls.new_user = serializer.save()
+
+        new_user_data["email"] = "user2@scu.edu"
+        serializer = UserSerializer(data=new_user_data)
+        serializer.is_valid(raise_exception=True)
+        cls.new_user2 = serializer.save()
 
         another_user_data = {
             "email": "another_email@sjsu.edu",
@@ -399,15 +404,31 @@ class VoteTestCase(AbstractTestCase):
     def test_api_vote_post(self):
         vote_data = {
             "election_id": self.new_election.id,
-            "position_id": self.new_position.id,
-            "candidate_id": self.new_candidate.id,
-            "vote_count": 1,
+            "votes": [
+                {
+                    "position_id": self.new_position.id,
+                    "candidates": [
+                        {
+                            "candidate_id": self.new_candidate.id,
+                            "vote_count": 1,
+                        }
+                    ]
+                }
+            ]
         }
         another_vote_data = {
             "election_id": self.another_election.id,
-            "position_id": self.another_position.id,
-            "candidate_id": self.another_candidate.id,
-            "vote_count": 1,
+            "votes": [
+                {
+                    "position_id": self.another_position.id,
+                    "candidates": [
+                        {
+                            "candidate_id": self.another_candidate.id,
+                            "vote_count": 1,
+                        }
+                    ]
+                }
+            ]
         }
 
         # no login
@@ -437,7 +458,7 @@ class VoteTestCase(AbstractTestCase):
         election.save()
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(candidate.vote_count + 1, res.json().get("candidate").get("vote_count"))
+        self.assertEqual(candidate.vote_count + 1, res.json()["result"][0]["votes"][0]["candidates"][0]["vote_count"])
         # post again
         res = self.client.post("/votes/", data=vote_data)
         self.assertTrue(res.exception)
@@ -462,11 +483,46 @@ class VoteTestCase(AbstractTestCase):
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
         res = self.client.get("/votes/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.json()), len(Vote.objects.filter(user_id=self.new_user.id)))
+        res = self.client.get(f"/votes/{self.new_election.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.client.logout()
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         res = self.client.get("/votes/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.json()), 0)  # admin cannot vote
+        self.client.logout()
+
+    def test_api_vote_multiple_candidates(self):
+        new_candidate_data = {
+            "user_id": self.new_user2.id,
+            "election_id": self.new_election.id,
+            "position_id": self.new_position.id,
+            "candidate_name": "Tim Cook",
+            "desc": "desc for candidates",
+        }
+        candidate2 = Candidate.objects.create(**new_candidate_data)
+        vote_data = {
+            "election_id": self.new_election.id,
+            "votes": [
+                {
+                    "position_id": self.new_position.id,
+                    "candidates": [
+                        {
+                            "candidate_id": self.new_candidate.id,
+                            "vote_count": 1,
+                        },
+                        {
+                            "candidate_id": candidate2.id,
+                            "vote_count": 1,
+                        }
+                    ]
+                }
+            ]
+        }
+        self.client.login(email=self.new_user2.email, password=self.new_user_pwd)
+        res_post = self.client.post("/votes/", data=vote_data)
+        self.assertEqual(res_post.status_code, status.HTTP_201_CREATED)
+        res_get = self.client.get("/votes/", data=vote_data)
+        self.assertEqual(res_get.status_code, status.HTTP_200_OK)
         self.client.logout()

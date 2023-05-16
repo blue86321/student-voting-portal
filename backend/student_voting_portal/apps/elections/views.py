@@ -1,12 +1,12 @@
+from typing import List, Dict, Any
+
 from django.db import transaction
-from django.db.models import QuerySet
-from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from elections.models import Election, Position, Vote, Candidate
 from elections.serializers import ElectionSerializer, PositionSerializer, CandidateSerializer, VoteSerializer
@@ -31,35 +31,137 @@ class CandidateView(ModelViewSet):
     permission_classes = [Get | (IsOwnerOrAdmin & IsSameUniversity)]
 
 
-class VoteView(CreateAPIView, ListAPIView, RetrieveAPIView, GenericViewSet):
-    serializer_class = VoteSerializer
-    queryset = Vote.objects.all()
+class VoteCandidateView(APIView):
+    """**Post** vote format:
+    ```
+    {
+        "election_id": 1,
+        "votes": [
+            {
+                "position_id": 1,
+                "candidates": [
+                    {"candidate_id": 1, "vote_count": 1},
+                    {"candidate_id": 2, "vote_count": 1}
+                ]
+            }
+        ]
+    }
+    ```
+    """
     permission_classes = [VotePermission]
 
     @transaction.atomic
-    def create(self, request: Request, *args, **kwargs):
-        if hasattr(request.data, "_mutable"):
-            request.data._mutable = True
-        request.data["user_id"] = request.user.id
+    def post(self, request: Request):
+        if not request.data:
+            return Response("data cannot be empty", status.HTTP_400_BAD_REQUEST)
+        data = request.data
+        user_id = request.user.id
+        election_id: int = data.get("election_id")
+        votes: List[Dict[str, Any]] = data.get("votes")
+        if not election_id or not votes:
+            return Response("invalid data", status.HTTP_400_BAD_REQUEST)
 
-        # check time between `start_time` and `end_time`
-        election = Election.objects.get(id=request.data.get("election_id"))
-        now = timezone.now()
-        valid_time = election.start_time <= now <= election.end_time
-        if not valid_time:
-            return Response("election not yet starts or already ends", status=status.HTTP_400_BAD_REQUEST)
+        vote_serializer_list: List[VoteSerializer] = []
+        for vote_position in votes:
+            # for each vote (one position + multiple candidates)
+            position_id = vote_position.get("position_id")
+            candidates = vote_position.get("candidates")
+            if not position_id or not candidates:
+                return Response("invalid data", status.HTTP_400_BAD_REQUEST)
 
-        # increment candidate `vote_count`
-        candidate = Candidate.objects.get(id=request.data.get("candidate_id"))
-        candidate.vote_count += 1
-        candidate.save()
+            position = Position.objects.get(id=position_id)
+            serializer_list_for_position: List[VoteSerializer] = []
+            for vote_candidate in candidates:
+                # for each candidate
+                candidate_id = vote_candidate.get("candidate_id")
+                vote_count = vote_candidate.get("vote_count")
+                if not candidate_id or not vote_count:
+                    return Response("invalid data", status.HTTP_400_BAD_REQUEST)
 
-        # create `vote`
-        return super().create(request, args, kwargs)
+                vote_serializer = VoteSerializer(
+                    data={
+                        "user_id": user_id,
+                        "election_id": election_id,
+                        "position_id": position_id,
+                        "candidate_id": candidate_id,
+                        "vote_count": vote_count,
+                    },
+                    context={"request": self.request}
+                )
+                # internally check vote per candidate
+                vote_serializer.is_valid(raise_exception=True)
+                serializer_list_for_position.append(vote_serializer)
 
-    def get_queryset(self):
-        """user can only see his votes"""
-        queryset = self.queryset
-        if isinstance(queryset, QuerySet):
-            queryset = queryset.filter(user_id=self.request.user.id)
-        return queryset
+            # check total vote count
+            total_vote_count = sum([s.validated_data.get("vote_count") for s in serializer_list_for_position])
+            if position.max_votes_total < total_vote_count:
+                return Response(f"max total vote exceeds for position {position.id}", status.HTTP_400_BAD_REQUEST)
+            # add to total list
+            vote_serializer_list.extend(serializer_list_for_position)
+
+        vote_list: List[Vote] = []
+        for serializer in vote_serializer_list:
+            # increment candidate `vote_count`
+            candidate = serializer.validated_data.get("candidate")
+            candidate.vote_count += 1
+            candidate.save()
+            # save vote
+            serializer.save()
+            vote_list.append(serializer.instance)
+        ret = self.serialize_vote_list(vote_list)
+        return Response(ret, status.HTTP_201_CREATED)
+
+    def get(self, request: Request, election_id: int = None):
+        if election_id:
+            queryset = Vote.objects.filter(user_id=self.request.user.id, election_id=election_id)
+        else:
+            queryset = Vote.objects.filter(user_id=self.request.user.id)
+
+        if not queryset:
+            return Response([], status.HTTP_200_OK)
+
+        ret = self.serialize_vote_list(queryset)
+        return Response(ret, status.HTTP_200_OK)
+
+    def serialize_vote_list(self, vote_list: List[Vote]) -> Dict[str, List[Dict[str, Any]]]:
+        election_idx_map = {}
+        position_idx_map = {}
+        formatted_list = []
+        for vote in vote_list:
+            if vote.election.id not in election_idx_map:
+                election_idx_map[vote.election.id] = len(formatted_list)
+                position_idx_map[vote.position.id] = 0
+                formatted_list.append({
+                    "election": {
+                        "id": vote.election.id,
+                        "election_name": vote.election.election_name,
+                        "desc": vote.election.desc,
+                        "start_time": vote.election.start_time,
+                        "end_time": vote.election.end_time,
+                    },
+                    "votes": [{
+                        "position": PositionSerializer(vote.position, context={"request": self.request}).data,
+                        "candidates": [{
+                            "candidate": CandidateSerializer(vote.candidate, context={"request": self.request}).data,
+                            "vote_count": vote.vote_count,
+                        }]
+                    }],
+                })
+            else:
+                election_idx = election_idx_map.get(vote.election.id)
+                if vote.position.id not in position_idx_map:
+                    position_idx_map[vote.position.id] = len(formatted_list[election_idx]["votes"])
+                    formatted_list[election_idx]["votes"].append({
+                        "position": PositionSerializer(vote.position, context={"request": self.request}).data,
+                        "candidates": [{
+                            "candidate": CandidateSerializer(vote.candidate, context={"request": self.request}).data,
+                            "vote_count": vote.vote_count,
+                        }]
+                    })
+                else:
+                    position_idx = position_idx_map[vote.position.id]
+                    formatted_list[election_idx]["votes"][position_idx]["candidates"].append({
+                        "candidate": CandidateSerializer(vote.candidate, context={"request": self.request}).data,
+                        "vote_count": vote.vote_count,
+                    })
+        return {"result": formatted_list}

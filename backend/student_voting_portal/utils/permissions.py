@@ -3,7 +3,7 @@ from django.db import models
 from rest_framework import permissions
 from rest_framework.request import Request
 
-from elections.models import Candidate, Position, Election
+from elections.models import Candidate, Position, Election, Vote
 from users.models import User
 
 
@@ -44,7 +44,7 @@ class IsSameUniversity(permissions.BasePermission):
 
 class VotePermission(permissions.IsAuthenticated):
     def has_permission(self, request: Request, view: views.View):
-        """Only normal user can vote for elections in the same university"""
+        """Only normal user can vote"""
         authenticated = super().has_permission(request, view)
         if authenticated:
             if request.method == "POST":
