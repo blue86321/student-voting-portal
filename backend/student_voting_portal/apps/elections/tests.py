@@ -483,7 +483,8 @@ class VoteTestCase(AbstractTestCase):
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
         res = self.client.get("/votes/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.json()), len(Vote.objects.filter(user_id=self.new_user.id)))
+        res = self.client.get(f"/votes/{self.new_election.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.client.logout()
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)

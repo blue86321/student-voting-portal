@@ -36,6 +36,7 @@ router.register("elections", ElectionView)
 router.register("positions", PositionView)
 router.register("candidates", CandidateView)
 router.add_api_view("votes", path("votes/", VoteCandidateView.as_view(), name="votes"))
+router.add_api_view("vote-detail", path("votes/<int:election_id>/", VoteCandidateView.as_view(), name="vote-detail"))
 
 urlpatterns = [
     path("", include(router.urls)),
