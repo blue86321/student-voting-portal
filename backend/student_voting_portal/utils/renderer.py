@@ -6,7 +6,7 @@ class JSONResponseRenderer(JSONRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         response: Response = renderer_context.get("response")
-        success = 300 <= response.status_code < 400
+        success = 400 <= response.status_code < 400
         response_dict = {
             "success": success,
             "code": response.status_code,
