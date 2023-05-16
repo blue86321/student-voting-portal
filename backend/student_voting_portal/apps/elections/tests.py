@@ -67,7 +67,7 @@ class AbstractTestCase(APITestCase):
             "position_name": "SCU student council president",
             "desc": "desc for SCU student council president",
             "max_votes_total": 2,
-            "max_votes_per_candidate": 1,
+            "max_votes_per_candidate": 2,
         }
         cls.new_position = Position.objects.create(**new_position_data)
         another_position_data = {
@@ -402,6 +402,7 @@ class CandidateTestCase(AbstractTestCase):
 class VoteTestCase(AbstractTestCase):
 
     def test_api_vote_post(self):
+        vote_count = 2
         vote_data = {
             "election_id": self.new_election.id,
             "votes": [
@@ -410,7 +411,7 @@ class VoteTestCase(AbstractTestCase):
                     "candidates": [
                         {
                             "candidate_id": self.new_candidate.id,
-                            "vote_count": 1,
+                            "vote_count": vote_count,
                         }
                     ]
                 }
@@ -458,7 +459,10 @@ class VoteTestCase(AbstractTestCase):
         election.save()
         res = self.client.post("/votes/", data=vote_data)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(candidate.vote_count + 1, res.json()["result"][0]["votes"][0]["candidates"][0]["vote_count"])
+        self.assertEqual(
+            candidate.vote_count + vote_count,
+            res.json()["result"][0]["votes"][0]["candidates"][0]["vote_count"],
+        )
         # post again
         res = self.client.post("/votes/", data=vote_data)
         self.assertTrue(res.exception)

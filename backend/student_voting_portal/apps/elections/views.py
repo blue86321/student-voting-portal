@@ -103,7 +103,7 @@ class VoteCandidateView(APIView):
         for serializer in vote_serializer_list:
             # increment candidate `vote_count`
             candidate = serializer.validated_data.get("candidate")
-            candidate.vote_count += 1
+            candidate.vote_count += serializer.validated_data.get("vote_count")
             candidate.save()
             # save vote
             serializer.save()
