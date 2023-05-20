@@ -10,10 +10,10 @@ function Navigation({userType, navigate}) {
                     <Nav.Link onClick={()=>{navigate('/manage_elections')}}>Manage Elections</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link href="/create">Create New Elections</Nav.Link>
+                    <Nav.Link onClick={()=>{navigate('/create_new_elections')}}>Create New Elections</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link href="/manage_users">Manage Users</Nav.Link>
+                    <Nav.Link onClick={()=>{navigate('/manage_users')}}>Manage Users</Nav.Link>
                 </Nav.Item>
                 </Nav>
             </Container>

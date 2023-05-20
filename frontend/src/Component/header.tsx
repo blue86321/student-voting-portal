@@ -5,15 +5,13 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import logo from '../Logo.svg';
 import Login from './login';
-import Register from './register';
 import Navigation from './navigation'
 
 function Header({ children, isPending, navigate }) {
   const [loginModalShow, setLoginModalShow] = React.useState(false);
-  const [registerModalShow, setRegisterModalShow] = React.useState(false);
 
   // TODO: connet to usertype and user status
-  const currentUserType = 'user';
+  const currentUserType = 'admin';
 
   return (
     <div>
@@ -48,9 +46,6 @@ function Header({ children, isPending, navigate }) {
       <Login
         show={loginModalShow}
         onHide={() => setLoginModalShow(false)} />
-      {/* <Register
-        show={registerModalShow}
-        onHide={() => setRegisterModalShow(false)} /> */}
       <main>
         {children}
       </main>

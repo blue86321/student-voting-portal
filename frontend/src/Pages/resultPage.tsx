@@ -1,6 +1,14 @@
+import Candidates from "../Component/candidates";
+import ResultChart from "../Component/resultChart";
 
+function ResultPage( {navigate} ) {
 
-function ResultPage() {
+    return (
+        <div>
+            <ResultChart></ResultChart>
+            <Candidates></Candidates>
+        </div>
+    )
 
 }
 

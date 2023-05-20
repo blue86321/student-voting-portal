@@ -18,6 +18,10 @@ function Register(props) {
       <Modal.Body>
         <Form>
           <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>University</Form.Label>
+            <Form.Control type="email" placeholder="Enter Your University" />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Name</Form.Label>
             <Form.Control type="email" placeholder="Enter Your Name" />
           </Form.Group>
@@ -42,7 +46,7 @@ function Register(props) {
               <Form.Control type="password" placeholder="Confirm Password" />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check type="checkbox" label="Create An Admin Account" />
+              <Form.Check type="checkbox" label="Create an Admin Account" />
           </Form.Group>
           <Button variant="primary" type="submit">
               Submit

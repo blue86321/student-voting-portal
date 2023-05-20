@@ -4,7 +4,6 @@ import { Image } from 'react-bootstrap';
 
 function ElectionDetail() {
     
-    
     return (
         <div className='text-center'>
             <Container>
