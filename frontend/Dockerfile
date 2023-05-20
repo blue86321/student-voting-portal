@@ -1,4 +1,4 @@
-FROM node:16-alpine 
+FROM node:lts-alpine3.16
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY . .
 
 # ==== BUILD =====
 # Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 # Build the app
 RUN npm run build
 
