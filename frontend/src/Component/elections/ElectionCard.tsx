@@ -1,41 +1,40 @@
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import classes from './elections.module.css';
 
-function Candidates() {
-    // TODO: card key
+function ElectionCard() {
+    // TODO: elections from the backend.
 
     return (
         <>
         {[
-            'Candidate1',
-            'Candidate2',
-            'Candidate3',
+            'Election1',
+            'Election2',
+            'Election3',
         ].map((variant) => (
             <div style={{ margin: '10px', padding: '20px' }}>
             <Card key={variant}
                   style={{ width: '22rem' }}>
-                
                 <Card.Body>
-                    
                     <Card.Title className="text-center">{variant}</Card.Title>
-                    <Card.Img variant="top" src={require("./defaultImage.png")} style={{ width: '320px', height: 'auto' }}/>
+                    <Card.Subtitle className="mb-2 text-muted text-center">Deadline: MM/DD/YYYY</Card.Subtitle>
+                    <Card.Img variant="top" src={require("../defaultImage.png")} style={{ width: '320px', height: 'auto' }}/>
                     <Card.Text className="card-text-multiline">
-                    Introduction: <br/>
+                    descriptions: <br/>
                     xxx <br/>
                     xxx <br/>
                     </Card.Text>
-                    {/* TODO: to vote the candidate, add 1 for total votes. */}
+                    {/* TODO: link to the detail page. */}
                     <div className="text-center">
-                        <Button  variant="primary">VOTE</Button> 
+                        <Card.Link as={Link} to={('/elections/'+variant)}>View More</Card.Link> 
                     </div>
-                       
                 </Card.Body>
             </Card>
         </div>
         ))}
         </>
-    )
-
+  );
 }
 
-export default Candidates;
+export default ElectionCard;

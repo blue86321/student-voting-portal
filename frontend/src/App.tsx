@@ -1,24 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import Header from "./component/navigator/Header";
+import Home from "./pages/Home";
+import ResultPage from "./pages/ResultPage";
+
+import ElectionRouter from "./component/elections/Elections.router";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Header />
+      <Routes>
+          {/* <Route index element={<Home />} /> */}
+        <Route path="your_votes" element={<ResultPage />} />
+        {/* <Route path="past_elections" element={<Header />} /> */}
+        <Route path="elections" element={<Home />} />
+        <Route path="elections/*" element={<ElectionRouter />} />
+        <Route path="/" element={<Home />}>
+          {/* <Route path="*" element={<NoPage />} /> */}
+        </Route>
+      </Routes>
     </div>
   );
 }

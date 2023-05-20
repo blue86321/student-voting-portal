@@ -1,19 +1,14 @@
 import { Container } from 'react-bootstrap';
-import Navigation from '../Component/navigation';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Elections from '../Component/elections';
+import ElectionCard from '../component/elections/ElectionCard';
 
-function Home({ navigate }) {
+function Home() {
   
   return (
 
     <div>
     <Container>
       
-        <Elections navigate={navigate}></Elections>
+        <ElectionCard></ElectionCard>
       
     </Container>
     </div>
