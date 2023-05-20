@@ -35,7 +35,7 @@ python manage.py test
 
 ### Create superuser
 ```shell
-python manage.py createsuperuser --email test@scu.edu
+python manage.py createsuperuser --email super@gmail.com
 # Then set password for superuser
 ```
 

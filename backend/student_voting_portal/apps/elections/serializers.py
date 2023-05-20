@@ -84,6 +84,10 @@ class VoteSerializer(serializers.HyperlinkedModelSerializer):
         position: Union[Position, None] = attrs.get("position")
         if position and position.max_votes_per_candidate < vote_count:
             raise serializers.ValidationError("vote count exceeds")
+        # check position and candidate
+        candidate: Union[Candidate, None] = attrs.get("candidate")
+        if candidate and candidate.position_id != position.id:
+            raise serializers.ValidationError("candidate and position are not matched")
         return attrs
 
     class Meta:

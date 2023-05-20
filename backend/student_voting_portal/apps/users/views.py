@@ -17,9 +17,9 @@ class UserView(CreateAPIView, ReadOnlyModelViewSet):
     queryset = User.objects.all()
     permission_classes = [Post | IsAdminUser]
 
-    def get_queryset(self):
+    def filter_queryset(self, queryset):
         """Non-superuser can only see users in the same university"""
-        queryset = self.queryset
+        queryset = super().filter_queryset(queryset)
         user = self.request.user
         if isinstance(queryset, QuerySet) and not user.is_superuser:
             queryset = queryset.filter(university_id=user.university_id)

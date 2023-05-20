@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import logo from '../../Logo.svg';
+import logo from '../../logo.svg';
 import Login from '../user/Login';
 import Navigation from './Navigation'
 

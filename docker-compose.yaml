@@ -24,7 +24,9 @@ services:
     networks:
       - local
     volumes:
-      - ./frontend/:/app/src/
+      - ./frontend/src:/app/src
+      - ./frontend/package-lock.json:/app/package-lock.json
+      - ./frontend/package.json:/app/package.json
     ports:
       - 3000:3000
     depends_on:
@@ -46,7 +48,7 @@ services:
       - v_mysql:/var/lib/mysql
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     ports:
-      - "3306:3306"
+      - "24850:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
       interval: 3s
