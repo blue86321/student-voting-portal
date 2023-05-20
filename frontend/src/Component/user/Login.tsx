@@ -1,5 +1,5 @@
 import React from "react";
-import Register from "./register";
+import Register from "./Register";
 import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 
 function Login(props) {

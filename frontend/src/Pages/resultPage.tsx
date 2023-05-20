@@ -1,7 +1,7 @@
-import Candidates from "../Component/candidates";
-import ResultChart from "../Component/resultChart";
+import Candidates from "../component/elections/CandidateCard";
+import ResultChart from "../component/elections/ElectionResultChart";
 
-function ResultPage( {navigate} ) {
+function ResultPage() {
 
     return (
         <div>

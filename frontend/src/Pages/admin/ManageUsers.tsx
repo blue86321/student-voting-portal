@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Container, Button, ListGroup, Row } from "react-bootstrap";
-import DeleteModal from "../Component/deleteModal";
+import DeleteModal from "../../component/admin/DeleteModal";
 
 function ManageUsers({ navigate }) {
   const [searchTerm, setSearchTerm] = useState("");

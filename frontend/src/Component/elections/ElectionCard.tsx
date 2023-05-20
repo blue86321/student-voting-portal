@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import classes from './elections.module.css';
 
-function Elections({navigate}) {
+function ElectionCard() {
     // TODO: elections from the backend.
 
     return (
@@ -18,7 +19,7 @@ function Elections({navigate}) {
                 <Card.Body>
                     <Card.Title className="text-center">{variant}</Card.Title>
                     <Card.Subtitle className="mb-2 text-muted text-center">Deadline: MM/DD/YYYY</Card.Subtitle>
-                    <Card.Img variant="top" src={require("./defaultImage.png")} style={{ width: '320px', height: 'auto' }}/>
+                    <Card.Img variant="top" src={require("../defaultImage.png")} style={{ width: '320px', height: 'auto' }}/>
                     <Card.Text className="card-text-multiline">
                     descriptions: <br/>
                     xxx <br/>
@@ -26,7 +27,7 @@ function Elections({navigate}) {
                     </Card.Text>
                     {/* TODO: link to the detail page. */}
                     <div className="text-center">
-                        <Card.Link onClick={()=>{navigate('/'+variant)}}>View More</Card.Link> 
+                        <Card.Link as={Link} to={('/elections/'+variant)}>View More</Card.Link> 
                     </div>
                 </Card.Body>
             </Card>
@@ -36,4 +37,4 @@ function Elections({navigate}) {
   );
 }
 
-export default Elections;
+export default ElectionCard;

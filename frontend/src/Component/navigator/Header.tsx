@@ -3,15 +3,15 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import logo from '../Logo.svg';
-import Login from './login';
-import Navigation from './navigation'
+import logo from '../../Logo.svg';
+import Login from '../user/Login';
+import Navigation from './Navigation'
 
-function Header({ children, isPending, navigate }) {
+function Header() {
   const [loginModalShow, setLoginModalShow] = React.useState(false);
 
   // TODO: connet to usertype and user status
-  const currentUserType = 'admin';
+  const currentUserType = 'user';
 
   return (
     <div>
@@ -41,14 +41,14 @@ function Header({ children, isPending, navigate }) {
       </h1>
     </Container>
     <Container>
-      <Navigation userType={currentUserType} navigate={(url)=>navigate(url)} />
+      <Navigation userType={currentUserType} />
     </Container>
       <Login
         show={loginModalShow}
         onHide={() => setLoginModalShow(false)} />
-      <main>
+      {/* <main>
         {children}
-      </main>
+      </main> */}
     </div>
   );
 }

@@ -51,7 +51,7 @@ function Candidates() {
                 <Card.Body>
                     
                     <Card.Title className="text-center">{variant}</Card.Title>
-                    <Card.Img variant="top" src={require("./defaultImage.png")} style={{ width: '320px', height: 'auto' }}/>
+                    <Card.Img variant="top" src={require("../defaultImage.png")} style={{ width: '320px', height: 'auto' }}/>
                     <Card.Text className="card-text-multiline">
                     Introduction: <br/>
                     xxx <br/>
