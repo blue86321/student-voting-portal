@@ -1,9 +1,7 @@
-import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import logo from '../../logo.svg';
+import React, { useState, useEffect } from 'react';
+import { Nav, Navbar, NavDropdown, Container } from 'react-bootstrap';
+
+import logo from '../../Logo.svg';
 import Login from '../user/Login';
 import Navigation from './Navigation'
 

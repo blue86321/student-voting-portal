@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 
-import ElectionDetailsPage from "../../pages/ElectionDetailsPage";
+import ElectionDetailsPage from "../../pages/user/ElectionDetailsPage";
 
 function ElectionRouter() {
   return (
