@@ -19,12 +19,6 @@
 ./mvnw test
 ```
 
-### Create superuser
-```shell
-python manage.py createsuperuser --email super@gmail.com
-# Then set password for superuser
-```
-
 ### Run the server
 ```shell
 ./mvnw package -DskipTests
@@ -33,6 +27,13 @@ java -jar target/student_voting_portal-0.0.1-SNAPSHOT.jar
 
 - visit API Root page: http://localhost:8080/swagger-ui.html
 - Login with superuser and send request with the given JWT to have full permission in API Root page
+
+### Superuser
+- Superuser will create on running the server
+- Configuration is at `src/main/java/edu/scu/studentvotingportal/config/SuperuserConfig.java`
+- Default superuser:
+  - email: `super@gmail.com`
+  - password: `super`
 
 #### Send request with JWT token 
 - Process: login -> get JWT token -> access with JWT token
