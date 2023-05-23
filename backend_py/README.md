@@ -49,6 +49,10 @@ python manage.py runserver
 - visit API Root page: http://localhost:8000
 - Login with superuser to have full permission in API Root page
 
+#### API docs preview
+
+<img width="700" src="../imgs/api-docs-py-django-restful-framework.jpg">
+
 ### Exit venv
 ```shell
 deactivate

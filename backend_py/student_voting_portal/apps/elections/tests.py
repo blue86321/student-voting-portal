@@ -48,7 +48,7 @@ class AbstractTestCase(APITestCase):
         new_election_data = {
             "university_id": cls.new_university.id,
             "election_name": "SCU student council election",
-            "desc": "desc for SCU student council election",
+            "election_desc": "desc for SCU student council election",
             "start_time": timezone.now(),
             "end_time": timezone.now() + timedelta(days=1),
         }
@@ -56,7 +56,7 @@ class AbstractTestCase(APITestCase):
         another_election_data = {
             "university_id": cls.another_university.id,
             "election_name": "SJSU student council election",
-            "desc": "desc for SJSU student council election",
+            "election_desc": "desc for SJSU student council election",
             "start_time": timezone.now(),
             "end_time": timezone.now() + timedelta(days=1),
         }
@@ -65,7 +65,7 @@ class AbstractTestCase(APITestCase):
         new_position_data = {
             "election_id": cls.new_election.id,
             "position_name": "SCU student council president",
-            "desc": "desc for SCU student council president",
+            "position_desc": "desc for SCU student council president",
             "max_votes_total": 2,
             "max_votes_per_candidate": 2,
         }
@@ -73,7 +73,7 @@ class AbstractTestCase(APITestCase):
         another_position_data = {
             "election_id": cls.another_election.id,
             "position_name": "SJSU student council president",
-            "desc": "desc for SJSU student council president",
+            "position_desc": "desc for SJSU student council president",
             "max_votes_total": 1,
             "max_votes_per_candidate": 1,
         }
@@ -111,7 +111,7 @@ class AbstractTestCase(APITestCase):
             "election_id": cls.new_election.id,
             "position_id": cls.new_position.id,
             "candidate_name": "John Miller",
-            "desc": "desc for candidates",
+            "candidate_desc": "desc for candidates",
         }
         cls.new_candidate = Candidate.objects.create(**new_candidate_data)
         another_candidate_data = {
@@ -119,7 +119,7 @@ class AbstractTestCase(APITestCase):
             "election_id": cls.another_election.id,
             "position_id": cls.another_position.id,
             "candidate_name": "John Miller",
-            "desc": "desc for candidates",
+            "candidate_desc": "desc for candidates",
         }
         cls.another_candidate = Candidate.objects.create(**another_candidate_data)
 
@@ -278,7 +278,7 @@ class PositionTestCase(AbstractTestCase):
     def test_api_positions_patch(self):
         existing_position = PositionSerializer(instance=self.new_position, context=context).data
         modified_position = existing_position
-        patch_data = {"desc": "ANOTHER_DESC"}
+        patch_data = {"position_desc": "ANOTHER_DESC"}
         modified_position.update(patch_data)
         res = self.diff_user_call(self.client.patch, f"/positions/{self.new_position.id}/", data=patch_data)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -346,9 +346,9 @@ class CandidateTestCase(AbstractTestCase):
 
     def test_api_candidates_put(self):
         modified_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
-        modified_candidate["desc"] = "NEW_DESC"
+        modified_candidate["candidate_desc"] = "NEW_DESC"
         another_candidate = self.test_api_candidates_post()
-        another_candidate["desc"] = "NEW_DESC"
+        another_candidate["candidate_desc"] = "NEW_DESC"
 
         # no login
         self.assertTrue(self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).exception)
@@ -364,13 +364,13 @@ class CandidateTestCase(AbstractTestCase):
         Candidate.objects.get(id=another_candidate.get("id")).delete()
 
         # admin
-        modified_candidate["desc"] = "ADMIN_NEW_DESC"
+        modified_candidate["candidate_desc"] = "ADMIN_NEW_DESC"
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
         res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json().get("data")
         self.assertDictEqual(res_json, modified_candidate)
         # another university
         modified_candidate = CandidateSerializer(instance=self.another_candidate, context=context).data
-        modified_candidate["desc"] = "ADMIN_NEW_DESC"
+        modified_candidate["candidate_desc"] = "ADMIN_NEW_DESC"
         res = self.client.put(f"/candidates/{self.another_candidate.id}/", data=modified_candidate)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
@@ -503,7 +503,7 @@ class VoteTestCase(AbstractTestCase):
             "election_id": self.new_election.id,
             "position_id": self.new_position.id,
             "candidate_name": "Tim Cook",
-            "desc": "desc for candidates",
+            "candidate_desc": "desc for candidates",
         }
         candidate2 = Candidate.objects.create(**new_candidate_data)
         vote_data = {
