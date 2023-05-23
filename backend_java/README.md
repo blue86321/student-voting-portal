@@ -39,3 +39,6 @@ java -jar target/student_voting_portal-0.0.1-SNAPSHOT.jar
   - **Login**: send a `POST` request to `/authentication/` endpoint with email and password. 
   - **JWT token**: In API docs, the upper-right side has a `Authorize` icon, where you can put your JWT token.
 
+#### API docs preview
+
+<img width="700" src="../imgs/api-docs-java-spring-boot-swagger.jpg">
