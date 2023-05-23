@@ -136,7 +136,7 @@ class VoteCandidateView(APIView):
                     "election": {
                         "id": vote.election.id,
                         "election_name": vote.election.election_name,
-                        "desc": vote.election.desc,
+                        "election_desc": vote.election.election_desc,
                         "start_time": vote.election.start_time,
                         "end_time": vote.election.end_time,
                     },

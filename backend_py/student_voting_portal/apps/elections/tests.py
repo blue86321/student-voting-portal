@@ -176,7 +176,7 @@ class ElectionTestCase(AbstractTestCase):
 
     def test_api_elections_put(self):
         modified_election = ElectionSerializer(instance=self.new_election, context=context).data
-        modified_election["desc"] = "NEW_DESC"
+        modified_election["election_desc"] = "NEW_DESC"
         res = self.diff_user_call(
             self.client.put, f"/elections/{self.new_election.id}/",
             data={
@@ -193,7 +193,7 @@ class ElectionTestCase(AbstractTestCase):
 
         # another university
         modified_election = ElectionSerializer(instance=self.another_election, context=context).data
-        modified_election["desc"] = "NEW_DESC"
+        modified_election["election_desc"] = "NEW_DESC"
         res = self.diff_user_call(
             self.client.put, f"/elections/{self.another_election.id}/",
             data={
@@ -208,7 +208,7 @@ class ElectionTestCase(AbstractTestCase):
     def test_api_elections_patch(self):
         existing_election = ElectionSerializer(instance=self.new_election, context=context).data
         modified_election = existing_election
-        patch_data = {"desc": "ANOTHER_DESC"}
+        patch_data = {"election_desc": "ANOTHER_DESC"}
         modified_election.update(patch_data)
         res = self.diff_user_call(self.client.patch, f"/elections/{self.new_election.id}/", data=patch_data)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -259,7 +259,7 @@ class PositionTestCase(AbstractTestCase):
 
     def test_api_positions_put(self):
         modified_position = PositionSerializer(instance=self.new_position, context=context).data
-        modified_position["desc"] = "NEW_DESC"
+        modified_position["position_desc"] = "NEW_DESC"
         modified_position["max_votes_total"] = 2
         res = self.diff_user_call(self.client.put, f"/positions/{self.new_position.id}/", data=modified_position)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -269,7 +269,7 @@ class PositionTestCase(AbstractTestCase):
 
         # another university
         modified_position = PositionSerializer(instance=self.another_position, context=context).data
-        modified_position["desc"] = "NEW_DESC"
+        modified_position["position_desc"] = "NEW_DESC"
         res = self.diff_user_call(self.client.put, f"/positions/{self.another_position.id}/", data=modified_position)
         self.assertEqual(res.no_login.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)

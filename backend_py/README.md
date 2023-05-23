@@ -1,4 +1,4 @@
-# Backend of Student Voting Portal
+# Backend of Student Voting Portal (Python)
 
 
 ## Run
@@ -18,7 +18,9 @@ python -m pip install -r requirements.txt
   - Create a mysql user
     - username: `student_voting_portal`
     - password: `student_voting_portal`
-  - Create a schema: `student_voting_portal`
+  - Create a database: `student_voting_portal_py`
+  - Create a database: `test_student_voting_portal_py` (for test)
+  - Grant new user with permissions to operate the new database
 - Ps. If you do not want to run a mysql
   - Go to `settings/dev.py`
   - In `DATABASES`, comment `mysql` part and uncomment `sqlite3` part

@@ -8,7 +8,7 @@ class Election(BaseModel, models.Model):
     """Election meta data"""
     university = models.ForeignKey(University, on_delete=models.DO_NOTHING)
     election_name = models.CharField(default="", max_length=255)
-    desc = models.TextField(default="", blank=True)
+    election_desc = models.TextField(default="", blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
@@ -17,7 +17,7 @@ class Position(BaseModel, models.Model):
     """Position for elections, since an election can contain multiple positions"""
     election = models.ForeignKey(Election, on_delete=models.DO_NOTHING, related_name="positions")
     position_name = models.CharField(default="", max_length=255)
-    desc = models.TextField(default="", blank=True)
+    position_desc = models.TextField(default="", blank=True)
     max_votes_total = models.IntegerField(default=1)
     max_votes_per_candidate = models.IntegerField(default=1)
 
@@ -28,7 +28,7 @@ class Candidate(BaseModel, models.Model):
     election = models.ForeignKey(Election, on_delete=models.DO_NOTHING, related_name="candidates")
     position = models.ForeignKey(Position, on_delete=models.DO_NOTHING)
     candidate_name = models.CharField(default="", max_length=255)
-    desc = models.TextField(default="", blank=True)
+    candidate_desc = models.TextField(default="", blank=True)
     photo_url = models.CharField(default="", max_length=255, blank=True)
     vote_count = models.IntegerField(default=0, blank=True)
 

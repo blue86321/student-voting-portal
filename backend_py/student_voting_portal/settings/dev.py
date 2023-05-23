@@ -94,12 +94,11 @@ DATABASES = {
     # },
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        # "ENGINE": "mysql.connector.django",
         "HOST": os.environ.get("DB_HOST") or "127.0.0.1",
         "PORT": 3306,
         "USER": os.environ.get("DB_USER") or "student_voting_portal",
         "PASSWORD": os.environ.get("DB_PASSWORD") or "student_voting_portal",
-        "NAME": os.environ.get("DB_NAME") or "student_voting_portal",
+        "NAME": os.environ.get("DB_NAME") or "student_voting_portal_py",
     },
 }
 
