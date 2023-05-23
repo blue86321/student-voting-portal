@@ -27,6 +27,7 @@ public class Users extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     University university;
+    
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)

@@ -1,14 +1,18 @@
 package edu.scu.studentvotingportal.service.serviceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import edu.scu.studentvotingportal.dto.CandidateParams;
 import edu.scu.studentvotingportal.dto.CandidateResp;
-import edu.scu.studentvotingportal.dto.ElectionParams;
 import edu.scu.studentvotingportal.entity.Candidates;
 import edu.scu.studentvotingportal.entity.Elections;
 import edu.scu.studentvotingportal.entity.Positions;
 import edu.scu.studentvotingportal.entity.Users;
 import edu.scu.studentvotingportal.exception.DataNotExistsException;
-import edu.scu.studentvotingportal.exception.PermissionException;
 import edu.scu.studentvotingportal.exception.ValidationException;
 import edu.scu.studentvotingportal.repository.CandidateRepository;
 import edu.scu.studentvotingportal.repository.ElectionRepository;
@@ -16,15 +20,8 @@ import edu.scu.studentvotingportal.repository.PositionRepository;
 import edu.scu.studentvotingportal.repository.UserRepository;
 import edu.scu.studentvotingportal.service.CandidateService;
 import edu.scu.studentvotingportal.utils.Permissions;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
-@Slf4j
 public class CandidateServiceImpl implements CandidateService {
 
     @Autowired

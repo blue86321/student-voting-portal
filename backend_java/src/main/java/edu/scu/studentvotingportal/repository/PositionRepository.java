@@ -1,7 +1,5 @@
 package edu.scu.studentvotingportal.repository;
 
-
-import edu.scu.studentvotingportal.entity.Elections;
 import edu.scu.studentvotingportal.entity.Positions;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
