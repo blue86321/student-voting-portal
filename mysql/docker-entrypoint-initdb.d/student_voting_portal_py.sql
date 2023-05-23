@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.32, for macos13.0 (arm64)
 --
--- Host: localhost    Database: student_voting_portal
+-- Host: localhost    Database: student_voting_portal_py
 -- ------------------------------------------------------
 -- Server version	8.0.32
 
@@ -16,14 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `student_voting_portal`
+-- Current Database: `student_voting_portal_py`
 --
 
-/*!40000 DROP DATABASE IF EXISTS `student_voting_portal`*/;
+/*!40000 DROP DATABASE IF EXISTS `student_voting_portal_py`*/;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `student_voting_portal` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `student_voting_portal_py` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
-USE `student_voting_portal`;
+USE `student_voting_portal_py`;
 
 --
 -- Table structure for table `auth_group`
@@ -228,7 +228,7 @@ CREATE TABLE `elections_candidate` (
   `create_time` datetime(6) NOT NULL,
   `update_time` datetime(6) NOT NULL,
   `candidate_name` varchar(255) NOT NULL,
-  `desc` longtext NOT NULL,
+  `candidate_desc` longtext NOT NULL,
   `photo_url` varchar(255) NOT NULL,
   `vote_count` int NOT NULL,
   `election_id` bigint NOT NULL,
@@ -266,7 +266,7 @@ CREATE TABLE `elections_election` (
   `create_time` datetime(6) NOT NULL,
   `update_time` datetime(6) NOT NULL,
   `election_name` varchar(255) NOT NULL,
-  `desc` longtext NOT NULL,
+  `election_desc` longtext NOT NULL,
   `start_time` datetime(6) NOT NULL,
   `end_time` datetime(6) NOT NULL,
   `university_id` smallint NOT NULL,
@@ -298,7 +298,7 @@ CREATE TABLE `elections_position` (
   `create_time` datetime(6) NOT NULL,
   `update_time` datetime(6) NOT NULL,
   `position_name` varchar(255) NOT NULL,
-  `desc` longtext NOT NULL,
+  `position_desc` longtext NOT NULL,
   `max_votes_total` int NOT NULL,
   `max_votes_per_candidate` int NOT NULL,
   `election_id` bigint NOT NULL,
