@@ -76,7 +76,7 @@ public class SpringSecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//            .cors().and()
+            .cors().and()
             .csrf().disable()
             // Not getting `SecurityContext` via `Session`
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
