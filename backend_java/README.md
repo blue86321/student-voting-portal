@@ -20,6 +20,13 @@
 ```
 
 ### Run the server
+
+#### Development mode
+```shell
+./mvnw spring-boot:run
+```
+
+#### Production mode
 ```shell
 ./mvnw package -DskipTests
 java -jar target/student_voting_portal-0.0.1-SNAPSHOT.jar
