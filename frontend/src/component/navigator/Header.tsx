@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Nav, Navbar, NavDropdown, Container } from 'react-bootstrap';
 
-import logo from '../../Logo.svg';
+import logo from '../../logo.svg';
 import Login from '../user/Login';
 import Navigation from './Navigation'
 
