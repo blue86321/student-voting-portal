@@ -5,7 +5,7 @@ spring:
   datasource:
     # MySQL
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME_JAVA:student_voting_portal_java}
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME_JAVA:student_voting_portal_java}?serverTimezone=UTC
 #    H2 database
 #    driver-class-name: org.h2.Driver
 #    url: jdbc:h2:mem:testdb

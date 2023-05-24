@@ -1,5 +1,11 @@
 package edu.scu.studentvotingportal.service.serviceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import edu.scu.studentvotingportal.dto.PositionParams;
 import edu.scu.studentvotingportal.dto.PositionResp;
 import edu.scu.studentvotingportal.entity.Candidates;
@@ -14,15 +20,8 @@ import edu.scu.studentvotingportal.repository.PositionRepository;
 import edu.scu.studentvotingportal.repository.UserRepository;
 import edu.scu.studentvotingportal.service.PositionService;
 import edu.scu.studentvotingportal.utils.Permissions;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
-@Slf4j
 public class PositionServiceImpl implements PositionService {
 
     @Autowired

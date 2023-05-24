@@ -1,14 +1,13 @@
 package edu.scu.studentvotingportal.dto;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import edu.scu.studentvotingportal.entity.Elections;
-import edu.scu.studentvotingportal.entity.Positions;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Data;
-
-import java.util.Date;
-import java.util.List;
 
 @Data
 public class VoteElectionResp {
@@ -24,7 +23,6 @@ public class VoteElectionResp {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @Temporal(TemporalType.TIMESTAMP)
     Date endTime;
-
 
     public VoteElectionResp(Elections elections) {
         this.id = elections.getId();

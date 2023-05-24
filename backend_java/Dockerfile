@@ -9,10 +9,11 @@ COPY .mvn ./.mvn
 COPY mvnw ./mvnw
 
 # Build the Maven project
-RUN ./mvnw package -DskipTests
-RUN mv target/student_voting_portal-0.0.1-SNAPSHOT.jar app.jar
+# RUN ./mvnw package -DskipTests
+# RUN mv target/student_voting_portal-0.0.1-SNAPSHOT.jar app.jar
 
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["./mvnw", "spring-boot:run"]

@@ -12,7 +12,17 @@ docker compose up
 
 ### Visit
 - frontend: http://localhost:3000
-- backend: http://localhost:8000
+- backend (python): http://localhost:8000
+- backend (java): http://localhost:8080/swagger-ui.html
+
+#### Default Data
+##### Superuser
+- email: `super@gmail.com`
+- password: `super`
+##### Admin
+###### Santa Clara University
+- email: `admin@scu.edu`
+- password: `admin_scu`
 
 ### Destroy
 ```shell

@@ -1,11 +1,12 @@
 package edu.scu.studentvotingportal;
 
-import jakarta.annotation.PostConstruct;
+import java.util.TimeZone;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.util.TimeZone;
+import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication
 @EnableWebMvc
@@ -16,7 +17,7 @@ public class Application {
     }
 
     @PostConstruct
-    public void init(){
+    public void init() {
         // Setting Spring Boot SetTimeZone
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }

@@ -1,23 +1,39 @@
 package edu.scu.studentvotingportal.service.serviceImpl;
 
-import edu.scu.studentvotingportal.dto.*;
-import edu.scu.studentvotingportal.entity.*;
-import edu.scu.studentvotingportal.exception.DataNotExistsException;
-import edu.scu.studentvotingportal.exception.PermissionException;
-import edu.scu.studentvotingportal.exception.ValidationException;
-import edu.scu.studentvotingportal.repository.*;
-import edu.scu.studentvotingportal.service.VoteService;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
+import edu.scu.studentvotingportal.dto.CandidateResp;
+import edu.scu.studentvotingportal.dto.VoteElectionResp;
+import edu.scu.studentvotingportal.dto.VoteParams;
+import edu.scu.studentvotingportal.dto.VotePositionResp;
+import edu.scu.studentvotingportal.dto.VoteResp;
+import edu.scu.studentvotingportal.entity.Candidates;
+import edu.scu.studentvotingportal.entity.Elections;
+import edu.scu.studentvotingportal.entity.Positions;
+import edu.scu.studentvotingportal.entity.Users;
+import edu.scu.studentvotingportal.entity.Votes;
+import edu.scu.studentvotingportal.exception.DataNotExistsException;
+import edu.scu.studentvotingportal.exception.PermissionException;
+import edu.scu.studentvotingportal.exception.ValidationException;
+import edu.scu.studentvotingportal.repository.CandidateRepository;
+import edu.scu.studentvotingportal.repository.ElectionRepository;
+import edu.scu.studentvotingportal.repository.PositionRepository;
+import edu.scu.studentvotingportal.repository.UserRepository;
+import edu.scu.studentvotingportal.repository.VoteRepository;
+import edu.scu.studentvotingportal.service.VoteService;
+import jakarta.transaction.Transactional;
 
 @Service
-@Slf4j
 public class VoteServiceImpl implements VoteService {
 
     @Autowired
