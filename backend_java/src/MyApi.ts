@@ -1,6 +1,6 @@
 
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { LoginParams, LoginResponse, createUser, Vote, Candidate, Election, Position } from '../Interfaces/User';
+import { LoginParams, LoginResponse, createUser, Vote, Candidate, Election, Position } from '../User';
 
 export interface Response<T = any> {
   data: T | undefined;
