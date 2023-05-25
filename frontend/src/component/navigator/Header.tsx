@@ -9,7 +9,7 @@ function Header() {
   const [loginModalShow, setLoginModalShow] = React.useState(false);
 
   // TODO: connet to usertype and user status
-  const currentUserType = 'user';
+  const currentUserType = 'admin';
 
   return (
     <div>

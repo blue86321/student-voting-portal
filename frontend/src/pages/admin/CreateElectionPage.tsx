@@ -1,13 +1,11 @@
+import { ProgressBar, Container, Button } from 'react-bootstrap';
+import { useState} from 'react';
+
 import CreateElection from "../../component/admin/CreatElection";
 import CreatePositions from "../../component/admin/CreatePositions";
 import CreateCandidates from "../../component/admin/CreateCandidates";
-import ProgressBar from 'react-bootstrap/ProgressBar';
-import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button';
-import { useState} from 'react';
 
-
-function CreateElectionPage({navigate}) {
+function CreateElectionPage() {
 
     let currentStep = 1;
 
@@ -29,18 +27,13 @@ function CreateElectionPage({navigate}) {
                 
                 <CreateElection></CreateElection>
 
-                {/* TODO: every time click the button, add one "create position" component */}
-                <Button variant="outline-primary"
-                >+ Position</Button>
+                
                 <CreatePositions></CreatePositions>
                 <div className="container d-flex justify-content-center">
                     <Button variant="primary" onClick={handleClick}
                     >Save</Button>
                 </div>
-
-                {/* TODO:  every time click the button, add one "create candidate" component */}
-                <Button variant="outline-primary"
-                >+ Candidates</Button>
+                
                 <CreateCandidates></CreateCandidates>
 
                 <div className="container d-flex justify-content-center">

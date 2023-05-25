@@ -5,8 +5,8 @@ enum ElectionState {
 }
 
 class Election {
-  id: number;
-  url: string;
+  id?: number;
+  url?: string;
   election_name: string;
   desc: string;
   start_time: string;
@@ -14,19 +14,19 @@ class Election {
   readonly state: ElectionState;
 
   constructor(
-    id: number,
-    url: string,
     election_name: string,
     desc: string,
     start_time: string,
-    end_time: string
+    end_time: string,
+    id?: number,
+    url?: string,
   ) {
-    this.id = id;
-    this.url = url;
     this.election_name = election_name;
     this.desc = desc;
     this.start_time = start_time;
     this.end_time = end_time;
+    this.id = id;
+    this.url = url;
 
     const currentTime = new Date();
     const electionEndTime = new Date(end_time);

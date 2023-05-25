@@ -1,8 +1,6 @@
-import Container from "react-bootstrap/Container";
-import { Image } from "react-bootstrap";
+import { Container, Image } from "react-bootstrap";
 
 function ElectionDetail({ election }) {
-  
   return (
     <div className="text-center">
       <Container>

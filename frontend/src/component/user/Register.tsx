@@ -1,6 +1,4 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import { Button, Modal, Form } from "react-bootstrap";
 
 function Register(props) {
   return (
@@ -26,30 +24,33 @@ function Register(props) {
             <Form.Control type="email" placeholder="Enter Your Name" />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email Address</Form.Label>
-              <Form.Control type="email" placeholder="Enter Your Email Address" />
+            <Form.Label>Email Address</Form.Label>
+            <Form.Control type="email" placeholder="Enter Your Email Address" />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Date of Birth</Form.Label>
-              <Form.Control type="email" placeholder="Enter Your Date of Birth" />
+            <Form.Label>Date of Birth</Form.Label>
+            <Form.Control type="email" placeholder="Enter Your Date of Birth" />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>ID</Form.Label>
-              <Form.Control type="email" placeholder="Enter Your Identification Number" />
+            <Form.Label>ID</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Enter Your Identification Number"
+            />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" placeholder="Enter Password" />
+            <Form.Label>Password</Form.Label>
+            <Form.Control type="password" placeholder="Enter Password" />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control type="password" placeholder="Confirm Password" />
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control type="password" placeholder="Confirm Password" />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check type="checkbox" label="Create an Admin Account" />
+            <Form.Check type="checkbox" label="Create an Admin Account" />
           </Form.Group>
           <Button variant="primary" type="submit">
-              Submit
+            Submit
           </Button>
         </Form>
       </Modal.Body>

@@ -1,6 +1,5 @@
 import React, { useEffect, useState, createContext } from "react";
 import { Container } from "react-bootstrap";
-import { Link, useParams, useLocation } from "react-router-dom";
 import ElectionCard from "../../component/elections/ElectionCard";
 import { fetchElections } from "../../service/Api";
 import Election from "../../model/Election.model";
@@ -16,12 +15,12 @@ function Home({ type }) {
           (item) =>
             { console.log('[Home] item: ', item)
               const e = new Election(
-              item.id,
-              item.url,
               item.election_name,
               item.desc,
               item.start_time,
-              item.end_time
+              item.end_time,
+              item.id,
+              item.url,
             )
              console.log('[Home] election: ', e)
             return e

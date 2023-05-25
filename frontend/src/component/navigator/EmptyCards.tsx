@@ -1,6 +1,5 @@
-
 function EmptyCards() {
-    return (<h1>No Elections Now!</h1>)
+  return <h1>No Elections Now!</h1>;
 }
 
 export default EmptyCards;

@@ -1,86 +1,145 @@
-import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import ProgressBar from 'react-bootstrap/ProgressBar';
-import React from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { useState} from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-
+import { Container, Button, Form, Alert, Row, Col } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useEffect, useState } from "react";
+import Election from "../../model/Election.model";
+import { createElection } from "../../service/Api";
+import { AxiosError } from "axios";
 
 function CreateElection() {
+  const [electionName, setElectionName] = useState("");
+  const [startTime, setstartTime] = useState("");
+  const [endTime, setendTime] = useState("");
+  const [description, setDescription] = useState("");
 
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+  const handlestartTime = (date) => {
+    setstartTime(date);
+  };
+  const handleendTime = (date) => {
+    setendTime(date);
+  };
 
-
-    // TODO: get this selected date to the backend
-    const handleStartDate = (date) => {
-        setStartDate(date);
-    };
-
-    const handleEndDate = (date) => {
-        setEndDate(date);
-    };
-
-    const [isClicked, setIsClicked] = useState(false);
-
-    const handleClick = () => {
-        setIsClicked(true);
-    };
-
-    // TODO: onclick handler
-
+  // Form control
+  const [isClicked, setIsClicked] = useState(false);
+  const [isValid, setValid] = useState(false);
+  const validate = () => {
     return (
-        <div style={{ margin: '20px' }}>
-            <Container>
-                {/* <ProgressBar now={33} /> */}
-                <Form>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Election Name</Form.Label>
-                    <Form.Control type="email" placeholder="Election Name" />
-                </Form.Group>
+      electionName.length !== 0 &&
+      description.length !== 0 &&
+      startTime.length !== 0 &&
+      endTime.length !== 0
+    );
+  };
+  useEffect(() => {
+    const isValid = validate();
+    setValid(isValid);
+  }, [electionName, description]);
 
-                <Row>
-                    <Col>
-                        <Form.Group controlId="formDate">
-                            <Form.Label>Start Date</Form.Label>
-                            <DatePicker
-                            selected={startDate}
-                            onChange={(date) => handleStartDate(date)}
-                            className="form-control"
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col>
-                        <Form.Group controlId="formDate">
-                            <Form.Label>End Date</Form.Label>
-                            <DatePicker
-                            selected={endDate}
-                            onChange={(date) => handleEndDate(date)}
-                            className="form-control"
-                            />
-                        </Form.Group>
-                    </Col>
-                </Row>
+  // Form submition
+  const [error, setError] = useState("");
+  const handleClick = async () => {
+    const election = new Election(
+      electionName,
+      description,
+      startTime,
+      endTime
+    );
+    setIsClicked(true);
+    setShowError(false);
+    console.log("#K_ [CreatElection] submit event", election);
+    try {
+      const result: Election[] = await createElection(election);
+      console.log("#K_ [CreatElection] result", result);
+    } catch (error) {
+      setError((error as AxiosError).message);
+      setIsClicked(false);
+      setShowError(true);
+      console.log("#K_ [CreatElection] error", error);
+    }
+  };
 
-                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control  placeholder="Description" as="textarea" rows={3}/>
-                </Form.Group>
+  // Error alert
+  const [showError, setShowError] = useState(false);
 
-                <div className="container d-flex justify-content-center">
-                    <Button variant= 'primary' onClick={handleClick} disabled={isClicked}>{isClicked ? 'Saved' : 'Next'}</Button>
-                </div>
-                </Form>
-            </Container>
+  const showErrorAlert = () => {
+    if (showError) {
+      return (
+        <Alert variant="danger" onClose={() => setShowError(false)} dismissible>
+          There is an errror: {error}
+        </Alert>
+      );
+    }
+  };
 
+  // TODO: onclick handler
 
-        </div>
-    )
+  return (
+    <div style={{ margin: "20px" }}>
+      <Container>
+        {showErrorAlert()}
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Election Name</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Election Name"
+              value={electionName}
+              onChange={(event) => setElectionName(event.target.value)}
+            />
+          </Form.Group>
 
+          <Row>
+            <Col>
+              <Form.Group controlId="formDate">
+                <Form.Label>Start Date</Form.Label>
+                <DatePicker
+                  selected={startTime}
+                  onChange={(date) => handlestartTime(date)}
+                  className="form-control"
+                  showTimeSelect
+                  dateFormat="Pp"
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="formDate">
+                <Form.Label>End Date</Form.Label>
+                <DatePicker
+                  selected={endTime}
+                  onChange={(date) => handleendTime(date)}
+                  className="form-control"
+                  showTimeSelect
+                  dateFormat="Pp"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              placeholder="Description"
+              as="textarea"
+              rows={3}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </Form.Group>
+
+          <div className="container d-flex justify-content-center">
+            <Button
+              variant="primary"
+              type="submit"
+              onClick={handleClick}
+              disabled={isClicked || !isValid}
+            >
+              {isClicked ? "Saved" : "Next"}
+            </Button>
+          </div>
+        </Form>
+      </Container>
+    </div>
+  );
 }
 
 export default CreateElection;

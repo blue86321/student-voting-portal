@@ -1,9 +1,66 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Register from "./Register";
-import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Form,
+  Alert,
+} from "react-bootstrap";
+import { LoginUser, authedUser } from "../../model/User.model";
+import { AxiosError } from "axios";
+import { authentication } from "../../service/Api";
 
 function Login(props) {
   const [registerModalShow, setRegisterModalShow] = React.useState(false);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  // Form control
+  const [isClicked, setIsClicked] = useState(false);
+  const [isValid, setValid] = useState(false);
+  const validate = () => {
+    return email.length !== 0 && password.length !== 0;
+  };
+  useEffect(() => {
+    const isValid = validate();
+    setValid(isValid);
+  }, [email, password]);
+
+  // Form submition
+  const [error, setError] = useState("");
+  const handleSubmit = async (event) => {
+    const user = new LoginUser(email!, password!);
+    setIsClicked(true);
+    setShowError(false);
+    console.log("#K_ [Login] submit event");
+    event.preventDefault();
+    try {
+      const result = await authentication(user);
+      authedUser.setUser(result.email, result.token.access, result.token.refresh, result.is_staff, result.id)
+      console.log("#K_ [Login] result", authedUser);
+    } catch (error) {
+      setError((error as AxiosError).message);
+      setIsClicked(false);
+      setShowError(true);
+      console.log("#K_ [Login] error", error);
+    }
+  };
+
+  // Error alert
+  const [showError, setShowError] = useState(false);
+
+  const showErrorAlert = () => {
+    if (showError) {
+      return (
+        <Alert variant="danger" onClose={() => setShowError(false)} dismissible>
+          There is an errror: {error}
+        </Alert>
+      );
+    }
+  };
 
   return (
     <Modal
@@ -23,24 +80,40 @@ function Login(props) {
         </div>
       </Modal.Header>
       <Modal.Body>
-        <Form>
+        {showErrorAlert()}
+        <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
-            <Form.Control type="email" placeholder="Enter email" />
+            <Form.Control
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
-            <Form.Control type="password" placeholder="Password" />
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              onChange={(event) => setPassword(event.target.value)}
+            />
           </Form.Group>
           <div
             className="container d-flex justify-content-center"
             style={{ padding: "10px" }}
           >
-            <Button variant="primary" type="submit">
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={isClicked || !isValid}
+              // onClick={handleSubmit}
+            >
               Submit
             </Button>
           </div>
+
           <div className="container d-flex justify-content-center">
             <Button
               variant="light"
