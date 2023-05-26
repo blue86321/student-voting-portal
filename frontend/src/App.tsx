@@ -21,6 +21,12 @@ function App() {
         <Route path="/" element={<Home type={"onGoing"} />} />
 
         <Route path="/create_new_elections" element={<CreateElectionPage />} />
+        {/* <Route path="elections" element={<Home type={"onGoing"}/>} />
+        <Route path="elections/*" element={<ElectionRouter />} />
+        <Route path="past_elections" element={<Home type={"past"}/>} />
+        <Route path="upcoming_elections" element={<Home type={"upComing"}/>} />
+        <Route path="/" element={<Home type={"onGoing"}/>}>
+        </Route> */}
       </Routes>
     </div>
   );

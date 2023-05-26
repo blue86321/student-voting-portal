@@ -1,6 +1,6 @@
 import { Button, Card, Row } from "react-bootstrap";
 import React, { useState } from "react";
-import './CandidateCard.css'
+import "./CandidateCard.css";
 
 function CandidateCard({ candidates, electionStatus }) {
   /* TODO: debug for card key;
@@ -9,9 +9,9 @@ function CandidateCard({ candidates, electionStatus }) {
     update the electionStatus with the backend data.
     */
 
-  console.log("[CandidateCard]:", electionStatus)  
+  console.log("[CandidateCard]:", electionStatus);
   let voteCount = 0;
-//   let electionStatus = "onGoing";
+  //   let electionStatus = "onGoing";
 
   const [isClicked, setIsClicked] = useState(false);
 
@@ -50,10 +50,7 @@ function CandidateCard({ candidates, electionStatus }) {
               <Card.Title className="text-center">
                 {candidate.candidate_name}
               </Card.Title>
-              <Card.Img
-                className="card-image"
-                src={candidate.photo_url}         
-              />
+              <Card.Img className="card-image" src={candidate.photo_url} />
               <Card.Text className="card-text-multiline">
                 Introduction: <br />
                 {candidate.desc}

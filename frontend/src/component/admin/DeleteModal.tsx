@@ -9,7 +9,6 @@ function DeleteModal(props) {
 
   return (
     <>
-
       {/* <Button variant="outline-danger" onClick={handleShow}>
         Delete
       </Button> */}
@@ -21,12 +20,14 @@ function DeleteModal(props) {
         keyboard={false}
         centered
       >
-        <Modal.Header closeButton >
-          <Modal.Title className="text-center">Are You Sure to Delete This User?</Modal.Title>
+        <Modal.Header closeButton>
+          <Modal.Title className="text-center">
+            Are You Sure to Delete This User?
+          </Modal.Title>
         </Modal.Header>
-        
+
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={props.onHide} >
+          <Button variant="outline-secondary" onClick={props.onHide}>
             Cancel
           </Button>
           <Button variant="danger">Delete</Button>
