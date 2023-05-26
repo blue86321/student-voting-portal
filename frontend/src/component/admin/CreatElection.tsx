@@ -6,7 +6,7 @@ import Election from "../../model/Election.model";
 import { createElection } from "../../service/Api";
 import { AxiosError } from "axios";
 
-function CreateElection() {
+function CreateElection({onNext}) {
   const [electionName, setElectionName] = useState("");
   const [startTime, setstartTime] = useState("");
   const [endTime, setendTime] = useState("");
@@ -56,6 +56,8 @@ function CreateElection() {
       setShowError(true);
       console.log("#K_ [CreatElection] error", error);
     }
+
+    onNext(33.33);
   };
 
   // Error alert
@@ -70,8 +72,6 @@ function CreateElection() {
       );
     }
   };
-
-  // TODO: onclick handler
 
   return (
     <div style={{ margin: "20px" }}>
