@@ -75,3 +75,45 @@ export interface Position {
   maxVotesPerCandidate: number;
 }
 
+export interface ElectionData {
+  code: number;
+  success: boolean;
+  msg: string;
+  data: ElectionDetail[];
+}
+
+export interface ElectionDetail {
+  id: number;
+  positions: PositionDetail[];
+  university: University;
+  electionName: string;
+  electionDesc: string;
+  startTime: string;
+  endTime: string;
+}
+
+export interface PositionDetail {
+  id: number;
+  electionId: number;
+  positionName: string;
+  positionDesc: string;
+  maxVotesTotal: number;
+  maxVotesPerCandidate: number;
+  candidates: CandidateDetail[];
+}
+
+export interface CandidateDetail {
+  id: number;
+  electionId: number;
+  positionId: number;
+  userId: number;
+  voteCount: number;
+  candidateName: string;
+  candidateDesc: string;
+  photoUrl: string;
+}
+
+export interface University {
+  id: number;
+  name: string;
+}
