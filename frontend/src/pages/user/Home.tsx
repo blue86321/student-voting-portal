@@ -5,12 +5,12 @@ import ElectionCard from "../../component/elections/ElectionCard";
 import Election from "../../model/Election.model";
 import myApi from "../../service/MyApi";
 import { ElectionDetail } from "../../Interfaces/Election";
+import { currentUser } from "../../model/User.model";
 // import {LoginResponse} from "../../service/MyApi"
 
 function Home({ type }) {
-  console.log("[Rendering] Home");
   const [data, setData] = useState<Election[]>([]);
-
+  const contentType = currentUser.isAdmin ? "admin" : type
   useEffect(() => {
     const fetchDataAsync = async () => {
       const result = await myApi.getElections();
@@ -27,24 +27,25 @@ function Home({ type }) {
     };
 
     fetchDataAsync();
-  }, []);
+  }, [currentUser]);
+  console.log("[Rendering] Home", contentType);
 
   return (
     <div>
       <Container className="mt-4">
-        {type === "onGoing" ? (
+        {contentType === "onGoing" ? (
           <ElectionCard
             elections={data.filter((election) => election.state === 1)}
           ></ElectionCard>
-        ) : type === "past" ? (
+        ) : contentType === "past" ? (
           <ElectionCard
             elections={data.filter((election) => election.state === 2)}
           ></ElectionCard>
-        ) : type === "upComing" ? (
+        ) : contentType === "upComing" ? (
           <ElectionCard
             elections={data.filter((election) => election.state === 0)}
           ></ElectionCard>
-        ) : type === "admin" ? (
+        ) : contentType === "admin" ? (
           <ElectionCard elections={data}></ElectionCard>
         ) : null}
       </Container>

@@ -64,6 +64,10 @@ class CurrentUser implements LoginResponse {
     return currentUser;
   }
 
+  get isAdmin(): boolean {
+    return this.staff || this.superuser;
+  }
+
   isLoggedIn(): boolean {
     return this.email !== "";
   }

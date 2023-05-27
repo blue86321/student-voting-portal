@@ -24,8 +24,22 @@ class Election implements ElectionDetail {
     this.university = e.university;
     this.electionName = e.electionName;
     this.electionDesc = e.electionDesc;
-    this.startTime = e.startTime;
-    this.endTime = e.endTime;
+    const st = new Date(e.startTime)
+    const et = new Date(e.endTime)
+    this.startTime = st.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    this.endTime = et.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
   
   get state(): Number {
