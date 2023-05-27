@@ -2,21 +2,23 @@ import { Container, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
-import Election from "../../model/Election.model";
-import { createElection } from "../../service/Api";
-import { AxiosError } from "axios";
+import myApi from "../../service/MyApi";
+import { Election, ElectionDetail } from "../../Interfaces/Election";
 
-function CreateElection({onNext}) {
+function CreateElection({ onNext }) {
   const [electionName, setElectionName] = useState("");
-  const [startTime, setstartTime] = useState("");
-  const [endTime, setendTime] = useState("");
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
   const [description, setDescription] = useState("");
 
-  const handlestartTime = (date) => {
-    setstartTime(date);
+  const handleStartTime = (date: Date) => {
+    setStartTime(date);
+    const newDate = new Date(date.getTime() + 86400000)
+    console.log("[CreateElection] date: ", date, ", newDate: ", newDate);
+    setEndTime(newDate);
   };
-  const handleendTime = (date) => {
-    setendTime(date);
+  const handleEndTime = (date) => {
+    setEndTime(date);
   };
 
   // Form control
@@ -26,39 +28,14 @@ function CreateElection({onNext}) {
     return (
       electionName.length !== 0 &&
       description.length !== 0 &&
-      startTime.length !== 0 &&
-      endTime.length !== 0
+      startTime !== null &&
+      endTime !== null
     );
   };
   useEffect(() => {
     const isValid = validate();
     setValid(isValid);
   }, [electionName, description]);
-
-  // Form submition
-  const [error, setError] = useState("");
-  const handleClick = async () => {
-    const election = new Election(
-      electionName,
-      description,
-      startTime,
-      endTime
-    );
-    setIsClicked(true);
-    setShowError(false);
-    console.log("#K_ [CreatElection] submit event", election);
-    try {
-      const result: Election[] = await createElection(election);
-      console.log("#K_ [CreatElection] result", result);
-    } catch (error) {
-      setError((error as AxiosError).message);
-      setIsClicked(false);
-      setShowError(true);
-      console.log("#K_ [CreatElection] error", error);
-    }
-
-    onNext(33.33);
-  };
 
   // Error alert
   const [showError, setShowError] = useState(false);
@@ -70,6 +47,34 @@ function CreateElection({onNext}) {
           There is an errror: {error}
         </Alert>
       );
+    }
+  };
+
+  // Form submition
+  const [error, setError] = useState("");
+  const handleClick = async () => {
+    const election: Election = {
+      universityId: 1,
+      electionName: electionName,
+      electionDesc: description,
+      startTime: new Date(startTime!),
+      endTime: new Date(endTime!),
+    };
+    setIsClicked(true);
+    setShowError(false);
+    console.log("#K_ [CreatElection] submit event", election);
+    const result = await myApi.createElection(election);
+    if (result.success) {
+      const electionDetail: ElectionDetail = result.data as ElectionDetail
+      console.log("#K_ [CreatElection] result", electionDetail);
+      setIsClicked(false);
+      setShowError(false);
+      onNext(33.33);
+    } else {
+      setError(result.msg);
+      setIsClicked(false);
+      setShowError(true);
+      console.log("#K_ [CreatElection] error", error);
     }
   };
 
@@ -94,7 +99,7 @@ function CreateElection({onNext}) {
                 <Form.Label>Start Date</Form.Label>
                 <DatePicker
                   selected={startTime}
-                  onChange={(date) => handlestartTime(date)}
+                  onChange={(date) => handleStartTime(date)}
                   className="form-control"
                   showTimeSelect
                   dateFormat="Pp"
@@ -106,9 +111,11 @@ function CreateElection({onNext}) {
                 <Form.Label>End Date</Form.Label>
                 <DatePicker
                   selected={endTime}
-                  onChange={(date) => handleendTime(date)}
+                  onChange={(date) => handleEndTime(date)}
                   className="form-control"
                   showTimeSelect
+                  minDate={startTime}
+                  showDisabledMonthNavigation
                   dateFormat="Pp"
                 />
               </Form.Group>

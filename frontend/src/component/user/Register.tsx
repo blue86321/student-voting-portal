@@ -7,7 +7,7 @@ import { currentUser } from "../../model/User.model";
 
 function Register(props) {
   const [isClicked, setIsClicked] = useState(false);
-  const [dob, setDob] = useState("");
+  const [dob, setDob] = useState(new Date().setFullYear(new Date().getFullYear()-18));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
