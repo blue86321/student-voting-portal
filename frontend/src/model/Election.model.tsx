@@ -1,52 +1,54 @@
+import { ElectionDetail, PositionDetail } from "../Interfaces/Election";
+import { University } from "../Interfaces/User";
+
 enum ElectionState {
   upComing = 0,
   onGoing = 1,
   past = 2,
 }
 
-class Election {
-  id?: number;
-  url?: string;
-  election_name: string;
-  desc: string;
-  start_time: string;
-  end_time: string;
-  readonly state: ElectionState;
+class Election implements ElectionDetail {
+  id: number;
+  positions: PositionDetail[];
+  university: University;
+  electionName: string;
+  electionDesc: string;
+  startTime: string;
+  endTime: string;
 
   constructor(
-    election_name: string,
-    desc: string,
-    start_time: string,
-    end_time: string,
-    id?: number,
-    url?: string,
+    e: ElectionDetail
   ) {
-    this.election_name = election_name;
-    this.desc = desc;
-    this.start_time = start_time;
-    this.end_time = end_time;
-    this.id = id;
-    this.url = url;
-
+    this.id = e.id;
+    this.positions = e.positions;
+    this.university = e.university;
+    this.electionName = e.electionName;
+    this.electionDesc = e.electionDesc;
+    this.startTime = e.startTime;
+    this.endTime = e.endTime;
+  }
+  
+  get state(): Number {
     const currentTime = new Date();
-    const electionEndTime = new Date(end_time);
-    const electionStartTime = new Date(start_time);
+    const electionEndTime = new Date(this.endTime);
+    const electionStartTime = new Date(this.startTime);
     const isElectionPast = electionEndTime.getTime() < currentTime.getTime();
     const isElectionFuture =
       electionStartTime.getTime() > currentTime.getTime();
     console.log(
-      "[Election model] electionStartTime:",this.end_time ,
-      electionStartTime.toString(), 
+      "[Election model] electionStartTime:",
+      this.endTime,
+      electionStartTime.toString(),
       "currentTime:",
       currentTime.toString()
     );
 
     if (isElectionPast) {
-      this.state = ElectionState.past;
+      return ElectionState.past;
     } else if (isElectionFuture) {
-        this.state = ElectionState.upComing;
+      return ElectionState.upComing;
     } else {
-        this.state = ElectionState.onGoing;
+      return ElectionState.onGoing;
     }
   }
 }
