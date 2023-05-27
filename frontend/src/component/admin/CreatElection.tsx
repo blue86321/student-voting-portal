@@ -5,21 +5,32 @@ import { useEffect, useState } from "react";
 import myApi from "../../service/MyApi";
 import { Election, ElectionDetail } from "../../Interfaces/Election";
 
-function CreateElection({ onNext }) {
+function CreateElection({ onNext, electionForUpdate }) {
   const [electionName, setElectionName] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [description, setDescription] = useState("");
+  const [electionID, setElectionID] = useState<Number | null>(null);
 
   const handleStartTime = (date: Date) => {
     setStartTime(date);
-    const newDate = new Date(date.getTime() + 86400000)
+    const newDate = new Date(date.getTime() + 86400000);
     console.log("[CreateElection] date: ", date, ", newDate: ", newDate);
     setEndTime(newDate);
   };
   const handleEndTime = (date) => {
     setEndTime(date);
   };
+
+  // Fetch election by election ID for update
+  if (electionForUpdate !== null) {
+    console.log("[CreateElection] update with eID: ", electionForUpdate.id);
+    setElectionID(electionForUpdate.id);
+    setElectionName(electionForUpdate.electionName);
+    setStartTime(electionForUpdate.startTime);
+    setEndTime(electionForUpdate.endTime);
+    setDescription(electionForUpdate.electionDesc);
+  }
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
@@ -63,13 +74,19 @@ function CreateElection({ onNext }) {
     setIsClicked(true);
     setShowError(false);
     console.log("#K_ [CreatElection] submit event", election);
-    const result = await myApi.createElection(election);
+    const isCreate = electionID === null;
+    const result = isCreate
+      ? await myApi.createElection(election)
+      : await myApi.updateElection({
+          electionData: election,
+          electionId: electionID.toString(),
+        });
     if (result.success) {
-      const electionDetail: ElectionDetail = result.data as ElectionDetail
+      const electionDetail: ElectionDetail = result.data as ElectionDetail;
+      setElectionID(electionDetail.id);
       console.log("#K_ [CreatElection] result", electionDetail);
-      setIsClicked(false);
       setShowError(false);
-      onNext(33.33);
+      onNext(33.33, electionDetail);
     } else {
       setError(result.msg);
       setIsClicked(false);
@@ -83,10 +100,10 @@ function CreateElection({ onNext }) {
       <Container>
         {showErrorAlert()}
         <Form>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Group className="mb-3" controlId="formElectionName">
             <Form.Label>Election Name</Form.Label>
             <Form.Control
-              type="email"
+              type="text"
               placeholder="Election Name"
               value={electionName}
               onChange={(event) => setElectionName(event.target.value)}
@@ -122,7 +139,7 @@ function CreateElection({ onNext }) {
             </Col>
           </Row>
 
-          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+          <Form.Group className="mb-3" controlId="formElectionDescription">
             <Form.Label>Description</Form.Label>
             <Form.Control
               placeholder="Description"
@@ -138,9 +155,9 @@ function CreateElection({ onNext }) {
               variant="primary"
               type="submit"
               onClick={handleClick}
-              disabled={isClicked || !isValid}
+              disabled={(electionID === null && isClicked) || !isValid}
             >
-              {isClicked ? "Saved" : "Next"}
+              {electionID === null ? (isClicked ? "Saved" : "Next") : "Update"}
             </Button>
           </div>
         </Form>

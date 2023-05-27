@@ -13,6 +13,7 @@ import { CurrentUser, currentUser } from "../../model/User.model";
 import { AxiosError } from "axios";
 import myApi from "../../service/MyApi";
 import User, { LoginParams } from "../../Interfaces/User";
+import { useNavigate } from "react-router-dom";
 // import { useAppSelector, useAppDispatch } from "../../hooks";
 
 function Login(props) {
@@ -26,6 +27,7 @@ function Login(props) {
   // Form control
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
+  const navigate = useNavigate();
   const validate = () => {
     return email.length !== 0 && password.length !== 0;
   };
@@ -38,9 +40,9 @@ function Login(props) {
   const [error, setError] = useState("");
   const handleSubmit = async (event) => {
     const user: LoginParams = {
-      email:  email,
+      email: email,
       password: password,
-    }
+    };
     setIsClicked(true);
     setShowError(false);
     console.log("#K_ [Login] submit event");
@@ -56,6 +58,9 @@ function Login(props) {
 
       setIsClicked(false);
       props.onHide();
+      currentUser.staff || currentUser.superuser
+        ? navigate("/manage_elections")
+        : navigate("/");
     } catch (error) {
       setError((error as AxiosError).message);
       setIsClicked(false);

@@ -29,7 +29,7 @@ function PositionComponent({ id, onDelete }) {
 }
 let positionCount = 1; // need to set at least 1 position
 
-function CreatePositions() {
+function CreatePositions(electionID) {
   const [positions, setPositions] = useState<React.ReactNode[]>([]);
 
   const handleAddPosition = () => {

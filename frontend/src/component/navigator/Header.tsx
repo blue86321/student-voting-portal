@@ -15,13 +15,11 @@ function Header() {
   const [alertType, setAlertType] = useState("danger");
   const navigate = useNavigate();
   // TODO: connet to usertype and user status
-  const currentUserType =
-    currentUser.staff || currentUser.superuser ? "admin" : "user";
   const isLoggedIn = currentUser.isLoggedIn();
 
   useEffect(() => {
     loadUserType();
-  }, []);
+  }, [isLoggedIn]);
 
   // Error alert
   const [showError, setShowError] = useState(false);
@@ -29,7 +27,11 @@ function Header() {
   const showErrorAlert = () => {
     if (showError) {
       return (
-        <Alert variant={alertType} onClose={() => setShowError(false)} dismissible>
+        <Alert
+          variant={alertType}
+          onClose={() => setShowError(false)}
+          dismissible
+        >
           {error}
         </Alert>
       );
@@ -46,24 +48,32 @@ function Header() {
     setError("You have been logged out!");
     setAlertType("success");
     setShowError(true);
+    console.log("[Header] Logout reset navigate");
     navigate("/");
   };
 
   const loadUserType = async () => {
-    console.log("[Header] loadUserType")
+    console.log("[Header] loadUserType");
     let token = localStorage.getItem("token");
     if (!token) {
       //no token: no user logged in
-      return
+      console.log("[Header] no token: no user logged in");
+      setIsAdmin(false);
+      setShowError(false);
+      console.log("[Header] loadUserType(no token) reset navigate");
+      navigate("/");
+      return;
     }
     const user = await currentUser.getUser();
-    console.log("[Header] user: ", user)
-    if (user.email !== '') {
+    console.log("[Header] user: ", user);
+    if (user.email !== "") {
       setIsAdmin(user.staff || user.superuser);
+      setShowError(false);
     } else {
       setAlertType("danger");
       setError("Login expired!");
       setShowError(true);
+      console.log("[Header] loadUserType reset navigate");
       navigate("/");
     }
   };
@@ -97,7 +107,7 @@ function Header() {
         <h1>Student Voting</h1>
       </Container>
       <Container>
-        <Navigation isAdmin={currentUserType==="admin"} />
+        <Navigation isAdmin={isAdmin} />
       </Container>
       <Login show={loginModalShow} onHide={() => setLoginModalShow(false)} />
       {/* <main>

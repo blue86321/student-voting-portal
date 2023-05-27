@@ -1,16 +1,27 @@
+import { useEffect, useState } from "react";
 import { Container, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 function Navigation({ isAdmin }) {
+  const [activeKey, setActiveKey] = useState("/");
+
+  const handleSelect = (selectedKey) => {
+    setActiveKey(selectedKey);
+  };
   if (isAdmin) {
     return (
       <Container>
-        <Nav variant="tabs" defaultActiveKey="/manage_elections">
+        <Nav
+          activeKey={activeKey}
+          variant="tabs"
+          defaultActiveKey="/"
+          onSelect={handleSelect}
+        >
           <Nav.Item>
             <Nav.Link
               as={Link}
               to="/manage_elections"
-              eventKey="/manage_elections"
+              eventKey="/"
             >
               Manage Elections
             </Nav.Link>

@@ -18,7 +18,7 @@ class CurrentUser implements User {
   }
 
   setUser(user: User) {
-    console.log("[UserModel] setUser")
+    console.log("[UserModel] setUser");
     this.id = user.id;
     this.email = user.email;
     this.dob = user.dob;
@@ -29,7 +29,7 @@ class CurrentUser implements User {
   async refreshUserIfNeeded() {
     let token = localStorage.getItem("token");
     if (this.email !== "") {
-        console.log("[UserModel] no need to refresh user (email: " + this.email);
+      console.log("[UserModel] no need to refresh user (email: " + this.email);
       return;
     }
     if (token) {
@@ -52,7 +52,7 @@ class CurrentUser implements User {
     return currentUser;
   }
 
- isLoggedIn(): boolean {
+  isLoggedIn(): boolean {
     return this.email !== "";
   }
 

@@ -7,8 +7,11 @@ import CreateCandidates from "../../component/admin/CreateCandidates";
 
 function CreateElectionPage() {
   const [progress, setProgress] = useState(0);
-  const handleNext = (value) => {
+  const [electionID, setElectionID] = useState<Number | null>(null);
+  const handleNext = (value, election) => {
     setProgress(value);
+    console.log("[CreateElectionPage] create election: ", election.id);
+    setElectionID(election.id);
   };
 
   const [isClicked, setIsClicked] = useState(false);
@@ -31,11 +34,11 @@ function CreateElectionPage() {
           <ProgressBar now={progress} label={`${progress}%`} />
         </Container>
 
-        {progress >= 0 && <CreateElection onNext={handleNext}></CreateElection>}
+        {progress >= 0 && <CreateElection onNext={handleNext} electionForUpdate={null}></CreateElection>}
 
         {progress >= 33.33 && (
           <>
-            <CreatePositions></CreatePositions>
+            <CreatePositions electionID={electionID}></CreatePositions>
             <div className="container d-flex justify-content-center">
               <Button variant="primary" onClick={handleSave}>
                 Save
