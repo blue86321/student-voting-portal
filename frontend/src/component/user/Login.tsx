@@ -12,7 +12,7 @@ import {
 import { CurrentUser, currentUser } from "../../model/User.model";
 import { AxiosError } from "axios";
 import myApi from "../../service/MyApi";
-import User, { LoginParams } from "../../Interfaces/User";
+import User, { LoginParams, LoginResponse } from "../../Interfaces/User";
 import { useNavigate } from "react-router-dom";
 // import { useAppSelector, useAppDispatch } from "../../hooks";
 
@@ -51,7 +51,7 @@ function Login(props) {
       const result = await myApi.login(user);
       // authedUser.setUser(result.email, result.token.access, result.token.refresh, result.is_staff, result.id)
       console.log("#K_ [Login] result", result);
-      currentUser.setUser(result.data as User);
+      currentUser.setUser(result.data as LoginResponse);
       // const cUser = new CurrentUser()
       // cUser.setUser(result.data as User)
       // dispatch(setUser(cUser))

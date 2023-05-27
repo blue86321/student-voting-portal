@@ -34,9 +34,3 @@ export interface CreateUserParams {
   dob: Date,
   admin: Boolean
 }
-
-
-export interface University {
-  id: number;
-  name: string;
-}

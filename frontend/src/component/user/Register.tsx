@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Modal, Form, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import User, { CreateUserParams, University } from "../../Interfaces/User";
+import User, { CreateUserParams, LoginResponse, University } from "../../Interfaces/User";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
 
@@ -50,7 +50,7 @@ function Register(props) {
     const result = await myApi.createUser(user);
     if (result.success) {
     console.log("#K_ [Register] result success:", result);
-    currentUser.setUser(result.data as User);
+    currentUser.setUser(result.data as LoginResponse);
       setIsClicked(false);
       props.onHide();
     } else {

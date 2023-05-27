@@ -1,12 +1,14 @@
-import User from "../Interfaces/User";
+import User, { LoginResponse, Token, University } from "../Interfaces/User";
 import myApi from "../service/MyApi";
 
-class CurrentUser implements User {
+class CurrentUser implements LoginResponse {
   id: number;
   email: string;
   dob: string;
   staff: boolean;
   superuser: boolean;
+  token: Token;
+  university: University;
 
   constructor() {
     console.log("[User Model] create new user");
@@ -15,15 +17,25 @@ class CurrentUser implements User {
     this.dob = "";
     this.staff = false;
     this.superuser = false;
+    this.token = {
+      access: '',
+      refresh: '',
+    }
+    this.university = {
+      id: 1,
+      name: '',
+    }
   }
 
-  setUser(user: User) {
+  setUser(user: LoginResponse) {
     console.log("[UserModel] setUser");
     this.id = user.id;
     this.email = user.email;
     this.dob = user.dob;
     this.staff = user.staff;
     this.superuser = user.superuser;
+    this.token = user.token;
+    this.university = user.university;
   }
 
   async refreshUserIfNeeded() {
@@ -37,7 +49,7 @@ class CurrentUser implements User {
       const result = await myApi.getMe();
       if (result.success) {
         console.log("[UserModel] user refresh success");
-        this.setUser(result.data as User);
+        this.setUser(result.data as LoginResponse);
       } else {
         console.log("[UserModel] user fresh failed: ", result.msg);
       }
@@ -63,6 +75,14 @@ class CurrentUser implements User {
     this.dob = "";
     this.staff = false;
     this.superuser = false;
+    this.token = {
+      access: '',
+      refresh: '',
+    }
+    this.university = {
+      id: 1,
+      name: '',
+    }
     localStorage.removeItem("token");
   }
 }
