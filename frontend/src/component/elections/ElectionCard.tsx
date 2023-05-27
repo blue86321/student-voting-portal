@@ -6,11 +6,9 @@ import EmptyCards from "../navigator/EmptyCards";
 // export const ElectionContext = createContext<Election | null>(null);
 
 function ElectionCard({ elections }) {
-
   return (
     <Row xs={1} md={2} lg={3} className="g-4">
-      {/* <ElectionContext.Provider value={data}> */}
-      {elections ? (
+      {elections.length > 0 ? (
         elections.map((variant) => (
           <Col key={variant.id}>
             <Card key={variant.id} style={{ width: "22rem" }}>
@@ -37,7 +35,7 @@ function ElectionCard({ elections }) {
                     to={`/elections/${variant.id}`}
                     state={variant}
                   >
-                    View More
+                    {elections.state === 2 ? "View Result" : "View More"}
                   </Card.Link>
                 </div>
               </Card.Body>
@@ -47,7 +45,6 @@ function ElectionCard({ elections }) {
       ) : (
         <EmptyCards />
       )}
-      {/* </ElectionContext.Provider> */}
     </Row>
   );
 }

@@ -47,9 +47,11 @@ class MyApi {
     //The request method is then called with the created parameters, and the response is returned.
     const response = await this.request(params)
     // Assuming the token is returned in the response data as 'token'
-    const token = response.data.token;
-    // Store the token in localStorage
-    localStorage.setItem('token', token);
+    if (response.success) {
+      const token = response.data.token;
+      // Store the token in localStorage
+      localStorage.setItem('token', token.access);
+    }
     // your post-process logic. e.g. calculate who's the election winner and add a tag to it.
     return response
   }
@@ -334,8 +336,10 @@ class MyApi {
     };
     const response = await this.request(params);
     // set token
-    const token = response.data.token;
-    localStorage.setItem('token', token);
+    if (response.success) {
+      const token = response.data.token;
+      localStorage.setItem('token', token.access);
+    }
     return response;
   }
   async getUser(userId: string): Promise<Response<User>> {

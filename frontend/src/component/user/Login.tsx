@@ -9,14 +9,19 @@ import {
   Form,
   Alert,
 } from "react-bootstrap";
-import { LoginUser, authedUser } from "../../model/User.model";
+import { CurrentUser, currentUser } from "../../model/User.model";
 import { AxiosError } from "axios";
-import { authentication } from "../../service/Api";
+import myApi from "../../service/MyApi";
+import User, { LoginParams } from "../../Interfaces/User";
+// import { useAppSelector, useAppDispatch } from "../../hooks";
 
 function Login(props) {
   const [registerModalShow, setRegisterModalShow] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  //redux
+  // const reduxUser = useAppSelector((state) => state.user.value);
+  // const dispatch = useAppDispatch();
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
@@ -32,15 +37,25 @@ function Login(props) {
   // Form submition
   const [error, setError] = useState("");
   const handleSubmit = async (event) => {
-    const user = new LoginUser(email!, password!);
+    const user: LoginParams = {
+      email:  email,
+      password: password,
+    }
     setIsClicked(true);
     setShowError(false);
     console.log("#K_ [Login] submit event");
     event.preventDefault();
     try {
-      const result = await authentication(user);
-      authedUser.setUser(result.email, result.token.access, result.token.refresh, result.is_staff, result.id)
-      console.log("#K_ [Login] result", authedUser);
+      const result = await myApi.login(user);
+      // authedUser.setUser(result.email, result.token.access, result.token.refresh, result.is_staff, result.id)
+      console.log("#K_ [Login] result", result);
+      currentUser.setUser(result.data as User);
+      // const cUser = new CurrentUser()
+      // cUser.setUser(result.data as User)
+      // dispatch(setUser(cUser))
+
+      setIsClicked(false);
+      props.onHide();
     } catch (error) {
       setError((error as AxiosError).message);
       setIsClicked(false);
@@ -81,7 +96,7 @@ function Login(props) {
       </Modal.Header>
       <Modal.Body>
         {showErrorAlert()}
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
             <Form.Control
@@ -108,7 +123,7 @@ function Login(props) {
               variant="primary"
               type="submit"
               disabled={isClicked || !isValid}
-              // onClick={handleSubmit}
+              onClick={handleSubmit}
             >
               Submit
             </Button>
@@ -116,7 +131,7 @@ function Login(props) {
 
           <div className="container d-flex justify-content-center">
             <Button
-              variant="light"
+              variant="link"
               type="button"
               onClick={() => setRegisterModalShow(true)}
             >

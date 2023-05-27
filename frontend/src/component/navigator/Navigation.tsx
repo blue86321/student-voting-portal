@@ -1,8 +1,8 @@
 import { Container, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-function Navigation({ userType }) {
-  if (userType === "admin") {
+function Navigation({ isAdmin }) {
+  if (isAdmin) {
     return (
       <Container>
         <Nav variant="tabs" defaultActiveKey="/manage_elections">
