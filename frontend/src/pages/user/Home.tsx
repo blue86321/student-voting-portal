@@ -1,59 +1,52 @@
 import React, { useEffect, useState, createContext } from "react";
 import { Container } from "react-bootstrap";
-import { Link, useParams, useLocation } from "react-router-dom";
 import ElectionCard from "../../component/elections/ElectionCard";
-import { fetchElections } from "../../service/Api";
+// import { getElections } from "../../service/Api";
 import Election from "../../model/Election.model";
+import myApi from "../../service/MyApi";
+import { ElectionDetail } from "../../Interfaces/Election";
+import { currentUser } from "../../model/User.model";
+// import {LoginResponse} from "../../service/MyApi"
 
 function Home({ type }) {
   const [data, setData] = useState<Election[]>([]);
-
+  const contentType = currentUser.isAdmin ? "admin" : type
   useEffect(() => {
     const fetchDataAsync = async () => {
-      try {
-        const result: Election[] = await fetchElections();
-        const instances = result.map(
-          (item) =>
-            { console.log('[Home] item: ', item)
-              const e = new Election(
-              item.id,
-              item.url,
-              item.election_name,
-              item.desc,
-              item.start_time,
-              item.end_time
-            )
-             console.log('[Home] election: ', e)
-            return e
-          }
-        );
-        setData(instances);
-        console.log("[Election card] data:", instances);
-      } catch (error) {
+      const result = await myApi.getElections();
+      if (result.success) {
+        const electionDetails = (result.data as ElectionDetail[]).map(election => {
+          return new Election(election);
+        });
+        setData(electionDetails);
+        // console.log("[Home] data:", electionDetails);
+      } else {
         // Handle error
+        console.log("[Home] getElections failed: " + result.msg);
       }
     };
 
     fetchDataAsync();
-  }, []);
-
-  console.log("[Home]:", data);
+  }, [currentUser]);
+  console.log("[Rendering] Home", contentType);
 
   return (
     <div>
       <Container className="mt-4">
-        {type === "onGoing" ? (
+        {contentType === "onGoing" ? (
           <ElectionCard
             elections={data.filter((election) => election.state === 1)}
           ></ElectionCard>
-        ) : type === "past" ? (
+        ) : contentType === "past" ? (
           <ElectionCard
             elections={data.filter((election) => election.state === 2)}
           ></ElectionCard>
-        ) : type === "upComing" ? (
+        ) : contentType === "upComing" ? (
           <ElectionCard
             elections={data.filter((election) => election.state === 0)}
           ></ElectionCard>
+        ) : contentType === "admin" ? (
+          <ElectionCard elections={data}></ElectionCard>
         ) : null}
       </Container>
     </div>

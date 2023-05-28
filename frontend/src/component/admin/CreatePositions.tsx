@@ -1,42 +1,225 @@
-import Button from 'react-bootstrap/Button';
-import { useState} from 'react';
-import Form from 'react-bootstrap/Form';
+import { Alert, Button, Form } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Position, PositionDetail } from "../../Interfaces/Election";
+import myApi from "../../service/MyApi";
 
+function PositionComponent({ index, position, onDelete, updatePosition }) {
+  const [positionName, setPositionName] = useState(position.positionName);
+  const [positionDesc, setPositionDesc] = useState(position.positionDesc);
+  const [shouldShowSave, setShouldShowSave] = useState(false);
 
+  useEffect(() => {
+    console.log("[CreatePosition] position updated: ", position);
+    setPositionName(position.positionName);
+    setPositionDesc(position.positionDesc);
+  }, [position]);
 
-function CreatePositions() {
+  const handleOnChangeName = (name) => {
+    setPositionName(name);
+    position.positionName = name;
+    handleOnChange();
+  };
+  const handleOnChangeDesc = (desc) => {
+    setPositionDesc(desc);
+    position.positionDesc = desc;
+    handleOnChange();
+  };
+  const handleOnChange = () => {
+    updatePosition(index, position);
+    setShouldShowSave(true);
+  };
 
-    const [isClicked, setIsClicked] = useState(false);
-
-    const handleClick = () => {
-        setIsClicked(true);
+  const onSave = async (index) => {
+    console.log("[CreatePositions] create", position);
+    const positionData: Position = {
+      electionId: Number(position.electionId),
+      positionName: positionName,
+      positionDesc: positionDesc,
+      maxVotesTotal: 9,
+      maxVotesPerCandidate: 9,
     };
+    const isCreate = position.id === 0;
+    const result = isCreate
+      ? await myApi.createPosition(positionData)
+      : await myApi.updatePosition({
+          positionData: positionData,
+          positionId: position.id,
+        });
+    if (result.success) {
+      position.id = (result.data as PositionDetail).id;
+      updatePosition(index, position);
+      setShouldShowSave(false);
+    } else {
+      console.log("[CreatePosition] Error creating position", result.msg);
+    }
+  };
 
+  const onDeleteClicked = async (index) => {
+    if (position.id === -1) {
+      // local change only
+      onDelete(index);
+    } else {
+      // delete position from server
+      const result = await myApi.deletePosition(position.id);
+      if (!result.success) {
+        console.log(
+          "[CreatePosition] Error deleting position id",
+          position.id,
+          "with error:",
+          result.msg
+        );
+      }
+      onDelete(index);
+    }
+  };
 
-    return (
-        <div style={{ margin: '20px', padding: '10px' }}>
+  return (
+    <div>
+      <Form>
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Label> ({index + 1}) Position Name</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Position Name"
+            value={positionName}
+            onChange={(event) => handleOnChangeName(event.target.value)}
+          />
+        </Form.Group>
 
-            <Form>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label> ({ 1 }) Position Name</Form.Label>
-                    <Form.Control type="email" placeholder="Position Name" />
-                </Form.Group>
-
-                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                    <Form.Label>Postition Description</Form.Label>
-                    <Form.Control  placeholder="Description" as="textarea" rows={2}/>
-                </Form.Group>
-
-                <div className="container d-flex justify-content-end">
-                    <Button variant= 'outline-danger' onClick={handleClick}> Delete</Button>
-                    
-                </div>
- 
-            </Form>
-
+        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+          <Form.Label>Postition Description</Form.Label>
+          <Form.Control
+            placeholder="Description"
+            as="textarea"
+            value={positionDesc}
+            onChange={(event) => handleOnChangeDesc(event.target.value)}
+            rows={2}
+          />
+        </Form.Group>
+        <div className="container d-flex justify-content-end">
+          {shouldShowSave && (
+            <Button variant="primary" onClick={() => onSave(index)}>
+              Save
+            </Button>
+          )}
+          <div style={{ width: "8px" }}></div>
+          <Button
+            variant="outline-danger"
+            onClick={() => onDeleteClicked(index)}
+          >
+            Delete
+          </Button>
         </div>
-    )
+      </Form>
+    </div>
+  );
+}
+let positionCount = 1; // need to set at least 1 position
 
+function CreatePositions({ electionID, prePositions, onNext }) {
+  const [positions, setPositions] = useState<PositionDetail[]>(prePositions??[]);
+  const updatePosition = (index, position) => {
+    console.log(
+      "[CreatePositions] update position: ",
+      position,
+      " for index",
+      index
+    );
+    positions.map((p, i) => {
+      if (i === index) {
+        p = position;
+      }
+    });
+    console.log("[CreatePositions] update position result:", positions);
+  };
+  useEffect(() => {
+    console.log("[CreatePositions] positions updated: ", positions);
+  }, [positions]);
+
+  const handleAddPosition = () => {
+    const newPos: PositionDetail = {
+      electionId: electionID,
+      positionName: "",
+      positionDesc: "",
+      maxVotesTotal: 0,
+      maxVotesPerCandidate: 0,
+      id: 0,
+      candidates: [],
+    };
+    setPositions([...positions, newPos]);
+  };
+
+  if (positions.length === 0) {
+    handleAddPosition();
+    console.log("[CreatePositions] current positions", positions);
+  }
+
+  const handleDeletePosition = (id) => {
+    console.log("[CreatePositions] before delete: ", positions);
+    if (positions.length < 1) return;
+    console.log("[CreatePositions] deleting position", id);
+    setPositions((prevPositions) => {
+      const updatedPositions = prevPositions.filter((_, index) => {
+        console.log("[CreatePositions] checking index", index, "!==", id);
+        return index !== id;
+      });
+      console.log("[CreatePositions] after delete: ", updatedPositions);
+      return updatedPositions;
+    });
+  };
+
+  // Error alert
+  const [showError, setShowError] = useState(false);
+
+  const showErrorAlert = () => {
+    if (showError) {
+      return (
+        <Alert variant="danger" onClose={() => setShowError(false)} dismissible>
+          "Please save all positions before proceed"
+        </Alert>
+      );
+    }
+  };
+
+  const handleNext = () => {
+    let allPositionsSaved = true;
+    positions.forEach((pos) => {
+      if (pos.id === 0) allPositionsSaved = false;
+      return;
+    });
+    if (allPositionsSaved) {
+      setShowError(false);
+      onNext(positions);
+    } else {
+      setShowError(true);
+    }
+  };
+
+  return (
+    <>
+      <div style={{ margin: "20px" }}>
+        {positions.map((pos, index) => (
+          <PositionComponent
+            key={index}
+            index={index}
+            position={pos}
+            onDelete={handleDeletePosition} // Pass the delete handler
+            updatePosition={updatePosition}
+          />
+        ))}
+
+        <Button variant="outline-primary" onClick={handleAddPosition}>
+          + Position
+        </Button>
+      </div>
+      {showErrorAlert()}
+      <div className="container d-flex justify-content-center">
+        <Button variant="primary" onClick={handleNext}>
+          Next
+        </Button>
+      </div>
+    </>
+  );
 }
 
 export default CreatePositions;
