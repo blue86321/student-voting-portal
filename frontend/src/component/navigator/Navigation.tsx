@@ -29,7 +29,7 @@ function Navigation({ isAdmin }) {
           <Nav.Item>
             <Nav.Link
               as={Link}
-              to="/create_new_elections"
+              to="/create"
               eventKey="/create_new_elections"
             >
               Create New Elections

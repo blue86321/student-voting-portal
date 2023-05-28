@@ -3,14 +3,16 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
 import myApi from "../../service/MyApi";
-import { Election, ElectionDetail } from "../../Interfaces/Election";
+import { Election as ElectionInterface, ElectionDetail } from "../../Interfaces/Election";
+import Election from "../../model/Election.model";
 
-function CreateElection({ onNext, electionForUpdate }) {
-  const [electionName, setElectionName] = useState("");
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [endTime, setEndTime] = useState<Date | null>(null);
-  const [description, setDescription] = useState("");
-  const [electionID, setElectionID] = useState<Number | null>(null);
+function CreateElection({ electionForUpdate, onNext }) {
+  const eUpdate = electionForUpdate as Election|null;
+  const [electionName, setElectionName] = useState(eUpdate ? eUpdate.electionName : "");
+  const [startTime, setStartTime] = useState<Date | null>(eUpdate ? eUpdate.startDate : null);
+  const [endTime, setEndTime] = useState<Date | null>(eUpdate ? eUpdate.endDate : null);
+  const [description, setDescription] = useState(eUpdate ? eUpdate.electionDesc : "");
+  const [electionID, setElectionID] = useState<Number | null>(eUpdate ? eUpdate.id : null);
 
   const handleStartTime = (date: Date) => {
     setStartTime(date);
@@ -23,14 +25,14 @@ function CreateElection({ onNext, electionForUpdate }) {
   };
 
   // Fetch election by election ID for update
-  if (electionForUpdate !== null) {
-    console.log("[CreateElection] update with eID: ", electionForUpdate.id);
-    setElectionID(electionForUpdate.id);
-    setElectionName(electionForUpdate.electionName);
-    setStartTime(electionForUpdate.startTime);
-    setEndTime(electionForUpdate.endTime);
-    setDescription(electionForUpdate.electionDesc);
-  }
+  // if (electionForUpdate !== null) {
+  //   console.log("[CreateElection] update with eID: ", electionForUpdate.id);
+  //   setElectionID(electionForUpdate.id);
+  //   setElectionName(electionForUpdate.electionName);
+  //   setStartTime(electionForUpdate.startTime);
+  //   setEndTime(electionForUpdate.endTime);
+  //   setDescription(electionForUpdate.electionDesc);
+  // }
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
@@ -43,7 +45,9 @@ function CreateElection({ onNext, electionForUpdate }) {
       endTime !== null
     );
   };
+
   useEffect(() => {
+    console.log("[CreateElectron] useEffect triggered");
     const isValid = validate();
     setValid(isValid);
   }, [electionName, description]);
@@ -64,7 +68,7 @@ function CreateElection({ onNext, electionForUpdate }) {
   // Form submition
   const [error, setError] = useState("");
   const handleClick = async () => {
-    const election: Election = {
+    const election: ElectionInterface = {
       universityId: 1,
       electionName: electionName,
       electionDesc: description,
@@ -81,6 +85,7 @@ function CreateElection({ onNext, electionForUpdate }) {
           electionData: election,
           electionId: electionID.toString(),
         });
+    console.log("#K_ [CreatElection] is create event", isCreate, "with result:", result);
     if (result.success) {
       const electionDetail: ElectionDetail = result.data as ElectionDetail;
       setElectionID(electionDetail.id);

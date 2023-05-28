@@ -1,4 +1,4 @@
-import { Container, Button } from "react-bootstrap";
+import { Container, Button, Alert } from "react-bootstrap";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import CandidateCard from "../../component/elections/CandidateCard";
@@ -14,6 +14,7 @@ import {
   VotePosition,
   VoteCandidate,
 } from "../../Interfaces/Election";
+import { currentUser } from "../../model/User.model";
 
 function ElectionDetailsPage() {
   const location = useLocation();
@@ -25,6 +26,24 @@ function ElectionDetailsPage() {
   const [vote, setVote] = useState<Vote | undefined>(undefined);
   const [votePosition, setVotePosition] = useState<VotePosition[]>([]);
   const [voteCandidate, setVoteCandidate] = useState<VoteCandidate[]>([]);
+
+  const isElectionFinished = (election) => {};
+
+  // Error alert
+  const [showError, setShowError] = useState(!election.isDataCompleted);
+
+  const showErrorAlert = () => {
+    if (showError) {
+      return (
+        <Alert variant="danger" onClose={() => setShowError(false)} dismissible>
+          There election is not completed!{" "}
+          {currentUser.isAdmin
+            ? "Edit now"
+            : "Please contact the administrator to complete the election!"}
+        </Alert>
+      );
+    }
+  };
 
   useEffect(() => {
     const fetchDataAsync = async () => {
@@ -70,19 +89,31 @@ function ElectionDetailsPage() {
 
   console.log("[Election detail] election:", election);
 
-  setVotePosition(vote!.votes)
+  // setVotePosition(vote!.votes)
 
   return (
     <div style={{ margin: "10px" }}>
       <Container>
-        <Button //@ts-expect-error
-          as={Link}
-          variant="outline-dark"
-          to={"/"}
-        >
-          {" "}
-          Back{" "}
-        </Button>
+        <div className="mb-2">
+          <Button //@ts-expect-error
+            as={Link}
+            variant="outline-dark"
+            to={"/"}
+          >
+            Back
+          </Button>{" "}
+          {currentUser.isAdmin ? (
+            <Button //@ts-expect-error
+              as={Link}
+              variant="primary"
+              to={`/create`}
+              state={election}
+            >
+              Edit
+            </Button>
+          ) : null}
+        </div>
+        {showErrorAlert()}
         <ElectionDetail election={election}></ElectionDetail>
 
         <h5> </h5>
@@ -101,6 +132,7 @@ function ElectionDetailsPage() {
                   (candidate) => candidate.positionId === position.id
                 )}
                 electionStatus={election.state}
+                isCompleted={isElectionFinished}
               ></CandidateCard>
             </Container>
           </div>

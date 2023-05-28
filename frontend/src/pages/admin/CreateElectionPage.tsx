@@ -4,15 +4,22 @@ import { useState } from "react";
 import CreateElection from "../../component/admin/CreatElection";
 import CreatePositions from "../../component/admin/CreatePositions";
 import CreateCandidates from "../../component/admin/CreateCandidates";
+import { useLocation, useParams } from "react-router-dom";
+import Election from "../../model/Election.model";
 
 function CreateElectionPage() {
-  const [progress, setProgress] = useState(0);
-  const [electionID, setElectionID] = useState<Number | null>(null);
+  const location = useLocation();
+  const election = location.state as Election | null;
+  const [progress, setProgress] = useState(election ? 33.33 : 0);
+  const [electionID, setElectionID] = useState<Number | null>(
+    election ? election.id : null
+  );
   const handleNext = (value, election) => {
     setProgress(value);
     console.log("[CreateElectionPage] create election: ", election.id);
     setElectionID(election.id);
   };
+  console.log("[CreateElectionPage] election: ", election);
 
   const [isClicked, setIsClicked] = useState(false);
 
@@ -34,17 +41,15 @@ function CreateElectionPage() {
           <ProgressBar now={progress} label={`${progress}%`} />
         </Container>
 
-        {progress >= 0 && <CreateElection onNext={handleNext} electionForUpdate={null}></CreateElection>}
+        {progress >= 0 && (
+          <CreateElection
+            electionForUpdate={election}
+            onNext={handleNext}
+          ></CreateElection>
+        )}
 
         {progress >= 33.33 && (
-          <>
-            <CreatePositions electionID={electionID}></CreatePositions>
-            <div className="container d-flex justify-content-center">
-              <Button variant="primary" onClick={handleSave}>
-                Save
-              </Button>
-            </div>
-          </>
+            <CreatePositions electionID={electionID} prePositions={election ? election.positions:null} onNext={handleSave}></CreatePositions>
         )}
 
         {progress >= 66.67 && (

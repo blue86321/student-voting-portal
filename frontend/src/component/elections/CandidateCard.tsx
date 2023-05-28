@@ -2,7 +2,7 @@ import { Button, Card, Row } from "react-bootstrap";
 import React, { useState } from "react";
 import "./CandidateCard.css";
 
-function CandidateCard({ candidates, electionStatus }) {
+function CandidateCard({ candidates, electionStatus, isCompleted }) {
   /* TODO: debug for card key;
     count add 1 after click the 'VOTE' button; 
     set them into position groups, currently, if clicked one "VOTE" in one of these cards, all the buttons will be disabled;
