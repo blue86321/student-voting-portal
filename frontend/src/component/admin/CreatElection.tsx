@@ -87,7 +87,7 @@ function CreateElection({ electionForUpdate, onNext }) {
         });
     console.log("#K_ [CreatElection] is create event", isCreate, "with result:", result);
     if (result.success) {
-      const electionDetail: ElectionDetail = result.data as ElectionDetail;
+      const electionDetail = new Election(result.data as ElectionDetail);
       setElectionID(electionDetail.id);
       console.log("#K_ [CreatElection] result", electionDetail);
       setShowError(false);

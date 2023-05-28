@@ -9,7 +9,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
   const [shouldShowSave, setShouldShowSave] = useState(false);
 
   useEffect(() => {
-    console.log("[CreateElectron] position updated: ", position);
+    console.log("[CreatePosition] position updated: ", position);
     setPositionName(position.positionName);
     setPositionDesc(position.positionDesc);
   }, [position]);
@@ -31,18 +31,18 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
 
   const onSave = async (index) => {
     console.log("[CreatePositions] create", position);
-    const createPosition: Position = {
+    const positionData: Position = {
       electionId: Number(position.electionId),
       positionName: positionName,
       positionDesc: positionDesc,
       maxVotesTotal: 9,
       maxVotesPerCandidate: 9,
     };
-    const isCreate = position.id === -1;
+    const isCreate = position.id === 0;
     const result = isCreate
-      ? await myApi.createPosition(createPosition)
+      ? await myApi.createPosition(positionData)
       : await myApi.updatePosition({
-          positionData: createPosition,
+          positionData: positionData,
           positionId: position.id,
         });
     if (result.success) {
@@ -133,7 +133,7 @@ function CreatePositions({ electionID, prePositions, onNext }) {
     console.log("[CreatePositions] update position result:", positions);
   };
   useEffect(() => {
-    console.log("[CreateElectron] positions updated: ", positions);
+    console.log("[CreatePositions] positions updated: ", positions);
   }, [positions]);
 
   const handleAddPosition = () => {
@@ -143,7 +143,7 @@ function CreatePositions({ electionID, prePositions, onNext }) {
       positionDesc: "",
       maxVotesTotal: 0,
       maxVotesPerCandidate: 0,
-      id: -1,
+      id: 0,
       candidates: [],
     };
     setPositions([...positions, newPos]);
@@ -184,12 +184,12 @@ function CreatePositions({ electionID, prePositions, onNext }) {
   const handleNext = () => {
     let allPositionsSaved = true;
     positions.forEach((pos) => {
-      if (pos.id === -1) allPositionsSaved = false;
+      if (pos.id === 0) allPositionsSaved = false;
       return;
     });
     if (allPositionsSaved) {
       setShowError(false);
-      onNext();
+      onNext(positions);
     } else {
       setShowError(true);
     }
