@@ -1,6 +1,6 @@
 import { Container, Button, Alert } from "react-bootstrap";
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import CandidateCard from "../../component/elections/CandidateCard";
 import ElectionDetail from "../../component/elections/ElectionDetail";
 import ResultChart from "../../component/elections/ElectionResultChart";
@@ -18,7 +18,7 @@ import { currentUser } from "../../model/User.model";
 
 function ElectionDetailsPage() {
   const location = useLocation();
-  const election = location.state as Election;
+  const election = location.state as Election|null;
 
   const [positions, setPositions] = useState<PositionDetail[]>([]);
   const [candidates, setCandidates] = useState<CandidateDetail[]>([]);
@@ -30,7 +30,7 @@ function ElectionDetailsPage() {
   const isElectionFinished = (election) => {};
 
   // Error alert
-  const [showError, setShowError] = useState(!election.isDataCompleted);
+  const [showError, setShowError] = useState(election ? !election.isDataCompleted : false);
 
   const showErrorAlert = () => {
     if (showError) {
@@ -50,7 +50,7 @@ function ElectionDetailsPage() {
       const positionResult = await myApi.getPositions();
       if (positionResult.success) {
         const positions = (positionResult.data as PositionDetail[]).filter(
-          (position) => position.electionId === election.id
+          (position) => position.electionId === election?.id
         );
         setPositions(positions);
         console.log("[Election detail] position data:", positionResult);
@@ -61,7 +61,7 @@ function ElectionDetailsPage() {
       const candidateResult = await myApi.getCandidates();
       if (candidateResult.success) {
         const candidates = (candidateResult.data as CandidateDetail[]).filter(
-          (candidate) => candidate.electionId === election.id
+          (candidate) => candidate.electionId === election?.id
         );
         setCandidates(candidates);
         console.log("[Election detail] candidate data:", candidateResult);
@@ -70,11 +70,11 @@ function ElectionDetailsPage() {
       }
 
       // if past election, get vote result
-      if (election.state === 2) {
+      if (election?.state === 2) {
         const voteResult = await myApi.getVotes();
         if (voteResult.success) {
           const votes = (voteResult.data as Vote[]).filter(
-            (vote) => vote.electionId === election.id
+            (vote) => vote.electionId === election?.id
           );
           setVote(votes[0]);
           console.log("[Election detail] vote data:", voteResult);
@@ -90,7 +90,10 @@ function ElectionDetailsPage() {
   console.log("[Election detail] election:", election);
 
   // setVotePosition(vote!.votes)
-
+  const navigate = useNavigate();
+	const goBack = () => {
+		navigate(-1);
+	}
   return (
     <div style={{ margin: "10px" }}>
       <Container>
@@ -98,7 +101,7 @@ function ElectionDetailsPage() {
           <Button //@ts-expect-error
             as={Link}
             variant="outline-dark"
-            to={"/"}
+            onClick={goBack}
           >
             Back
           </Button>{" "}
@@ -114,14 +117,14 @@ function ElectionDetailsPage() {
           ) : null}
         </div>
         {showErrorAlert()}
-        <ElectionDetail election={election}></ElectionDetail>
+        {election && (<ElectionDetail election={election}></ElectionDetail>)}
 
         <h5> </h5>
         {positions.map((position) => (
           <div>
             <h5>{position.positionName}</h5>
             {/* if past election, show the result chart */}
-            {election.state === 2 ? (
+            {election?.state === 2 ? (
               <Container>
                 <ResultChart></ResultChart>
               </Container>
@@ -131,7 +134,7 @@ function ElectionDetailsPage() {
                 candidates={candidates.filter(
                   (candidate) => candidate.positionId === position.id
                 )}
-                electionStatus={election.state}
+                electionStatus={election?.state}
                 isCompleted={isElectionFinished}
               ></CandidateCard>
             </Container>
