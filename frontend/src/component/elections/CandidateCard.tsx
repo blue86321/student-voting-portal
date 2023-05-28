@@ -1,6 +1,7 @@
 import { Button, Card, Row } from "react-bootstrap";
 import React, { useState } from "react";
 import "./CandidateCard.css";
+import { currentUser } from "../../model/User.model";
 
 function CandidateCard({ candidates, electionStatus, isCompleted }) {
   /* TODO: debug for card key;
@@ -24,7 +25,7 @@ function CandidateCard({ candidates, electionStatus, isCompleted }) {
   // If the elections is "past", then show the total vote count instead of the "vote" button
   let buttonContent;
 
-  if (electionStatus === 1) {
+  if (electionStatus === 1 && !currentUser.isAdmin) {
     buttonContent = (
       <Button variant="primary" onClick={handleClick} disabled={isClicked}>
         {isClicked ? "VOTED" : "VOTE"}
@@ -48,12 +49,12 @@ function CandidateCard({ candidates, electionStatus, isCompleted }) {
           <Card key={candidate.id} style={{ width: "22rem" }}>
             <Card.Body>
               <Card.Title className="text-center">
-                {candidate.candidate_name}
+                {candidate.candidateName}
               </Card.Title>
-              <Card.Img className="card-image" src={candidate.photo_url} />
+              <Card.Img className="card-image" src={candidate.photoUrl} />
               <Card.Text className="card-text-multiline">
                 Introduction: <br />
-                {candidate.desc}
+                {candidate.candidateDesc}
               </Card.Text>
               {/* TODO: to vote the candidate, add 1 for total votes. */}
               <div className="text-center">{buttonContent}</div>

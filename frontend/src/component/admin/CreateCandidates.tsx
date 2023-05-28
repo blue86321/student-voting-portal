@@ -1,6 +1,10 @@
 import { Container, Form, Row, Col, Button, Alert } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
-import { Candidate, CandidateDetail } from "../../Interfaces/Election";
+import {
+  Candidate,
+  CandidateDetail,
+  PositionDetail,
+} from "../../Interfaces/Election";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
 
@@ -54,22 +58,32 @@ function CandidateComponent({
   };
 
   const onSave = async (index) => {
-    const position = positions.filter((position) => position.id == candidatePosition)[0]
+    console.log("#K_ position: ", positions as PositionDetail[]);
+    const position = candidatePosition === 0 ? positions[0] : positions.filter((position) => {
+      console.log(
+        "#K_ position: ",
+        position.id,
+        candidatePosition,
+        position.id == candidatePosition
+      );
+      return position.id == candidatePosition;
+    })[0];
+    console.log("#K_ position: " + position);
     const candidateData: Candidate = {
       userId: currentUser.id,
       electionId: position.electionId,
       positionId: position.id,
       candidateName: candidateName,
       candidateDesc: candidateDesc,
-      photoUrl: candidateImg
+      photoUrl: candidateImg,
     };
     console.log("[CreateCandidates] create", candidateData);
     const isCreate = candidate.id === 0;
     const result = isCreate
       ? await myApi.createCandidate(candidateData)
       : await myApi.updateCandidate({
-        candidateData: candidateData,
-        candidateId: candidate.id,
+          candidateData: candidateData,
+          candidateId: candidate.id,
         });
     if (result.success) {
       candidate.id = (result.data as CandidateDetail).id;
@@ -81,7 +95,7 @@ function CandidateComponent({
   };
 
   const onDeleteClicked = async (index) => {
-    if (candidate.id === -1) {
+    if (candidate.id === 0) {
       // local change only
       onDelete(index);
     } else {
@@ -118,12 +132,19 @@ function CandidateComponent({
           {/* TODO: connet to the position component */}
           <Form.Group className="mb-3" controlId="positionID">
             <Form.Label>Select a Position</Form.Label>
-            <Form.Select aria-label="Default select example"
+            <Form.Select
+              aria-label="Default select example"
               value={candidatePosition}
-              onChange={(event) => handleOnChangePositionID(event.target.value)}>
-              {positions.map((position, index) => (
-                <option key={index} value={position.id}>{position.positionName}</option>
-              ))}
+              onChange={(event) => handleOnChangePositionID(event.target.value)}
+            >
+              {positions.map((position, index) => {
+                console.log("#K_ selecter position id:", position.id);
+                return (
+                  <option key={index} value={position.id}>
+                    {position.positionName}
+                  </option>
+                );
+              })}
             </Form.Select>
           </Form.Group>
         </Col>
@@ -131,27 +152,34 @@ function CandidateComponent({
 
       <Form.Group className="mb-3" controlId="candidateDesc">
         <Form.Label>Candidate Introduction</Form.Label>
-        <Form.Control placeholder="Introduction" as="textarea" rows={2} 
-              value={candidateDesc}
-              onChange={(event) => handleOnChangeDesc(event.target.value)}/>
+        <Form.Control
+          placeholder="Introduction"
+          as="textarea"
+          rows={2}
+          value={candidateDesc}
+          onChange={(event) => handleOnChangeDesc(event.target.value)}
+        />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="candidateImg">
         <Form.Label>Candidate Image</Form.Label>
-        <Form.Control placeholder="Candidate Image" type="text" 
-              value={candidateImg}
-              onChange={(event) => handleOnChangeImg(event.target.value)}/>
+        <Form.Control
+          placeholder="Candidate Image"
+          type="text"
+          value={candidateImg}
+          onChange={(event) => handleOnChangeImg(event.target.value)}
+        />
       </Form.Group>
 
       {/* <Button variant="outline-secondary">+ Upload Photo</Button> */}
       <div className="container d-flex justify-content-end">
-          {shouldShowSave && (
-            <Button variant="primary" onClick={() => onSave(index)}>
-              Save
-            </Button>
-          )}
-          <div style={{ width: "8px" }}></div>
-        <Button variant="outline-danger" onClick={onDeleteClicked}>
+        {shouldShowSave && (
+          <Button variant="primary" onClick={() => onSave(index)}>
+            Save
+          </Button>
+        )}
+        <div style={{ width: "8px" }}></div>
+        <Button variant="outline-danger" onClick={() => onDeleteClicked(index)}>
           Delete
         </Button>
       </div>
@@ -160,7 +188,14 @@ function CandidateComponent({
 }
 
 function CreateCandidates({ electionID, positions, onNext }) {
-  const [candidates, setCandidates] = useState<CandidateDetail[]>([]);
+  const [candidates, setCandidates] = useState<CandidateDetail[]>(() => {
+    let candidates: CandidateDetail[] = [];
+    positions.forEach((position) => {
+      const cs: CandidateDetail[] = position.candidates;
+      candidates.push(...cs);
+    });
+    return candidates;
+  });
   const updateCandidate = (index, candidate) => {
     console.log(
       "[CreateCandidates] update position: ",
@@ -199,8 +234,8 @@ function CreateCandidates({ electionID, positions, onNext }) {
   }
 
   const handleDeleteCandidate = (id) => {
-    console.log("[CreateCandidates] before delete: ", positions);
-    if (positions.length < 1) return;
+    console.log("[CreateCandidates] before delete: ", candidates);
+    if (candidates.length < 1) return;
     console.log("[CreateCandidates] deleting position", id);
     setCandidates((prevCandidates) => {
       const updatedCandidates = prevCandidates.filter((_, index) => {
@@ -255,15 +290,17 @@ function CreateCandidates({ electionID, positions, onNext }) {
         ))}
 
         {/* TODO:  every time click the button, add one "create candidate" component */}
-        <Button variant="outline-primary">+ Candidates</Button>
+        <Button variant="outline-primary" onClick={handleAddCandidate}>
+          + Candidates
+        </Button>
       </div>
       {showErrorAlert()}
 
-<div className="container d-flex justify-content-center">
-  <Button variant="primary" onClick={handleSubmit}>
-    Submit
-  </Button>
-</div>
+      <div className="container d-flex justify-content-center">
+        <Button variant="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
+      </div>
     </>
   );
 }

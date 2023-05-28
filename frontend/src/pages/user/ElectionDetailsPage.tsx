@@ -18,7 +18,7 @@ import { currentUser } from "../../model/User.model";
 
 function ElectionDetailsPage() {
   const location = useLocation();
-  const election = location.state as Election|null;
+  const election:Election|null = location.state? new Election(location.state):null;
 
   const [positions, setPositions] = useState<PositionDetail[]>([]);
   const [candidates, setCandidates] = useState<CandidateDetail[]>([]);

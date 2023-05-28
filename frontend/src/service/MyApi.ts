@@ -26,10 +26,10 @@ class MyApi {
         ...params,
         method: params.method
       })
-      console.log('[MyApi] response: ' + JSON.stringify(res))
+      // console.log('[MyApi] response: ' + JSON.stringify(res))
       return res.data
     } catch (e) {
-      console.log('[MyApi] error: ' + e)
+      // console.log('[MyApi] error: ' + e)
       const defaultFailResp = { data: undefined, msg: "", code: 0, success: false }
       if (e instanceof AxiosError) {
         const resData: Response | undefined = e.response?.data;

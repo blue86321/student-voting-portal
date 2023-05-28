@@ -77,7 +77,7 @@ function CreateElection({ electionForUpdate, onNext }) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("#K_ [CreatElection] submit event", election);
+    console.log("[CreatElection] submit event", election);
     const isCreate = electionID === null;
     const result = isCreate
       ? await myApi.createElection(election)
@@ -85,18 +85,18 @@ function CreateElection({ electionForUpdate, onNext }) {
           electionData: election,
           electionId: electionID.toString(),
         });
-    console.log("#K_ [CreatElection] is create event", isCreate, "with result:", result);
+    console.log("[CreatElection] is create event", isCreate, "with result:", result);
     if (result.success) {
       const electionDetail = new Election(result.data as ElectionDetail);
       setElectionID(electionDetail.id);
-      console.log("#K_ [CreatElection] result", electionDetail);
+      console.log("[CreatElection] result", electionDetail);
       setShowError(false);
       onNext(33.33, electionDetail);
     } else {
       setError(result.msg);
       setIsClicked(false);
       setShowError(true);
-      console.log("#K_ [CreatElection] error", error);
+      console.log("[CreatElection] error", error);
     }
   };
 

@@ -55,7 +55,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
   };
 
   const onDeleteClicked = async (index) => {
-    if (position.id === -1) {
+    if (position.id === 0) {
       // local change only
       onDelete(index);
     } else {
