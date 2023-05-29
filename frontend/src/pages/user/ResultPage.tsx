@@ -4,8 +4,8 @@ import ResultChart from "../../component/elections/ElectionResultChart";
 function ResultPage() {
   return (
     <div>
-      <ResultChart></ResultChart>
-      <Candidates candidates={null} electionStatus={null} isCompleted={undefined} selectedID={undefined}></Candidates>
+      <ResultChart votes={undefined}></ResultChart>
+      <Candidates candidates={null} electionStatus={null} isCompleted={undefined} selectedID={undefined} votes={undefined}></Candidates>
     </div>
   );
 }

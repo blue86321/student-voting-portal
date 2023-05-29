@@ -147,6 +147,7 @@ function CreatePositions({ electionID, prePositions, onNext }) {
       positionDesc: "",
       maxVotesTotal: 0,
       maxVotesPerCandidate: 0,
+      totalVoteCount: 0,
       id: 0,
       candidates: [],
     };

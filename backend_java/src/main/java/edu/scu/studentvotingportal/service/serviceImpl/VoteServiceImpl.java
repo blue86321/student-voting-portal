@@ -146,7 +146,7 @@ public class VoteServiceImpl implements VoteService {
             savedVotes.add(voteRepository.save(v));
             // increment candidate `voteCount`
             Candidates candidate = v.getCandidate();
-            candidate.setVoteCount(v.getVoteCount());
+            candidate.setVoteCount(candidate.getVoteCount() + v.getVoteCount());
             candidateRepository.save(candidate);
         }
 
