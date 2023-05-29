@@ -13,6 +13,29 @@ export interface Response<T = any> {
 const HOST_URL = "http://localhost:8080";
 
 
+const calcVotePercentAndWinner = (position: PositionDetail): PositionDetail => {
+  // copy
+  const positionTemp = JSON.parse(JSON.stringify(position));
+  // Find the candidate with the highest voteCount for each position
+  let highestVoteCount = 0;
+  let winnerId = -1;
+  for (const candidate of positionTemp.candidates) {
+    if (candidate.voteCount > highestVoteCount) {
+      highestVoteCount = candidate.voteCount;
+      winnerId = candidate.id;
+    }
+  }
+  // Whether there is only one winner for the position
+  const oneWinner = positionTemp.candidates.filter((candidate) => candidate.voteCount === highestVoteCount)!.length > 0
+
+  positionTemp.candidates = positionTemp.candidates.map((candidate) => ({
+    ...candidate,
+    winner: oneWinner ? candidate.id === winnerId : false,
+    votePercentage: +((candidate.voteCount / position.totalVoteCount) * 100).toFixed(2),
+  }))
+  return positionTemp;
+}
+
 class MyApi {
   axiosInstance: AxiosInstance
   constructor() {
@@ -34,7 +57,7 @@ class MyApi {
       if (e instanceof AxiosError) {
         const resData: Response | undefined = e.response?.data;
         return resData
-          ? { data: undefined, msg: resData.msg, code: resData.code, success: false }
+          ? { data: resData.data, msg: resData.msg, code: resData.code, success: false }
           : defaultFailResp
       }
       return defaultFailResp
@@ -75,7 +98,10 @@ class MyApi {
   // '/positions/'
   async getPositions(): Promise<Response<PositionDetail[]>> {
     const params: AxiosRequestConfig = { url: '/positions/', method: 'GET' };
-    const response = await this.request(params);
+    const response: Response<PositionDetail[]> = await this.request(params);
+    if (response.success && response.data) {
+      response.data = response.data.map((pd) => calcVotePercentAndWinner(pd))
+    }
     return response;
   }
   async createPosition(positionData: Position): Promise<Response<PositionDetail>> {
@@ -118,7 +144,10 @@ class MyApi {
   }
   async getPosition(positionId: string): Promise<Response<PositionDetail>> {
     const params: AxiosRequestConfig = { url: `/positions/${positionId}/`, method: 'GET' };
-    const response = await this.request(params);
+    const response: Response<PositionDetail> = await this.request(params);
+    if (response.success && response.data) {
+      response.data = calcVotePercentAndWinner(response.data)
+    }
     return response;
   }
   async updateputPosition(query: { positionData: Position, positionId: string }): Promise<Response<PositionDetail>> {
@@ -176,46 +205,24 @@ class MyApi {
   }
   async getElection(electionId: string): Promise<Response<ElectionDetail>> {
     const params: AxiosRequestConfig = { url: `/elections/${electionId}/`, method: 'GET' };
-    const response = await this.request(params);
+    const response: Response<ElectionDetail> = await this.request(params);
+    if (response.success && response.data) {
+      response.data.positions = response.data.positions.map((p) => calcVotePercentAndWinner(p))
+    }
     return response;
   }
   //for this endpoint, the returned response only contains each position's winner's information. please check response json for details
   async getElections(): Promise<Response<ElectionDetail[]>> {
     const params: AxiosRequestConfig = { url: `/elections/`, method: 'GET' };
-    const response = await this.request(params);
+    const response: Response<ElectionDetail[]> = await this.request(params);
 
-    // Check if the response is successful and contains data
-    if (response.data && response.data.success && response.data.data && response.data.data.length > 0) {
-      const election = response.data.data[0];
-
-      // Iterate through each position in the election
-      for (const position of election.positions as PositionDetail[]) {
-
-        // Calculate the vote percentage for the winner
-        const totalVotes = position.candidates.reduce((sum, candidate) => sum + candidate.voteCount, 0);
-
-        // Find the candidate with the highest voteCount for each position
-        let highestVoteCount = 0;
-        let winnerId = -1;
-        for (const candidate of position.candidates) {
-          if (candidate.voteCount > highestVoteCount) {
-            highestVoteCount = candidate.voteCount;
-            winnerId = candidate.id;
-          }
-        }
-
-        // Whether there is only one winner for the position
-        const oneWinner = position.candidates.filter((candidate) => candidate.voteCount === highestVoteCount)!.length > 0
-
-        position.candidates = position.candidates.map((candidate) => ({
-          ...candidate,
-          winner: oneWinner ? candidate.id === winnerId : false,
-          votePercentage: +((candidate.voteCount / totalVotes) * 100).toFixed(2),
-        }))
-      }
+    if (response.success && response.data) {
+      response.data = response.data.map((electionDetail) => ({
+        ...electionDetail,
+        positions: electionDetail.positions.map((p) => calcVotePercentAndWinner(p))
+      }))
+      return response;
     }
-
-    // Return the modified response
     return response;
   }
   async updateputElection(query: { electionData: Election, electionId: string }): Promise<Response<ElectionDetail>> {
@@ -305,7 +312,12 @@ class MyApi {
         'Authorization': `Bearer ${token}` // Add the token to the Authorization header
       }
     };
-    const response = await this.request(params);
+    const response: Response<VoteDetail[]> = await this.request(params);
+    if (response.success && response.data) {
+      for (let i = 0; i < response.data?.length; i++) {
+        response.data[i].votes = response.data[i].votes.map((v) => ({ ...v, position: calcVotePercentAndWinner(v.position) }))
+      }
+    }
     return response;
   }
   async createVote(voteData: Vote): Promise<Response<Vote>> {
