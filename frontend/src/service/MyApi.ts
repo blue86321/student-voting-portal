@@ -91,6 +91,7 @@ class MyApi {
         'Authorization': `Bearer ${token}` // Add the token to the Authorization header
       }
     };
+    localStorage.remove('token');
     const response = await this.request(params);
     return response;
   }
