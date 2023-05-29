@@ -20,7 +20,7 @@ import { PositionVote } from "../../model/Position.model";
 function ElectionDetailsPage() {
   const location = useLocation();
   const election: Election | null = location.state
-    ? new Election(location.state)
+    ? new Election(location.state, false)
     : null;
 
   const [positions, setPositions] = useState<PositionVote[]>([]);
@@ -78,24 +78,38 @@ function ElectionDetailsPage() {
     const result = await myApi.createVote(postVote);
     if (result.success) {
       console.log("[ElectionDetailsPage] Successfully created vote", result);
-      setShow(true)
+      showModalWithMessage("Vote Success", "Thank you for your perticiption!");
     } else {
       console.error("[ElectionDetailsPage] Failed to create vote", result);
-      showErrorWithMessage("Submit failed!", result.msg);
+      showModalWithMessage("Submit failed!", result.msg, "danger");
     }
   };
 
+  const showModalWithMessage = (
+    title: string,
+    message: string,
+    variant: string = "primary"
+  ) => {
+    setModalTitle(title);
+    setModalBody(message);
+    setModalVariant(variant);
+    setShow(true);
+  };
+
   const [show, setShow] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalBody, setModalBody] = useState("");
+  const [modalVariant, setModalVariant] = useState("primary");
   const showSuccessModal = () => {
     return (
       <>
         <Modal show={show} onHide={goBack}>
           <Modal.Header closeButton>
-            <Modal.Title>Vote Success</Modal.Title>
+            <Modal.Title>{modalTitle}</Modal.Title>
           </Modal.Header>
-          <Modal.Body>Thank you for your perticiption!</Modal.Body>
+          <Modal.Body>{modalBody}</Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" onClick={goBack}>
+            <Button variant={modalVariant} onClick={goBack}>
               Close
             </Button>
           </Modal.Footer>
@@ -184,7 +198,7 @@ function ElectionDetailsPage() {
     navigate(-1);
   };
   const onClickEdit = () => {
-    navigate("/create", { state: { election } });
+    navigate("/create", { state: election });
   };
 
   // setVotePosition(vote!.votes)
@@ -201,7 +215,7 @@ function ElectionDetailsPage() {
             <Button
               variant="primary"
               onClick={onClickEdit}
-              disabled={election?.state === 1}
+              // disabled={election?.state === 1}
             >
               Edit
             </Button>
@@ -234,17 +248,19 @@ function ElectionDetailsPage() {
           </div>
         ))}
         <div className="text-center">
-          <Button
-            disabled={
-              !(
-                votePosition.length !== 0 &&
-                votePosition.length === positions.length
-              )
-            }
-            onClick={onClickSubmit}
-          >
-            Submit
-          </Button>
+          {election?.state === 1 && (
+            <Button
+              disabled={
+                !(
+                  votePosition.length !== 0 &&
+                  votePosition.length === positions.length
+                )
+              }
+              onClick={onClickSubmit}
+            >
+              Submit
+            </Button>
+          )}
         </div>
       </Container>
     </div>

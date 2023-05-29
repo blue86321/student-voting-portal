@@ -1,5 +1,6 @@
 import { ElectionDetail, PositionDetail } from "../Interfaces/Election";
 import { University } from "../Interfaces/User";
+import DateTimeUtils from "../component/utils/DateTimeUtil";
 import Position from "./Position.model";
 
 enum ElectionState {
@@ -19,7 +20,7 @@ class Election implements ElectionDetail {
   startDate: Date;
   endDate: Date;
 
-  constructor(e: ElectionDetail) {
+  constructor(e: ElectionDetail, convertTime: boolean = true) {
     this.id = e.id;
     this.positions = e.positions.map((p) => {
       return new Position(p);
@@ -27,8 +28,8 @@ class Election implements ElectionDetail {
     this.university = e.university;
     this.electionName = e.electionName;
     this.electionDesc = e.electionDesc;
-    this.startDate = new Date(e.startTime);
-    this.endDate = new Date(e.endTime);
+    this.startDate = convertTime ? DateTimeUtils.convertFromGMT(new Date(e.startTime)) : new Date(e.startTime);
+    this.endDate = convertTime ? DateTimeUtils.convertFromGMT(new Date(e.endTime)) : new Date(e.endTime);
     this.startTime = this.startDate.toLocaleString("en-US", {
       year: "numeric",
       month: "2-digit",
@@ -45,20 +46,13 @@ class Election implements ElectionDetail {
     });
   }
 
-  get state(): Number {
+  get state(): ElectionState {
     const currentTime = new Date();
     const electionEndTime = new Date(this.endTime);
     const electionStartTime = new Date(this.startTime);
     const isElectionPast = electionEndTime.getTime() < currentTime.getTime();
     const isElectionFuture =
       electionStartTime.getTime() > currentTime.getTime();
-    console.log(
-      "[Election model] electionStartTime:",
-      this.endTime,
-      electionStartTime.toString(),
-      "currentTime:",
-      currentTime.toString()
-    );
 
     if (isElectionPast) {
       return ElectionState.past;
@@ -70,7 +64,9 @@ class Election implements ElectionDetail {
   }
 
   get isDataCompleted(): boolean {
+    console.log('[Election model] positions', this.positions);
     if (this.positions.length === 0) {
+      console.log('[Election model] positions are empty', this.positions);
       return false;
     }
     let isCompleted = true;

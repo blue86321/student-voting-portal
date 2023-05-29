@@ -1,12 +1,16 @@
 import React, { useEffect, useState, createContext } from "react";
-import { Link } from "react-router-dom";
-import { Card, Col, Row } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import EmptyCards from "../navigator/EmptyCards";
 import Election from "../../model/Election.model";
 
 // export const ElectionContext = createContext<Election | null>(null);
 
 function ElectionCard({ elections }) {
+  const navigate = useNavigate();
+  const onClickButton = (election) => {
+    navigate(`/elections/${election.id}`, { state: election });
+  };
   return (
     <Row xs={1} md={2} lg={3} className="g-4">
       {elections.length > 0 ? (
@@ -24,24 +28,25 @@ function ElectionCard({ elections }) {
                     ? `Deadline: ${election.endTime}`
                     : `Finished on: ${election.endTime}`}
                 </Card.Subtitle>
-                <Card.Img
-                  variant="top"
-                  src={require("../defaultImage.png")}
-                  style={{ width: "320px", height: "auto" }}
-                />
+              </Card.Body>
+              <Card.Img
+                variant="top"
+                src={require("../defaultImage.png")}
+                // style={{ width: "320px", height: "auto" }}
+              />
+              <Card.Body>
                 <Card.Text className="card-text-multiline">
                   {/* descriptions: <br /> */}
                   {election.electionDesc}
                 </Card.Text>
 
                 <div className="text-center">
-                  <Card.Link
-                    as={Link}
-                    to={`/elections/${election.id}`}
-                    state={election}
+                  <Button
+                    variant="link"
+                    onClick={() => onClickButton(election)}
                   >
                     {election.state === 2 ? "View Result" : "View More"}
-                  </Card.Link>
+                  </Button>
                 </div>
               </Card.Body>
             </Card>

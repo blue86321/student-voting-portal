@@ -27,6 +27,7 @@ function App() {
         <Route path="/create" element={<CreateElectionPage />} />
         <Route path="/manage_users" element={<ManageUsers />} />
       </Routes>
+      <p></p>
     </div>
   );
 }

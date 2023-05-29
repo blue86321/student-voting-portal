@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Nav, Navbar, NavDropdown, Container, Alert } from "react-bootstrap";
+import "./Header.css"
 
 import logo from "../../logo.svg";
 import Login from "../user/Login";
@@ -91,7 +92,11 @@ function Header() {
               <Nav.Link href="/">Elections</Nav.Link>
               <NavDropdown title="Account" id="basic-nav-dropdown">
                 {isLoggedIn ? (
+                  <>
+                  <NavDropdown.Item disabled className="custom-disabled-item">{currentUser.email}</NavDropdown.Item>
+                  <NavDropdown.Divider />
                   <NavDropdown.Item onClick={logout}>Log Out</NavDropdown.Item>
+                  </>
                 ) : (
                   <NavDropdown.Item onClick={() => setLoginModalShow(true)}>
                     Log In

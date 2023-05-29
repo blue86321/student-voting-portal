@@ -7,6 +7,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
   const [positionName, setPositionName] = useState(position.positionName);
   const [positionDesc, setPositionDesc] = useState(position.positionDesc);
   const [shouldShowSave, setShouldShowSave] = useState(false);
+  const [saveButtonText, setSaveButtonText] = useState("Save");
 
   useEffect(() => {
     console.log("[CreatePosition] position updated: ", position);
@@ -27,6 +28,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
   const handleOnChange = () => {
     updatePosition(index, position);
     setShouldShowSave(true);
+    setSaveButtonText("Save");
   };
 
   const onSave = async (index) => {
@@ -39,6 +41,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
       maxVotesPerCandidate: 9,
     };
     const isCreate = position.id === 0;
+    console.log("[CreatePosition] creating position", positionData);
     const result = isCreate
       ? await myApi.createPosition(positionData)
       : await myApi.updatePosition({
@@ -48,7 +51,8 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
     if (result.success) {
       position.id = (result.data as PositionDetail).id;
       updatePosition(index, position);
-      setShouldShowSave(false);
+      // setShouldShowSave(false);
+      setSaveButtonText("Saved");
     } else {
       console.log("[CreatePosition] Error creating position", result.msg);
     }
@@ -98,8 +102,8 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
         </Form.Group>
         <div className="container d-flex justify-content-end">
           {shouldShowSave && (
-            <Button variant="primary" onClick={() => onSave(index)}>
-              Save
+            <Button variant="primary" disabled={saveButtonText==="Saved"} onClick={() => onSave(index)}>
+              {saveButtonText}
             </Button>
           )}
           <div style={{ width: "8px" }}></div>
@@ -146,6 +150,7 @@ function CreatePositions({ electionID, prePositions, onNext }) {
       id: 0,
       candidates: [],
     };
+    console.log("[CreatePositions] handleAddPosition: ", newPos);
     setPositions([...positions, newPos]);
   };
 
