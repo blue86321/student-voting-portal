@@ -10,7 +10,7 @@ function ElectionCard({ elections }) {
   return (
     <Row xs={1} md={2} lg={3} className="g-4">
       {elections.length > 0 ? (
-        elections.map((election: Election) => (
+        elections.map((election) => (
           <Col key={election.id}>
             <Card key={election.id} style={{ width: "22rem" }}>
               <Card.Body>
@@ -30,7 +30,7 @@ function ElectionCard({ elections }) {
                   style={{ width: "320px", height: "auto" }}
                 />
                 <Card.Text className="card-text-multiline">
-                  descriptions: <br />
+                  {/* descriptions: <br /> */}
                   {election.electionDesc}
                 </Card.Text>
 
@@ -40,7 +40,7 @@ function ElectionCard({ elections }) {
                     to={`/elections/${election.id}`}
                     state={election}
                   >
-                    {elections.state === 2 ? "View Result" : "View More"}
+                    {election.state === 2 ? "View Result" : "View More"}
                   </Card.Link>
                 </div>
               </Card.Body>

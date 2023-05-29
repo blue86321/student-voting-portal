@@ -362,7 +362,7 @@ class MyApi {
   async deleteUser(userId: string): Promise<Response> {
     const token = localStorage.getItem('token'); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/user/${userId}/`, method: 'DELETE',
+      url: `/users/${userId}/`, method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}` // Add the token to the Authorization header
       }
