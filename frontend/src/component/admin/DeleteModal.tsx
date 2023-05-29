@@ -1,36 +1,30 @@
 import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 
-function DeleteModal(props) {
-  // const [show, setShow] = useState(false);
+function DeleteModal({ userToDelete, deleteUser, closeModal }) {
 
-  // const handleClose = () => setShow(false);
-  // const handleShow = () => setShow(true);
-
+  console.log("[delete modal]:", true)
   return (
     <>
-      {/* <Button variant="outline-danger" onClick={handleShow}>
-        Delete
-      </Button> */}
-
       <Modal
-        {...props}
-        // onHide={handleClose}
+        // {...props}
+        show={deleteUser}
+        onHide={closeModal}
         backdrop="static"
         keyboard={false}
         centered
       >
         <Modal.Header closeButton>
           <Modal.Title className="text-center">
-            Are You Sure to Delete This User?
+            Are You Sure to Delete {userToDelete.email}?
           </Modal.Title>
         </Modal.Header>
 
         <Modal.Footer>
-          <Button variant="outline-secondary" onClick={props.onHide}>
+          <Button variant="outline-secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button variant="danger">Delete</Button>
+          <Button variant="danger" onClick={()=>deleteUser(userToDelete)}>Delete</Button>
         </Modal.Footer>
       </Modal>
     </>

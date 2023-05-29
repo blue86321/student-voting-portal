@@ -45,16 +45,16 @@ function Register(props) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("#K_ [Register] submit register event", user);
+    console.log("[Register] submit register event", user);
     event.preventDefault();
     const result = await myApi.createUser(user);
     if (result.success) {
-    console.log("#K_ [Register] result success:", result);
+    console.log("[Register] result success:", result);
     currentUser.setUser(result.data as LoginResponse);
       setIsClicked(false);
       props.onHide();
     } else {
-      console.log("#K_ [Register] error with msg:", result.msg);
+      console.log("[Register] error with msg:", result.msg);
       setError(result.msg);
       setIsClicked(false);
       setShowError(true);

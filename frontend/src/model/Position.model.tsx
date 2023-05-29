@@ -20,8 +20,13 @@ class Position implements PositionDetail{
     }
 
     isDataCompleted(): boolean {
+      console.log('[Position model] candidates', this.candidates);
       return this.candidates.length > 0;
     }
+}
+
+export class PositionVote extends Position {
+  selectedCandidate: string = "";
 }
 
 export default Position;

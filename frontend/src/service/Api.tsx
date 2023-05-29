@@ -2,9 +2,23 @@ import axios from "axios";
 import Election from "../model/Election.model";
 import Position from "../model/Position.model";
 import Candidate from "../model/Candidate.model";
-import { authedUser } from "../model/User.model";
+// import { authedUser } from "../model/User.model";
 
-const HOST_URL = "http://localhost:8000";
+const HOST_URL = "http://localhost:8080";
+
+// const config = {
+//   headers: { token: `${authedUser.token}`}
+// }
+
+export const authentication = async (data) => {
+  try {
+    const response = await axios.post(`${HOST_URL}/authentication/`, data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error submitting data(create election):", error);
+    throw error;
+  }
+};
 
 // const config = {
 //   headers: { token: `${authedUser.token}`}
@@ -32,7 +46,7 @@ export const fetchElections = async (): Promise<Election[]> => {
 };
 
 export const createElection = async (data) => {
-  data['token'] = authedUser.token;
+  // data['token'] = authedUser.token;
   try {
     const response = await axios.post(`${HOST_URL}/elections/`, data);
     return response.data;

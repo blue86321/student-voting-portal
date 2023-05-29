@@ -12,11 +12,11 @@ function ElectionDetail({ election }) {
             ? `Deadline: ${election.endTime}`
             : `Finished on: ${election.endTime}`}
         </p>
-        <Image
+        {/* <Image
           src={require("../defaultImage.png")}
           style={{ width: "640px", height: "auto" }}
-        />
-        <p>Description: </p>
+        /> */}
+        {/* <p>Description: </p> */}
         <p>{election.electionDesc}</p>
       </Container>
     </div>

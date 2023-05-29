@@ -10,7 +10,20 @@ import Election from "../../model/Election.model";
 function CreateElectionPage() {
   const location = useLocation();
   let election = location.state as Election | null;
-  const [progress, setProgress] = useState(election ? 33.33 : 0);
+  const [progress, setProgress] = useState(()=>{
+    let haveCandidates = false;
+    if (election) {
+      election.positions.forEach(position => {
+        if (position.candidates.length > 0) {
+          haveCandidates = true;
+          return
+        }
+      });
+      return haveCandidates ? 66.67 : 33.33
+    } else {
+      return 0
+    }
+  });
   const [electionID, setElectionID] = useState<Number | null>(
     election ? election.id : null
   );

@@ -5,7 +5,7 @@ function ResultPage() {
   return (
     <div>
       <ResultChart></ResultChart>
-      <Candidates candidates={null} electionStatus={null}></Candidates>
+      <Candidates candidates={null} electionStatus={null} isCompleted={undefined} selectedID={undefined}></Candidates>
     </div>
   );
 }

@@ -45,12 +45,12 @@ function Login(props) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("#K_ [Login] submit event");
+    console.log("[Login] submit event");
     event.preventDefault();
     try {
       const result = await myApi.login(user);
       // authedUser.setUser(result.email, result.token.access, result.token.refresh, result.is_staff, result.id)
-      console.log("#K_ [Login] result", result);
+      console.log("[Login] result", result);
       currentUser.setUser(result.data as LoginResponse);
       // const cUser = new CurrentUser()
       // cUser.setUser(result.data as User)
@@ -65,7 +65,7 @@ function Login(props) {
       setError((error as AxiosError).message);
       setIsClicked(false);
       setShowError(true);
-      console.log("#K_ [Login] error", error);
+      console.log("[Login] error", error);
     }
   };
 
