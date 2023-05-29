@@ -187,6 +187,8 @@ function ElectionDetailsPage() {
     navigate("/create", { state: { election } });
   };
 
+  // setVotePosition(vote!.votes)
+
   return (
     <div style={{ margin: "10px" }}>
       {showSuccessModal()}

@@ -20,6 +20,20 @@ export const authentication = async (data) => {
   }
 };
 
+// const config = {
+//   headers: { token: `${authedUser.token}`}
+// }
+
+export const authentication = async (data) => {
+  try {
+    const response = await axios.post(`${HOST_URL}/authentication/`, data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error submitting data(create election):", error);
+    throw error;
+  }
+};
+
 export const fetchElections = async (): Promise<Election[]> => {
   try {
     const response = await axios.get(`${HOST_URL}/elections/`);
