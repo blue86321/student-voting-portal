@@ -11,7 +11,7 @@ export interface Response<T = any> {
 }
 
 const HOST_URL = "http://localhost:8080";
-
+const TOKEN = 'token';
 
 const calcVotePercentAndWinner = (position: PositionDetail): PositionDetail => {
   // copy
@@ -71,11 +71,11 @@ class MyApi {
     const params: AxiosRequestConfig = { url: '/authentication/', method: 'POST', data: data } // question, DOC says no parameter, what is data here?
     //The request method is then called with the created parameters, and the response is returned.
     const response = await this.request(params)
-    // Assuming the token is returned in the response data as 'token'
+    // Assuming the token is returned in the response data as TOKEN
     if (response.success) {
       const token = response.data.token;
       // Store the token in localStorage
-      localStorage.setItem('token', token.access);
+      localStorage.setItem(TOKEN, token.access);
       console.log("[MyApi] set token: " + JSON.stringify(token));
     }
     // your post-process logic. e.g. calculate who's the election winner and add a tag to it.
@@ -83,7 +83,7 @@ class MyApi {
   }
 
   async deleteLogin(): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/authentication/',
       method: 'DELETE',
@@ -91,7 +91,7 @@ class MyApi {
         'Authorization': `Bearer ${token}` // Add the token to the Authorization header
       }
     };
-    localStorage.remove('token');
+    localStorage.remove(TOKEN);
     const response = await this.request(params);
     return response;
   }
@@ -106,7 +106,7 @@ class MyApi {
     return response;
   }
   async createPosition(positionData: Position): Promise<Response<PositionDetail>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/positions/',
       method: 'POST',
@@ -120,7 +120,7 @@ class MyApi {
     return response;
   }
   async updatePosition(query: { positionData: Position, positionId: string }): Promise<Response<PositionDetail>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/positions/${query.positionId}/`,
       method: 'PATCH',
@@ -133,7 +133,7 @@ class MyApi {
     return response;
   }
   async deletePosition(positionId: string): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/positions/${positionId}/`, method: 'DELETE',
       headers: {
@@ -152,7 +152,7 @@ class MyApi {
     return response;
   }
   async updateputPosition(query: { positionData: Position, positionId: string }): Promise<Response<PositionDetail>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/positions/${query.positionId}/`,
       method: 'PUT',
@@ -167,7 +167,7 @@ class MyApi {
 
   // '/elections/'
   async createElection(electionData: Election): Promise<Response<ElectionDetail>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/elections/',
       method: 'POST',
@@ -181,7 +181,7 @@ class MyApi {
     return response;
   }
   async updateElection(query: { electionData: Election, electionId: string }): Promise<Response<ElectionDetail>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/elections/${query.electionId}/`,
       method: 'PATCH',
@@ -195,7 +195,7 @@ class MyApi {
     return response;
   }
   async deleteElection(electionId: string): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/elections/${electionId}/`, method: 'DELETE', headers: {
         'Authorization': `Bearer ${token}` // Add the token to the Authorization header
@@ -227,7 +227,7 @@ class MyApi {
     return response;
   }
   async updateputElection(query: { electionData: Election, electionId: string }): Promise<Response<ElectionDetail>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
 
     const params: AxiosRequestConfig = {
       url: `/elections/${query.electionId}/`,
@@ -249,7 +249,7 @@ class MyApi {
     return response;
   }
   async createCandidate(candidateData: Candidate): Promise<Response<Candidate>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/candidates/',
       method: 'POST',
@@ -262,7 +262,7 @@ class MyApi {
     return response;
   }
   async updateCandidate(query: { candidateData: Candidate, candidateId: string }): Promise<Response<Candidate>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/candidates/${query.candidateId}/`,
       method: 'PATCH',
@@ -275,7 +275,7 @@ class MyApi {
     return response;
   }
   async deleteCandidate(candidateId: string): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/candidates/${candidateId}/`, method: 'DELETE',
       headers: {
@@ -291,7 +291,7 @@ class MyApi {
     return response;
   }
   async updateputCandidate(query: { candidateData: Candidate, candidateId: string }): Promise<Response<Candidate>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/candidates/${query.candidateId}/`,
       method: 'PUT',
@@ -306,7 +306,7 @@ class MyApi {
 
   // '/votes/'
   async getVotes(): Promise<Response<VoteDetail[]>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/votes/', method: 'GET',
       headers: {
@@ -322,7 +322,7 @@ class MyApi {
     return response;
   }
   async createVote(voteData: Vote): Promise<Response<Vote>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/votes/',
       method: 'POST',
@@ -337,7 +337,7 @@ class MyApi {
 
   // '/users/'
   async getUsers(): Promise<Response<User[]>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/users/', method: 'GET',
       headers: {
@@ -357,12 +357,12 @@ class MyApi {
     // set token
     if (response.success) {
       const token = response.data.token;
-      localStorage.setItem('token', token.access);
+      localStorage.setItem(TOKEN, token.access);
     }
     return response;
   }
   async getUser(userId: string): Promise<Response<User>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/users/${userId}/`, method: 'GET',
       headers: {
@@ -373,7 +373,7 @@ class MyApi {
     return response;
   }
   async deleteUser(userId: string): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/users/${userId}/`, method: 'DELETE',
       headers: {
@@ -384,7 +384,7 @@ class MyApi {
     return response;
   }
   async updateUser(query: { userData: CreateUserParams, userId: string }): Promise<Response<User>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/users/${query.userId}/`,
       method: 'PATCH',
@@ -399,7 +399,7 @@ class MyApi {
 
   // '/me/'
   async getMe(): Promise<Response<User>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     console.log("[MyApi] getMe with token: " + token);
     const params: AxiosRequestConfig = {
       url: '/me/', method: 'GET',
@@ -411,7 +411,7 @@ class MyApi {
     return response;
   }
   async deleteMe(): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/me/`, method: 'DELETE',
       headers: {
@@ -422,7 +422,7 @@ class MyApi {
     return response;
   }
   async updateMe(userData: CreateUserParams): Promise<Response<User>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/me/',
       method: 'PATCH',
@@ -442,7 +442,7 @@ class MyApi {
     return response;
   }
   async createUniversity(name: String): Promise<Response<University>> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const data = { name };
     const params: AxiosRequestConfig = {
       url: '/university/', method: 'POST', data,
@@ -460,7 +460,7 @@ class MyApi {
     return response;
   }
   async deleteUniversity(universityId: string): Promise<Response> {
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/university/${universityId}/`, method: 'DELETE',
       headers: {
