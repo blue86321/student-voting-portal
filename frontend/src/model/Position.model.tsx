@@ -1,12 +1,13 @@
 import { CandidateDetail, PositionDetail } from "../Interfaces/Election";
 
-class Position implements PositionDetail{
+class Position implements PositionDetail {
     id: number;
     electionId: number;
     positionName: string;
     positionDesc: string;
     maxVotesTotal: number;
     maxVotesPerCandidate: number;
+    totalVoteCount: number;
     candidates: CandidateDetail[];
 
     constructor(p: PositionDetail) {
@@ -16,6 +17,7 @@ class Position implements PositionDetail{
         this.positionDesc = p.positionDesc;
         this.maxVotesTotal = p.maxVotesTotal;
         this.maxVotesPerCandidate = p.maxVotesPerCandidate
+        this.totalVoteCount = p.totalVoteCount
         this.candidates = p.candidates;
     }
 

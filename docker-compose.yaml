@@ -48,6 +48,7 @@ services:
       - 3000:3000
     depends_on:
       - django
+      - spring-boot
   database:
     container_name: mysql
     image: mysql:8.0.33-debian

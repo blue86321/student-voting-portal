@@ -15,6 +15,7 @@ public class PositionResp {
     String positionDesc = "";
     Integer maxVotesTotal;
     Integer maxVotesPerCandidate;
+    Integer totalVoteCount;
 
     List<CandidateResp> candidates;
 
@@ -25,6 +26,7 @@ public class PositionResp {
         this.positionDesc = positions.getPositionDesc();
         this.maxVotesTotal = positions.getMaxVotesTotal();
         this.maxVotesPerCandidate = positions.getMaxVotesPerCandidate();
+        this.totalVoteCount = candidates.stream().mapToInt(Candidates::getVoteCount).sum();
         this.candidates = candidates.stream().map(CandidateResp::new).collect(Collectors.toList());
     }
 }
