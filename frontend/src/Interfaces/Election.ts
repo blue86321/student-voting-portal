@@ -73,6 +73,7 @@ export interface PositionDetail {
   positionDesc: string;
   maxVotesTotal: number;
   maxVotesPerCandidate: number;
+  totalVoteCount: number;
   candidates: CandidateDetail[];
 }
 
