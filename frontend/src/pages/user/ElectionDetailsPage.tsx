@@ -210,7 +210,11 @@ function ElectionDetailsPage() {
     navigate("/create", { state: election });
   };
 
-  // setVotePosition(vote!.votes)
+  const getPositionVotes = (positionID) => {
+    return vote?.votes.filter(
+      (votePositionDetails) => votePositionDetails.position.id === positionID
+    )
+  }
 
   return (
     <div style={{ margin: "10px" }}>
@@ -241,7 +245,7 @@ function ElectionDetailsPage() {
             {/* if past election, show the result chart */}
             {election?.state === 2 ? (
               <Container>
-                <ResultChart></ResultChart>
+                <ResultChart votes={getPositionVotes(position.id)}></ResultChart>
               </Container>
             ) : null}
             <Container>
@@ -249,9 +253,7 @@ function ElectionDetailsPage() {
                 candidates={candidates.filter(
                   (candidate) => candidate.positionId === position.id
                 )}
-                votes={vote?.votes.filter(
-                  (votePositionDetails) => votePositionDetails.position.id === position.id
-                )}
+                votes={getPositionVotes(position.id)}
                 selectedID={position.selectedCandidate}
                 electionStatus={election?.state}
                 isCompleted={isElectionFinished}

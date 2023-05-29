@@ -15,6 +15,7 @@ export interface VoteCandidate {
   voteCount: number;
 }
 
+// returned from getVotes
 export interface VoteDetail {
   election: ElectionDetail;
   votes: VotePositionDetail[];
