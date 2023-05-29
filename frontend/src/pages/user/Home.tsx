@@ -30,23 +30,32 @@ function Home({ type }) {
   }, [currentUser]);
   console.log("[Rendering] Home", contentType);
 
+  const filterElections = (state, showCompletedOnly) => {
+    const filteredData = data.filter(e => {
+      const condition = e.state === state;
+      return (showCompletedOnly && e.state !== 0) ? condition && e.isDataCompleted : condition
+    })
+    console.log("[Home] filterElections", filteredData)
+    return filteredData
+  }
+
   return (
     <div>
       <Container className="mt-4">
         {contentType === "onGoing" ? (
           <ElectionCard
-            elections={data.filter((election) => election.state === 1)}
+            elections={filterElections(1,true)}
           ></ElectionCard>
         ) : contentType === "past" ? (
           <ElectionCard
-            elections={data.filter((election) => election.state === 2)}
+            elections={filterElections(2,true)}
           ></ElectionCard>
         ) : contentType === "upComing" ? (
           <ElectionCard
-            elections={data.filter((election) => election.state === 0)}
+            elections={filterElections(0,false)}
           ></ElectionCard>
         ) : contentType === "admin" ? (
-          <ElectionCard elections={data}></ElectionCard>
+          <ElectionCard elections={data.sort((a,b)=> a.state - b.state)}></ElectionCard>
         ) : null}
       </Container>
     </div>

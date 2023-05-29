@@ -13,6 +13,9 @@ function CreateElectionPage() {
   const [progress, setProgress] = useState(()=>{
     let haveCandidates = false;
     if (election) {
+      if (!election.positions) {
+        return 33.33
+      }
       election.positions.forEach(position => {
         if (position.candidates.length > 0) {
           haveCandidates = true;
@@ -24,14 +27,18 @@ function CreateElectionPage() {
       return 0
     }
   });
-  const [electionID, setElectionID] = useState<Number | null>(
-    election ? election.id : null
+  const [electionID, setElectionID] = useState(
+    election ? election.id : undefined
+  );
+  const [positions, setPositions] = useState(
+    election ? election.positions : undefined
   );
   const handleNext = (value, e) => {
     setProgress(value);
     console.log("[CreateElectionPage] create election: ", e.id);
     setElectionID(e.id);
     if (election) {
+      election.id = e.id;
       election.electionName = e.electionName;
       election.electionDesc = e.electionDesc;
       election.startDate = e.startDate;
@@ -41,11 +48,14 @@ function CreateElectionPage() {
     } else {
       election = e;
     }
+    console.log("[CreateElectionPage] created election: ", election);
   };
-  console.log("[CreateElectionPage] election: ", election);
+  // setElectionID(election?.id)
+  console.log("[CreateElectionPage] election: ", election, electionID);
 
   const handleSave = (positions) => {
-    election!.positions = positions;
+    console.log("[CreateElectionPage] handleSave: ", positions, election)
+    setPositions(positions);
     setProgress(66.67);
   };
 
@@ -99,7 +109,7 @@ function CreateElectionPage() {
         )}
 
         {progress >= 66.67 && (
-            <CreateCandidates electionID={electionID} positions={election ? election.positions:null} onNext={handleSubmit}></CreateCandidates>
+            <CreateCandidates electionID={electionID} positions={positions} onNext={handleSubmit}></CreateCandidates>
         )}
       </Container>
     </div>

@@ -13,6 +13,7 @@ import {
   Vote,
   VotePosition,
   VoteCandidate,
+  VoteDetail,
 } from "../../Interfaces/Election";
 import { currentUser } from "../../model/User.model";
 import { PositionVote } from "../../model/Position.model";
@@ -20,15 +21,17 @@ import { PositionVote } from "../../model/Position.model";
 function ElectionDetailsPage() {
   const location = useLocation();
   const election: Election | null = location.state
-    ? new Election(location.state)
+    ? new Election(location.state, false)
     : null;
 
   const [positions, setPositions] = useState<PositionVote[]>([]);
   const [candidates, setCandidates] = useState<CandidateDetail[]>([]);
 
-  const [vote, setVote] = useState<Vote | undefined>(undefined);
+  // vote for result page
+  const [vote, setVote] = useState<VoteDetail | undefined>(undefined);
+  // votePosition for submit vote
   const [votePosition, setVotePosition] = useState<VotePosition[]>([]);
-  const [voteCandidate, setVoteCandidate] = useState<VoteCandidate[]>([]);
+  // const [voteCandidate, setVoteCandidate] = useState<VoteCandidate[]>([]);
 
   const isElectionFinished = (candidateID, positionID) => {
     console.log(
@@ -78,24 +81,38 @@ function ElectionDetailsPage() {
     const result = await myApi.createVote(postVote);
     if (result.success) {
       console.log("[ElectionDetailsPage] Successfully created vote", result);
-      setShow(true)
+      showModalWithMessage("Vote Success", "Thank you for your perticiption!");
     } else {
       console.error("[ElectionDetailsPage] Failed to create vote", result);
-      showErrorWithMessage("Submit failed!", result.msg);
+      showModalWithMessage("Submit failed!", result.msg, "danger");
     }
   };
 
+  const showModalWithMessage = (
+    title: string,
+    message: string,
+    variant: string = "primary"
+  ) => {
+    setModalTitle(title);
+    setModalBody(message);
+    setModalVariant(variant);
+    setShow(true);
+  };
+
   const [show, setShow] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalBody, setModalBody] = useState("");
+  const [modalVariant, setModalVariant] = useState("primary");
   const showSuccessModal = () => {
     return (
       <>
         <Modal show={show} onHide={goBack}>
           <Modal.Header closeButton>
-            <Modal.Title>Vote Success</Modal.Title>
+            <Modal.Title>{modalTitle}</Modal.Title>
           </Modal.Header>
-          <Modal.Body>Thank you for your perticiption!</Modal.Body>
+          <Modal.Body>{modalBody}</Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" onClick={goBack}>
+            <Button variant={modalVariant} onClick={goBack}>
               Close
             </Button>
           </Modal.Footer>
@@ -146,9 +163,10 @@ function ElectionDetailsPage() {
         (position) => position.electionId === election?.id
       );
       setPositions(positions);
-      console.log("[Election detail] position data:", positionResult);
+      console.log("[ElectionDetailsPage] position data:", positions);
     } else {
       // Handle error
+      console.log("[ElectionDetailsPage] position data error:", positionResult);
     }
 
     const candidateResult = await myApi.getCandidates();
@@ -157,37 +175,46 @@ function ElectionDetailsPage() {
         (candidate) => candidate.electionId === election?.id
       );
       setCandidates(candidates);
-      console.log("[Election detail] candidate data:", candidateResult);
+      console.log("[ElectionDetailsPage] candidate data:", candidates);
     } else {
       // Handle error
+      console.log(
+        "[ElectionDetailsPage] candidate data error:",
+        candidateResult
+      );
     }
 
     // if past election, get vote result
     if (election?.state === 2) {
       const voteResult = await myApi.getVotes();
       if (voteResult.success) {
-        const votes = (voteResult.data as Vote[]).filter(
-          (vote) => vote.electionId === election?.id
+        const votes = (voteResult.data as VoteDetail[]).filter(
+          (vote) => vote.election.id === election?.id
         );
         setVote(votes[0]);
-        console.log("[Election detail] vote data:", voteResult);
+        console.log("[ElectionDetailsPage] vote data:", votes[0]);
       } else {
         // Handle error
+        console.log("[ElectionDetailsPage] vote data error:", voteResult);
       }
     }
   };
 
-  console.log("[Election detail] election:", election);
+  console.log("[ElectionDetailsPage] election:", election);
   // setVotePosition(vote!.votes)
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
   };
   const onClickEdit = () => {
-    navigate("/create", { state: { election } });
+    navigate("/create", { state: election });
   };
 
-  // setVotePosition(vote!.votes)
+  const getPositionVotes = (positionID) => {
+    return vote?.votes.filter(
+      (votePositionDetails) => votePositionDetails.position.id === positionID
+    )
+  }
 
   return (
     <div style={{ margin: "10px" }}>
@@ -201,7 +228,7 @@ function ElectionDetailsPage() {
             <Button
               variant="primary"
               onClick={onClickEdit}
-              disabled={election?.state === 1}
+              // disabled={election?.state === 1}
             >
               Edit
             </Button>
@@ -218,7 +245,7 @@ function ElectionDetailsPage() {
             {/* if past election, show the result chart */}
             {election?.state === 2 ? (
               <Container>
-                <ResultChart></ResultChart>
+                <ResultChart votes={getPositionVotes(position.id)}></ResultChart>
               </Container>
             ) : null}
             <Container>
@@ -226,6 +253,7 @@ function ElectionDetailsPage() {
                 candidates={candidates.filter(
                   (candidate) => candidate.positionId === position.id
                 )}
+                votes={getPositionVotes(position.id)}
                 selectedID={position.selectedCandidate}
                 electionStatus={election?.state}
                 isCompleted={isElectionFinished}
@@ -234,17 +262,19 @@ function ElectionDetailsPage() {
           </div>
         ))}
         <div className="text-center">
-          <Button
-            disabled={
-              !(
-                votePosition.length !== 0 &&
-                votePosition.length === positions.length
-              )
-            }
-            onClick={onClickSubmit}
-          >
-            Submit
-          </Button>
+          {election?.state === 1 && (
+            <Button
+              disabled={
+                !(
+                  votePosition.length !== 0 &&
+                  votePosition.length === positions.length
+                )
+              }
+              onClick={onClickSubmit}
+            >
+              Submit
+            </Button>
+          )}
         </div>
       </Container>
     </div>

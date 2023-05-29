@@ -22,6 +22,7 @@ function CandidateComponent({
     candidate.positionId
   );
   const [shouldShowSave, setShouldShowSave] = useState(false);
+  const [saveButtonText, setSaveButtonText] = useState("Save");
 
   useEffect(() => {
     console.log("[CreateCandidate] candidate updated:", candidate);
@@ -55,20 +56,16 @@ function CandidateComponent({
   const handleOnChange = () => {
     updateCandidate(index, candidate);
     setShouldShowSave(true);
+    setSaveButtonText("Save");
   };
 
   const onSave = async (index) => {
-    console.log("#K_ position: ", positions as PositionDetail[]);
-    const position = candidatePosition === 0 ? positions[0] : positions.filter((position) => {
-      console.log(
-        "#K_ position: ",
-        position.id,
-        candidatePosition,
-        position.id == candidatePosition
-      );
-      return position.id == candidatePosition;
-    })[0];
-    console.log("#K_ position: " + position);
+    const position =
+      candidatePosition === 0
+        ? positions[0]
+        : positions.filter((position) => {
+            return position.id == candidatePosition;
+          })[0];
     const candidateData: Candidate = {
       userId: currentUser.id,
       electionId: position.electionId,
@@ -88,7 +85,8 @@ function CandidateComponent({
     if (result.success) {
       candidate.id = (result.data as CandidateDetail).id;
       updateCandidate(index, candidate);
-      setShouldShowSave(false);
+      // setShouldShowSave(false);
+      setSaveButtonText("Saved");
     } else {
       console.log("[CreateCandidates] Error creating position", result.msg);
     }
@@ -138,7 +136,6 @@ function CandidateComponent({
               onChange={(event) => handleOnChangePositionID(event.target.value)}
             >
               {positions.map((position, index) => {
-                console.log("#K_ selecter position id:", position.id);
                 return (
                   <option key={index} value={position.id}>
                     {position.positionName}
@@ -174,8 +171,12 @@ function CandidateComponent({
       {/* <Button variant="outline-secondary">+ Upload Photo</Button> */}
       <div className="container d-flex justify-content-end">
         {shouldShowSave && (
-          <Button variant="primary" onClick={() => onSave(index)}>
-            Save
+          <Button
+            variant="primary"
+            disabled={saveButtonText === "Saved"}
+            onClick={() => onSave(index)}
+          >
+            {saveButtonText}
           </Button>
         )}
         <div style={{ width: "8px" }}></div>

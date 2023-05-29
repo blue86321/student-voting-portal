@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
 import { Button, Modal, Form, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import User, { CreateUserParams, LoginResponse, University } from "../../Interfaces/User";
+import User, {
+  CreateUserParams,
+  LoginResponse,
+  University,
+} from "../../Interfaces/User";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
 
 function Register(props) {
   const [isClicked, setIsClicked] = useState(false);
-  const [dob, setDob] = useState(new Date().setFullYear(new Date().getFullYear()-18));
+  const [dob, setDob] = useState(
+    new Date().setFullYear(new Date().getFullYear() - 18)
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [universityId, setUniversityId] = useState(0);
+  const [universities, setUniversities] = useState<University[]>([]);
   const [admin, setAdmin] = useState(false);
   const handleDob = (date) => {
     setDob(date);
@@ -21,11 +28,13 @@ function Register(props) {
     const fetchDataAsync = async () => {
       const universityResult = await myApi.getUniversities();
       if (universityResult.success) {
-        const universities = (universityResult.data as University[])
+        const universities = universityResult.data as University[];
         // setPositions(positions);
-        console.log("[Register] university data:", universityResult.data);
+        console.log("[Register] university data:", universities);
+        setUniversities(universities);
       } else {
         // Handle error
+        console.log("[Register] university data error:", universityResult);
       }
     };
 
@@ -39,7 +48,7 @@ function Register(props) {
       email: email,
       password: password,
       passwordConfirm: passwordConfirm,
-      universityId: universityId,
+      universityId: universityId === 0 ? universities[0].id : universityId,
       dob: new Date(dob),
       admin: admin,
     };
@@ -49,8 +58,8 @@ function Register(props) {
     event.preventDefault();
     const result = await myApi.createUser(user);
     if (result.success) {
-    console.log("[Register] result success:", result);
-    currentUser.setUser(result.data as LoginResponse);
+      console.log("[Register] result success:", result);
+      currentUser.setUser(result.data as LoginResponse);
       setIsClicked(false);
       props.onHide();
     } else {
@@ -132,10 +141,13 @@ function Register(props) {
                 setUniversityId(parseInt(e.target.value));
               }}
             >
-              <option>Open this select menu</option>
+              {universities.map((university) => (
+                <option key={university.id} value={university.id}>{university.name}</option>
+              ))}
+              {/* <option>Open this select menu</option>
               <option value="1">One</option>
               <option value="2">Two</option>
-              <option value="3">Three</option>
+              <option value="3">Three</option> */}
             </Form.Select>
             {/* <Form.Control
               type="text"

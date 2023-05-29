@@ -69,11 +69,11 @@ function Navigation({ isAdmin }) {
             </Nav.Link>
           </Nav.Item>
           {/* check the log in status */}
-          <Nav.Item>
+          {/* <Nav.Item>
             <Nav.Link eventKey="/your_votes" as={Link} to="/your_votes">
               Your Votes
             </Nav.Link>
-          </Nav.Item>
+          </Nav.Item> */}
         </Nav>
       </Container>
     );
