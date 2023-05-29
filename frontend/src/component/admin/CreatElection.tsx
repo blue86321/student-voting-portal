@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import myApi from "../../service/MyApi";
 import { Election as ElectionInterface, ElectionDetail } from "../../Interfaces/Election";
 import Election from "../../model/Election.model";
+import DateTimeUtils from "../utils/DateTimeUtil";
 
 function CreateElection({ electionForUpdate, onNext }) {
   const eUpdate = electionForUpdate as Election|null;
@@ -24,20 +25,11 @@ function CreateElection({ electionForUpdate, onNext }) {
     setEndTime(date);
   };
 
-  // Fetch election by election ID for update
-  // if (electionForUpdate !== null) {
-  //   console.log("[CreateElection] update with eID: ", electionForUpdate.id);
-  //   setElectionID(electionForUpdate.id);
-  //   setElectionName(electionForUpdate.electionName);
-  //   setStartTime(electionForUpdate.startTime);
-  //   setEndTime(electionForUpdate.endTime);
-  //   setDescription(electionForUpdate.electionDesc);
-  // }
-
   // Form control
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
   const validate = () => {
+    console.log('[CreateElection] electionName: ', eUpdate);
     return (
       electionName.length !== 0 &&
       description.length !== 0 &&
@@ -67,7 +59,8 @@ function CreateElection({ electionForUpdate, onNext }) {
 
   // Form submition
   const [error, setError] = useState("");
-  const handleClick = async () => {
+  const handleClick = async (event) => {
+    event.preventDefault();
     const election: ElectionInterface = {
       universityId: 1,
       electionName: electionName,
@@ -77,7 +70,7 @@ function CreateElection({ electionForUpdate, onNext }) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("[CreatElection] submit event", election);
+    console.log("[CreatElection] submit event", election, electionID);
     const isCreate = electionID === null;
     const result = isCreate
       ? await myApi.createElection(election)

@@ -2,8 +2,9 @@ import { Button, Card, Modal, Row } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import "./CandidateCard.css";
 import { currentUser } from "../../model/User.model";
+import { VoteCandidateDetail } from "../../Interfaces/Election";
 
-function CandidateCard({ candidates, selectedID, electionStatus, isCompleted }) {
+function CandidateCard({ candidates, votes, selectedID, electionStatus, isCompleted }) {
   /* TODO: debug for card key;
     count add 1 after click the 'VOTE' button; 
     set them into position groups, currently, if clicked one "VOTE" in one of these cards, all the buttons will be disabled;
@@ -11,7 +12,7 @@ function CandidateCard({ candidates, selectedID, electionStatus, isCompleted }) 
     */
 
   console.log("[CandidateCard]:", electionStatus);
-  let voteCount = 0;
+  // let voteCount = 0;
   //   let electionStatus = "onGoing";
 
   // const [isClicked, setIsClicked] = useState(false);
@@ -20,6 +21,7 @@ function CandidateCard({ candidates, selectedID, electionStatus, isCompleted }) 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  console.log("[CandidateCard] votes:", votes)
   // useEffect(() => {
   //   setUpVoteButton()
   // },[])
@@ -28,7 +30,7 @@ function CandidateCard({ candidates, selectedID, electionStatus, isCompleted }) 
     if (!currentUser.isLoggedIn()) {
       handleShow();
     } else {
-      voteCount++;
+      // voteCount++;
       // console.log(voteCount, value);
       isCompleted(candidateID, positionID)
     }
@@ -69,9 +71,20 @@ function CandidateCard({ candidates, selectedID, electionStatus, isCompleted }) 
         </Button>
       );
     } else if (electionStatus === 2) {
+      let c = 0;
+      if (votes !== undefined) {
+        const candidateVote:VoteCandidateDetail|undefined = votes[0].candidates.filter(
+          (can) => {
+            console.log("[CandidateCard] filtering:", can.candidate.id, can.voteCount)
+            return can.candidate.id === candidateID
+          }
+        )[0]
+        console.log("[CandidateCard] load votes for candidate:", candidateVote)
+        c = candidateVote?.candidate.voteCount ?? 0
+      }
       return (
         <Button variant="secondary" size="lg" disabled>
-          {voteCount}
+          {c}
         </Button>
       );
     } else {

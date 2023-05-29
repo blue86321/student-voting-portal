@@ -13,6 +13,7 @@ import {
   Vote,
   VotePosition,
   VoteCandidate,
+  VoteDetail,
 } from "../../Interfaces/Election";
 import { currentUser } from "../../model/User.model";
 import { PositionVote } from "../../model/Position.model";
@@ -26,9 +27,11 @@ function ElectionDetailsPage() {
   const [positions, setPositions] = useState<PositionVote[]>([]);
   const [candidates, setCandidates] = useState<CandidateDetail[]>([]);
 
-  const [vote, setVote] = useState<Vote | undefined>(undefined);
+  // vote for result page
+  const [vote, setVote] = useState<VoteDetail | undefined>(undefined);
+  // votePosition for submit vote
   const [votePosition, setVotePosition] = useState<VotePosition[]>([]);
-  const [voteCandidate, setVoteCandidate] = useState<VoteCandidate[]>([]);
+  // const [voteCandidate, setVoteCandidate] = useState<VoteCandidate[]>([]);
 
   const isElectionFinished = (candidateID, positionID) => {
     console.log(
@@ -160,9 +163,10 @@ function ElectionDetailsPage() {
         (position) => position.electionId === election?.id
       );
       setPositions(positions);
-      console.log("[Election detail] position data:", positionResult);
+      console.log("[ElectionDetailsPage] position data:", positions);
     } else {
       // Handle error
+      console.log("[ElectionDetailsPage] position data error:", positionResult);
     }
 
     const candidateResult = await myApi.getCandidates();
@@ -171,27 +175,32 @@ function ElectionDetailsPage() {
         (candidate) => candidate.electionId === election?.id
       );
       setCandidates(candidates);
-      console.log("[Election detail] candidate data:", candidateResult);
+      console.log("[ElectionDetailsPage] candidate data:", candidates);
     } else {
       // Handle error
+      console.log(
+        "[ElectionDetailsPage] candidate data error:",
+        candidateResult
+      );
     }
 
     // if past election, get vote result
     if (election?.state === 2) {
       const voteResult = await myApi.getVotes();
       if (voteResult.success) {
-        const votes = (voteResult.data as Vote[]).filter(
-          (vote) => vote.electionId === election?.id
+        const votes = (voteResult.data as VoteDetail[]).filter(
+          (vote) => vote.election.id === election?.id
         );
         setVote(votes[0]);
-        console.log("[Election detail] vote data:", voteResult);
+        console.log("[ElectionDetailsPage] vote data:", votes[0]);
       } else {
         // Handle error
+        console.log("[ElectionDetailsPage] vote data error:", voteResult);
       }
     }
   };
 
-  console.log("[Election detail] election:", election);
+  console.log("[ElectionDetailsPage] election:", election);
   // setVotePosition(vote!.votes)
   const navigate = useNavigate();
   const goBack = () => {
@@ -239,6 +248,9 @@ function ElectionDetailsPage() {
               <CandidateCard
                 candidates={candidates.filter(
                   (candidate) => candidate.positionId === position.id
+                )}
+                votes={vote?.votes.filter(
+                  (votePositionDetails) => votePositionDetails.position.id === position.id
                 )}
                 selectedID={position.selectedCandidate}
                 electionStatus={election?.state}

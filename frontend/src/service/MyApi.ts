@@ -1,6 +1,6 @@
 
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Candidate, Election, ElectionDetail, Position, PositionDetail, Vote } from '../Interfaces/Election';
+import { Candidate, Election, ElectionDetail, Position, PositionDetail, Vote, VoteDetail } from '../Interfaces/Election';
 import User, { CreateUserParams, LoginParams, LoginResponse, University } from '../Interfaces/User';
 
 export interface Response<T = any> {
@@ -26,10 +26,10 @@ class MyApi {
         ...params,
         method: params.method
       })
-      // console.log('[MyApi] response: ' + JSON.stringify(res))
+      console.log('[MyApi] response: ' + JSON.stringify(res))
       return res.data
     } catch (e) {
-      // console.log('[MyApi] error: ' + e)
+      console.log('[MyApi] error: ' + e)
       const defaultFailResp = { data: undefined, msg: "", code: 0, success: false }
       if (e instanceof AxiosError) {
         const resData: Response | undefined = e.response?.data;
@@ -158,9 +158,9 @@ class MyApi {
       data: query.electionData,
       headers: {
         'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+      },
+      maxRedirects: 0
     };
-    console.log("[myapi] updateElection")
     const response = await this.request(params);
     return response;
   }
@@ -297,7 +297,7 @@ class MyApi {
   }
 
   // '/votes/'
-  async getVotes(): Promise<Response<Vote[]>> {
+  async getVotes(): Promise<Response<VoteDetail[]>> {
     const token = localStorage.getItem('token'); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: '/votes/', method: 'GET',
