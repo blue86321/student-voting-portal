@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Nav, Navbar, NavDropdown, Container, Alert } from "react-bootstrap";
-import "./Header.css"
 
 import logo from "../../logo.svg";
 import Login from "../user/Login";
