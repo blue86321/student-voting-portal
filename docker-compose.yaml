@@ -1,23 +1,23 @@
 version: "3.8"
 
 services:
-  # django:
-  #   container_name: django
-  #   build: backend_py
-  #   networks:
-  #     - local
-  #   environment:
-  #     - DB_HOST=database
-  #     - DB_NAME=${DB_NAME_PREFIX}_py
-  #     - DB_USER=${DB_USER}
-  #     - DB_PASSWORD=${DB_PASSWORD}
-  #   volumes:
-  #     - ./backend_py/student_voting_portal/:/app/student_voting_portal/
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
+  django:
+    container_name: django
+    build: backend_py
+    networks:
+      - local
+    environment:
+      - DB_HOST=database
+      - DB_NAME=${DB_NAME_PREFIX}_py
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./backend_py/student_voting_portal/:/app/student_voting_portal/
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
   spring-boot:
     container_name: spring-boot
     build: backend_java
@@ -47,6 +47,7 @@ services:
     ports:
       - 3000:3000
     depends_on:
+      - django
       - spring-boot
   database:
     container_name: mysql
