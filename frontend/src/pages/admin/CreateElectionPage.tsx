@@ -1,11 +1,13 @@
 import { ProgressBar, Container, Button, Modal } from "react-bootstrap";
 import { useState } from "react";
 
+import "../../component/navigator/Header.css"
 import CreateElection from "../../component/admin/CreatElection";
 import CreatePositions from "../../component/admin/CreatePositions";
 import CreateCandidates from "../../component/admin/CreateCandidates";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Election from "../../model/Election.model";
+import Logger from "../../component/utils/Logger";
 
 function CreateElectionPage() {
   const location = useLocation();
@@ -34,8 +36,7 @@ function CreateElectionPage() {
     election ? election.positions : undefined
   );
   const handleNext = (value, e) => {
-    setProgress(value);
-    console.log("[CreateElectionPage] create election: ", e.id);
+    setProgress(Math.max(progress, value));
     setElectionID(e.id);
     if (election) {
       election.id = e.id;
@@ -48,13 +49,11 @@ function CreateElectionPage() {
     } else {
       election = e;
     }
-    console.log("[CreateElectionPage] created election: ", election);
+    Logger.debug("[CreateElectionPage] created election: ", election);
   };
-  // setElectionID(election?.id)
-  console.log("[CreateElectionPage] election: ", election, electionID);
 
   const handleSave = (positions) => {
-    console.log("[CreateElectionPage] handleSave: ", positions, election)
+    Logger.debug("[CreateElectionPage] handleSave: ", positions, election)
     setPositions(positions);
     setProgress(66.67);
   };
@@ -94,7 +93,7 @@ function CreateElectionPage() {
       <Container>
         {showFinishedModel()}
         <Container className="mx-2">
-          <ProgressBar now={progress} label={`${progress}%`} />
+          <ProgressBar variant="progbr-custom-color" now={progress} />
         </Container>
 
         {progress >= 0 && (

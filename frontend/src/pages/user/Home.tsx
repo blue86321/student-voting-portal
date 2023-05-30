@@ -1,12 +1,11 @@
-import React, { useEffect, useState, createContext } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import ElectionCard from "../../component/elections/ElectionCard";
-// import { getElections } from "../../service/Api";
 import Election from "../../model/Election.model";
 import myApi from "../../service/MyApi";
-import { ElectionDetail } from "../../Interfaces/Election";
+import { ElectionDetail } from "../../model/Interfaces/Election";
 import { currentUser } from "../../model/User.model";
-// import {LoginResponse} from "../../service/MyApi"
+import Logger from "../../component/utils/Logger";
 
 function Home({ type }) {
   const [data, setData] = useState<Election[]>([]);
@@ -19,23 +18,21 @@ function Home({ type }) {
           return new Election(election);
         });
         setData(electionDetails);
-        // console.log("[Home] data:", electionDetails);
       } else {
         // Handle error
-        console.log("[Home] getElections failed: " + result.msg);
+        Logger.error("[Home] getElections failed: " + result.msg);
       }
     };
 
     fetchDataAsync();
   }, [currentUser]);
-  console.log("[Rendering] Home", contentType);
 
   const filterElections = (state, showCompletedOnly) => {
     const filteredData = data.filter(e => {
       const condition = e.state === state;
       return (showCompletedOnly && e.state !== 0) ? condition && e.isDataCompleted : condition
     })
-    console.log("[Home] filterElections", filteredData)
+    Logger.debug("[Home] filterElections", filteredData)
     return filteredData
   }
 

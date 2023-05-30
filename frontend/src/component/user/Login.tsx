@@ -1,28 +1,21 @@
 import React, { useEffect, useState } from "react";
 import Register from "./Register";
 import {
-  Container,
-  Row,
-  Col,
   Button,
   Modal,
   Form,
   Alert,
 } from "react-bootstrap";
-import { CurrentUser, currentUser } from "../../model/User.model";
-import { AxiosError } from "axios";
+import { currentUser } from "../../model/User.model";
 import myApi from "../../service/MyApi";
-import User, { LoginParams, LoginResponse } from "../../Interfaces/User";
+import { LoginParams, LoginResponse } from "../../model/Interfaces/User";
 import { useNavigate } from "react-router-dom";
-// import { useAppSelector, useAppDispatch } from "../../hooks";
+import Logger from "../utils/Logger";
 
 function Login(props) {
   const [registerModalShow, setRegisterModalShow] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  //redux
-  // const reduxUser = useAppSelector((state) => state.user.value);
-  // const dispatch = useAppDispatch();
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
@@ -45,27 +38,22 @@ function Login(props) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("[Login] submit event");
     event.preventDefault();
-    try {
-      const result = await myApi.login(user);
-      // authedUser.setUser(result.email, result.token.access, result.token.refresh, result.is_staff, result.id)
-      console.log("[Login] result", result);
+    const result = await myApi.login(user);
+    Logger.debug("[Login] result", result);
+    if (result.success) {
       currentUser.setUser(result.data as LoginResponse);
-      // const cUser = new CurrentUser()
-      // cUser.setUser(result.data as User)
-      // dispatch(setUser(cUser))
-
+  
       setIsClicked(false);
       props.onHide();
       currentUser.staff || currentUser.superuser
         ? navigate("/manage_elections")
         : navigate("/");
-    } catch (error) {
-      setError((error as AxiosError).message);
+    } else {
+      setError(result.msg);
       setIsClicked(false);
       setShowError(true);
-      console.log("[Login] error", error);
+      Logger.error("[Login] error", error);
     }
   };
 

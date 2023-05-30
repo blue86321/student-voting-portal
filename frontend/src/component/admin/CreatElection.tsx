@@ -3,9 +3,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
 import myApi from "../../service/MyApi";
-import { Election as ElectionInterface, ElectionDetail } from "../../Interfaces/Election";
+import { Election as ElectionInterface, ElectionDetail } from "../../model/Interfaces/Election";
 import Election from "../../model/Election.model";
-import DateTimeUtils from "../utils/DateTimeUtil";
+import Logger from "../utils/Logger";
 
 function CreateElection({ electionForUpdate, onNext }) {
   const eUpdate = electionForUpdate as Election|null;
@@ -18,7 +18,7 @@ function CreateElection({ electionForUpdate, onNext }) {
   const handleStartTime = (date: Date) => {
     setStartTime(date);
     const newDate = new Date(date.getTime() + 86400000);
-    console.log("[CreateElection] date: ", date, ", newDate: ", newDate);
+    Logger.debug("[CreateElection] date: ", date, ", newDate: ", newDate);
     setEndTime(newDate);
   };
   const handleEndTime = (date) => {
@@ -29,7 +29,7 @@ function CreateElection({ electionForUpdate, onNext }) {
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
   const validate = () => {
-    console.log('[CreateElection] electionName: ', eUpdate);
+    Logger.debug('[CreateElection] electionName: ', eUpdate);
     return (
       electionName.length !== 0 &&
       description.length !== 0 &&
@@ -39,7 +39,7 @@ function CreateElection({ electionForUpdate, onNext }) {
   };
 
   useEffect(() => {
-    console.log("[CreateElectron] useEffect triggered");
+    Logger.debug("[CreateElectron] useEffect triggered");
     const isValid = validate();
     setValid(isValid);
   }, [electionName, description]);
@@ -70,7 +70,7 @@ function CreateElection({ electionForUpdate, onNext }) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("[CreatElection] submit event", election, electionID);
+    Logger.debug("[CreatElection] submit event", election, electionID);
     const isCreate = electionID === null;
     const result = isCreate
       ? await myApi.createElection(election)
@@ -78,18 +78,17 @@ function CreateElection({ electionForUpdate, onNext }) {
           electionData: election,
           electionId: electionID.toString(),
         });
-    console.log("[CreatElection] is create event", isCreate, "with result:", result);
+    Logger.debug("[CreatElection] is create event", isCreate, "with result:", result);
     if (result.success) {
       const electionDetail = new Election(result.data as ElectionDetail);
       setElectionID(electionDetail.id);
-      console.log("[CreatElection] result", electionDetail);
       setShowError(false);
       onNext(33.33, electionDetail);
     } else {
       setError(result.msg);
       setIsClicked(false);
       setShowError(true);
-      console.log("[CreatElection] error", error);
+      Logger.error("[CreatElection] error", error);
     }
   };
 
@@ -117,6 +116,8 @@ function CreateElection({ electionForUpdate, onNext }) {
                   onChange={(date) => handleStartTime(date)}
                   className="form-control"
                   showTimeSelect
+                  minDate={new Date()}
+                  showDisabledMonthNavigation
                   dateFormat="Pp"
                 />
               </Form.Group>

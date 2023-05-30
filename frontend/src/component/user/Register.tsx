@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Button, Modal, Form, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import User, {
+import {
   CreateUserParams,
   LoginResponse,
   University,
-} from "../../Interfaces/User";
+} from "../../model/Interfaces/User";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
+import Logger from "../utils/Logger";
 
 function Register(props) {
   const [isClicked, setIsClicked] = useState(false);
@@ -29,12 +30,11 @@ function Register(props) {
       const universityResult = await myApi.getUniversities();
       if (universityResult.success) {
         const universities = universityResult.data as University[];
-        // setPositions(positions);
-        console.log("[Register] university data:", universities);
+        Logger.debug("[Register] university data:", universities);
         setUniversities(universities);
       } else {
         // Handle error
-        console.log("[Register] university data error:", universityResult);
+        Logger.error("[Register] university data error:", universityResult);
       }
     };
 
@@ -54,16 +54,16 @@ function Register(props) {
     };
     setIsClicked(true);
     setShowError(false);
-    console.log("[Register] submit register event", user);
+    Logger.debug("[Register] submit register event", user);
     event.preventDefault();
     const result = await myApi.createUser(user);
     if (result.success) {
-      console.log("[Register] result success:", result);
+      Logger.debug("[Register] result success:", result);
       currentUser.setUser(result.data as LoginResponse);
       setIsClicked(false);
       props.onHide();
     } else {
-      console.log("[Register] error with msg:", result.msg);
+      Logger.error("[Register] error with msg:", result.msg);
       setError(result.msg);
       setIsClicked(false);
       setShowError(true);
@@ -144,35 +144,8 @@ function Register(props) {
               {universities.map((university) => (
                 <option key={university.id} value={university.id}>{university.name}</option>
               ))}
-              {/* <option>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option> */}
             </Form.Select>
-            {/* <Form.Control
-              type="text"
-              placeholder="Enter Your University"
-              value={universityId}
-              onChange={(e) => {
-                setUniversityId(e.target.value);
-              }}
-            /> */}
           </Form.Group>
-          {/* <Form.Group className="mb-3" controlId="formName">
-            <Form.Label>Name</Form.Label>
-            <Form.Control type="text" placeholder="Enter Your Name"
-              value={state.email}
-              onChange={(e) =>
-                setState(() => {
-                  state.email = e.target.value;
-                  return state;
-                })
-              } />
-          </Form.Group> */}
-          {/* <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Date of Birth</Form.Label>
-            <Form.Control type="email" placeholder="Enter Your Date of Birth" />
-          </Form.Group> */}
           <Form.Group controlId="formDate">
             <Form.Label>Date of Birth</Form.Label>
             <DatePicker
@@ -182,18 +155,10 @@ function Register(props) {
               value={dob}
             />
           </Form.Group>
-          {/* <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>ID</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter Your Identification Number"
-            />
-          </Form.Group> */}
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
             <Form.Check
               type="checkbox"
               label="Create an Admin Account"
-              // value={state.admin}
               onChange={(e) => {
                 setAdmin(e.target.checked);
               }}

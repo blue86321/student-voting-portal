@@ -1,9 +1,10 @@
-import { ElectionDetail, PositionDetail } from "../Interfaces/Election";
-import { University } from "../Interfaces/User";
+import { ElectionDetail } from "./Interfaces/Election";
+import { University } from "./Interfaces/User";
 import DateTimeUtils from "../component/utils/DateTimeUtil";
 import Position from "./Position.model";
+import Logger from "../component/utils/Logger";
 
-enum ElectionState {
+export enum ElectionState {
   upComing = 0,
   onGoing = 1,
   past = 2,
@@ -28,6 +29,7 @@ class Election implements ElectionDetail {
     this.university = e.university;
     this.electionName = e.electionName;
     this.electionDesc = e.electionDesc;
+    // convert server time (GMT) to local timezone
     this.startDate = convertTime ? DateTimeUtils.convertFromGMT(new Date(e.startTime)) : new Date(e.startTime);
     this.endDate = convertTime ? DateTimeUtils.convertFromGMT(new Date(e.endTime)) : new Date(e.endTime);
     this.startTime = this.startDate.toLocaleString("en-US", {
@@ -64,9 +66,8 @@ class Election implements ElectionDetail {
   }
 
   get isDataCompleted(): boolean {
-    console.log('[Election model] positions', this.positions);
+    Logger.debug('[ElectionModel] positions', this.positions);
     if (this.positions.length === 0) {
-      console.log('[Election model] positions are empty', this.positions);
       return false;
     }
     let isCompleted = true;

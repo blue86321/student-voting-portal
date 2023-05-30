@@ -1,37 +1,21 @@
 import { Button, Card, Modal, Row } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import "./CandidateCard.css";
 import { currentUser } from "../../model/User.model";
-import { VoteCandidateDetail } from "../../Interfaces/Election";
+import { VoteCandidateDetail } from "../../model/Interfaces/Election";
+import Logger from "../utils/Logger";
 
-function CandidateCard({ candidates, votes, selectedID, electionStatus, isCompleted }) {
-  /* TODO: debug for card key;
-    count add 1 after click the 'VOTE' button; 
-    set them into position groups, currently, if clicked one "VOTE" in one of these cards, all the buttons will be disabled;
-    update the electionStatus with the backend data.
-    */
-
-  console.log("[CandidateCard]:", electionStatus);
-  // let voteCount = 0;
-  //   let electionStatus = "onGoing";
-
-  // const [isClicked, setIsClicked] = useState(false);
+function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
+  Logger.debug("[CandidateCard]:", position);
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  console.log("[CandidateCard] votes:", votes)
-  // useEffect(() => {
-  //   setUpVoteButton()
-  // },[])
-
   const handleClick = (candidateID, positionID) => {
     if (!currentUser.isLoggedIn()) {
       handleShow();
     } else {
-      // voteCount++;
-      // console.log(voteCount, value);
       isCompleted(candidateID, positionID)
     }
   };
@@ -56,7 +40,7 @@ function CandidateCard({ candidates, votes, selectedID, electionStatus, isComple
 
   const setUpVoteButton = (candidateID, positionID) => {
     const isClicked = (candidateID === selectedID)
-    console.log(
+    Logger.debug(
       "[CandidateCard] setUpVoteButton by electionStatus",
       electionStatus
     );
@@ -72,15 +56,14 @@ function CandidateCard({ candidates, votes, selectedID, electionStatus, isComple
       );
     } else if (electionStatus === 2) {
       let c = 0;
-      if (votes !== undefined) {
-        const candidateVote:VoteCandidateDetail|undefined = votes[0].candidates.filter(
+      if (position !== undefined) {
+        const candidateVote:VoteCandidateDetail|undefined = position.candidates.filter(
           (can) => {
-            console.log("[CandidateCard] filtering:", can.candidate.id, can.voteCount)
-            return can.candidate.id === candidateID
+            return can.id === candidateID
           }
         )[0]
-        console.log("[CandidateCard] load votes for candidate:", candidateVote)
-        c = candidateVote?.candidate.voteCount ?? 0
+        // Logger.debug("[CandidateCard] load votes for candidate:", candidateVote)
+        c = candidateVote?.voteCount ?? 0
       }
       return (
         <Button variant="secondary" size="lg" disabled>
@@ -96,9 +79,10 @@ function CandidateCard({ candidates, votes, selectedID, electionStatus, isComple
   return (
     <Row xs={1} md={2} lg={3} className="g-4">
       {showErrorModal()}
-      {candidates.map((candidate) => (
+      {position.candidates.map((candidate) => (
         <div style={{ margin: "10px", padding: "20px" }}>
           <Card key={candidate.id} style={{ width: "22rem" }}>
+            {candidate.winner && (<div className="card-winner"> Winner </div>)}
             <Card.Body>
               <Card.Title className="text-center">
                 {candidate.candidateName}

@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Container, Button, ListGroup, Row, Table, Alert } from "react-bootstrap";
-import DeleteModal from "../../component/admin/DeleteModal";
+import { useState, useEffect } from "react";
+import { Container, Button, Table, Alert } from "react-bootstrap";
+import DeleteModal from "../../component/utils/DeleteModal";
 import myApi from "../../service/MyApi";
-import User, { LoginResponse } from "../../Interfaces/User";
 import { CurrentUser, currentUser } from "../../model/User.model";
+import Logger from "../../component/utils/Logger";
 
 function ManageUsers() {
-  // const [searchTerm, setSearchTerm] = useState("");
   const [managedUsers, setManagedUsers] = useState<CurrentUser[]>([]);
   const [userToDelete, setUserToDelete] = useState<CurrentUser | null>(null);
   const [deleteModalShow, setDeleteModalShow] = useState(false);
@@ -27,26 +26,24 @@ function ManageUsers() {
         u.setUser(user);
         return (u.university.id === currentUser.university.id) && !u.isAdmin;
       });
-      console.log("[ManageUser] data:", filtered);
+      Logger.debug("[ManageUser] data:", filtered);
       setManagedUsers(filtered);
     } else {
       // Handle error
-      console.log("[ManageUser] getUsers failed: " + userResult.msg);
+      Logger.error("[ManageUser] getUsers failed: " + userResult.msg);
     }
   }
 
   const deleteUser = async (userToDelete) => {
-
-
     const result = await myApi.deleteUser(userToDelete.id);
 
-    console.log("[ManageUsers] delete user result", result)
     if (result) {
+      Logger.error("[ManageUsers] delete user error", result.msg)
       setVariant("danger")
       setAlertMsg("Failed to delete. " + result.msg)
       setAlertShow(true)
     } else {
-      console.log("[Manage User]: deleteUser", userToDelete);
+      Logger.debug("[Manage User]: deleteUser", userToDelete);
       const updatedUsers = managedUsers.filter((user) => user.id !== userToDelete.id);
       setManagedUsers(updatedUsers);
       setVariant("success")
@@ -67,7 +64,6 @@ function ManageUsers() {
   }
 
   return (
-
     <div
       className="container justify-content-center"
       style={{ padding: "20px" }}>
@@ -91,7 +87,7 @@ function ManageUsers() {
                 <td className="align-middle" colSpan={5}>{user.email}</td>
                 <td>
                   <Button
-                    variant="outline-danger"
+                    variant="danger"
                     onClick={() => {
                       setUserToDelete(user);
                       setDeleteModalShow(true);
@@ -105,12 +101,13 @@ function ManageUsers() {
           ))}
         </Table>
       </Container>
-      {deleteModalShow ? (<DeleteModal
-        userToDelete={userToDelete}
-        // deleteItem={deleteItem}
-        deleteUser={deleteUser}
+      <DeleteModal
+        target={userToDelete}
+        targetName={userToDelete?.email}
+        shouldShow={deleteModalShow}
+        deleteFunc={deleteUser}
         closeModal={() => setDeleteModalShow(false)}
-      />) : null}
+      />
 
     </div>
   );
