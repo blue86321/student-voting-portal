@@ -1,5 +1,5 @@
 import { LoginResponse, Token, University } from "./Interfaces/User";
-import myApi from "../service/MyApi";
+import myApi, { TOKEN } from "../service/MyApi";
 import Logger from "../component/utils/Logger";
 
 class CurrentUser implements LoginResponse {
@@ -40,7 +40,7 @@ class CurrentUser implements LoginResponse {
   }
 
   async refreshUserIfNeeded() {
-    let token = localStorage.getItem("token");
+    let token = localStorage.getItem(TOKEN);
     if (this.email !== "") {
       Logger.debug("[UserModel] no need to refresh user (email: " + this.email);
       return;
@@ -88,7 +88,7 @@ class CurrentUser implements LoginResponse {
       id: 1,
       name: '',
     }
-    localStorage.removeItem("token");
+    localStorage.removeItem(TOKEN);
   }
 }
 
