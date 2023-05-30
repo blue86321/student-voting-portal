@@ -23,7 +23,7 @@ export interface Response<T = any> {
 }
 
 const HOST_URL = "http://localhost:8080";
-const TOKEN = "token";
+export const TOKEN = "token";
 
 const calcVotePercentAndWinner = (position: PositionDetail, electionEnd: boolean = false): PositionDetail => {
   // copy
@@ -391,14 +391,6 @@ class MyApi {
       },
     };
     const response: Response<VoteDetail[]> = await this.request(params);
-    if (response.success && response.data) {
-      for (let i = 0; i < response.data.length; i++) {
-        response.data[i].votes = response.data[i].votes.map((v) => ({
-          ...v,
-          position: calcVotePercentAndWinner(v.position, new Date(response.data![i].election.endTime).getTime() < new Date().getTime()),
-        }));
-      }
-    }
     return response;
   }
   async createVote(voteData: Vote): Promise<Response<Vote>> {

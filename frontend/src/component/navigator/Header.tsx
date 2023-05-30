@@ -6,7 +6,7 @@ import logo from "../../logo.svg";
 import Login from "../user/Login";
 import Navigation from "./Navigation";
 import { currentUser } from "../../model/User.model";
-import myApi from "../../service/MyApi";
+import myApi, { TOKEN } from "../../service/MyApi";
 import { useNavigate } from "react-router-dom";
 import Logger from "../utils/Logger";
 
@@ -30,13 +30,13 @@ function Header() {
   useEffect(() => {
     const loadUserType = async () => {
       Logger.debug("[Header] loadUserType");
-      let token = localStorage.getItem("token");
+      let token = localStorage.getItem(TOKEN);
       if (!token) {
         //no token: no user logged in
         Logger.debug("[Header] no token: no user logged in");
         setIsAdmin(false);
         // setShowError(false);
-        redirectToHome();
+        // redirectToHome();
         return;
       }
       const user = await currentUser.getUser();
