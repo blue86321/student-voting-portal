@@ -12,7 +12,7 @@ import {
 import { CurrentUser, currentUser } from "../../model/User.model";
 import { AxiosError } from "axios";
 import myApi from "../../service/MyApi";
-import User, { LoginParams, LoginResponse } from "../../Interfaces/User";
+import User, { LoginParams, LoginResponse } from "../../model/Interfaces/User";
 import { useNavigate } from "react-router-dom";
 // import { useAppSelector, useAppDispatch } from "../../hooks";
 

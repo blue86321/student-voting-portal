@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button, ListGroup, Row, Table, Alert } from "react-bootstrap";
-import DeleteModal from "../../component/admin/DeleteModal";
+import DeleteModal from "../../component/utils/DeleteModal";
 import myApi from "../../service/MyApi";
-import User, { LoginResponse } from "../../Interfaces/User";
+import User, { LoginResponse } from "../../model/Interfaces/User";
 import { CurrentUser, currentUser } from "../../model/User.model";
 
 function ManageUsers() {
@@ -36,8 +36,6 @@ function ManageUsers() {
   }
 
   const deleteUser = async (userToDelete) => {
-
-
     const result = await myApi.deleteUser(userToDelete.id);
 
     console.log("[ManageUsers] delete user result", result)
@@ -67,7 +65,6 @@ function ManageUsers() {
   }
 
   return (
-
     <div
       className="container justify-content-center"
       style={{ padding: "20px" }}>
@@ -91,7 +88,7 @@ function ManageUsers() {
                 <td className="align-middle" colSpan={5}>{user.email}</td>
                 <td>
                   <Button
-                    variant="outline-danger"
+                    variant="danger"
                     onClick={() => {
                       setUserToDelete(user);
                       setDeleteModalShow(true);
@@ -105,12 +102,13 @@ function ManageUsers() {
           ))}
         </Table>
       </Container>
-      {deleteModalShow ? (<DeleteModal
-        userToDelete={userToDelete}
-        // deleteItem={deleteItem}
-        deleteUser={deleteUser}
+      <DeleteModal
+        target={userToDelete}
+        targetName={userToDelete?.email}
+        shouldShow={deleteModalShow}
+        deleteFunc={deleteUser}
         closeModal={() => setDeleteModalShow(false)}
-      />) : null}
+      />
 
     </div>
   );

@@ -1,6 +1,6 @@
 import { Alert, Button, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { Position, PositionDetail } from "../../Interfaces/Election";
+import { Position, PositionDetail } from "../../model/Interfaces/Election";
 import myApi from "../../service/MyApi";
 
 function PositionComponent({ index, position, onDelete, updatePosition }) {

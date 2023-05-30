@@ -1,9 +1,9 @@
-import { ElectionDetail, PositionDetail } from "../Interfaces/Election";
-import { University } from "../Interfaces/User";
+import { ElectionDetail, PositionDetail } from "./Interfaces/Election";
+import { University } from "./Interfaces/User";
 import DateTimeUtils from "../component/utils/DateTimeUtil";
 import Position from "./Position.model";
 
-enum ElectionState {
+export enum ElectionState {
   upComing = 0,
   onGoing = 1,
   past = 2,

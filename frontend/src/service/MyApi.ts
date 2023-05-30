@@ -1,7 +1,19 @@
-
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Candidate, Election, ElectionDetail, Position, PositionDetail, Vote, VoteDetail } from '../Interfaces/Election';
-import User, { CreateUserParams, LoginParams, LoginResponse, University } from '../Interfaces/User';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
+import {
+  Candidate,
+  Election,
+  ElectionDetail,
+  Position,
+  PositionDetail,
+  Vote,
+  VoteDetail,
+} from "../model/Interfaces/Election";
+import User, {
+  CreateUserParams,
+  LoginParams,
+  LoginResponse,
+  University,
+} from "../model/Interfaces/User";
 
 export interface Response<T = any> {
   data: T | undefined;
@@ -11,7 +23,7 @@ export interface Response<T = any> {
 }
 
 const HOST_URL = "http://localhost:8080";
-const TOKEN = 'token';
+const TOKEN = "token";
 
 const calcVotePercentAndWinner = (position: PositionDetail): PositionDetail => {
   // copy
@@ -26,20 +38,26 @@ const calcVotePercentAndWinner = (position: PositionDetail): PositionDetail => {
     }
   }
   // Whether there is only one winner for the position
-  const oneWinner = positionTemp.candidates.filter((candidate) => candidate.voteCount === highestVoteCount)!.length > 0
+  const oneWinner =
+    positionTemp.candidates.filter(
+      (candidate) => candidate.voteCount === highestVoteCount
+    )!.length === 1;
 
   positionTemp.candidates = positionTemp.candidates.map((candidate) => ({
     ...candidate,
     winner: oneWinner ? candidate.id === winnerId : false,
-    votePercentage: +((candidate.voteCount / position.totalVoteCount) * 100).toFixed(2),
-  }))
+    votePercentage: +(
+      (candidate.voteCount / position.totalVoteCount) *
+      100
+    ).toFixed(2),
+  }));
   return positionTemp;
-}
+};
 
 class MyApi {
-  axiosInstance: AxiosInstance
+  axiosInstance: AxiosInstance;
   constructor() {
-    this.axiosInstance = axios.create({ baseURL: HOST_URL, timeout: 10000 })
+    this.axiosInstance = axios.create({ baseURL: HOST_URL, timeout: 10000 });
   }
 
   /** General request, all API method send request through this method */
@@ -47,30 +65,47 @@ class MyApi {
     try {
       const res = await this.axiosInstance.request({
         ...params,
-        method: params.method
-      })
-      console.log('[MyApi] response: ' + JSON.stringify(res))
-      return res.data
+        method: params.method,
+      });
+      console.log("[MyApi] response: " + JSON.stringify(res));
+      return res.data;
     } catch (e) {
-      console.log('[MyApi] error: ' + e)
-      const defaultFailResp = { data: undefined, msg: "", code: 0, success: false }
+      console.log("[MyApi] error: " + e);
+      const defaultFailResp = {
+        data: undefined,
+        msg: "",
+        code: 0,
+        success: false,
+      };
       if (e instanceof AxiosError) {
         const resData: Response | undefined = e.response?.data;
+        if (resData?.code == 401) {
+          console.log("[MyApi] Toen expired");
+          localStorage.removeItem(TOKEN);
+        }
         return resData
-          ? { data: resData.data, msg: resData.msg, code: resData.code, success: false }
-          : defaultFailResp
+          ? {
+              data: resData.data,
+              msg: resData.msg,
+              code: resData.code,
+              success: false,
+            }
+          : defaultFailResp;
       }
-      return defaultFailResp
+      return defaultFailResp;
     }
   }
 
-
-  //The login method is a specific API method for performing user authentication. 
+  //The login method is a specific API method for performing user authentication.
   async login(data: LoginParams): Promise<Response<LoginResponse>> {
-    //Inside the login method, an AxiosRequestConfig object is created with the URL, method, and data for the authentication request. 
-    const params: AxiosRequestConfig = { url: '/authentication/', method: 'POST', data: data } // question, DOC says no parameter, what is data here?
+    //Inside the login method, an AxiosRequestConfig object is created with the URL, method, and data for the authentication request.
+    const params: AxiosRequestConfig = {
+      url: "/authentication/",
+      method: "POST",
+      data: data,
+    }; // question, DOC says no parameter, what is data here?
     //The request method is then called with the created parameters, and the response is returned.
-    const response = await this.request(params)
+    const response = await this.request(params);
     // Assuming the token is returned in the response data as TOKEN
     if (response.success) {
       const token = response.data.token;
@@ -79,55 +114,60 @@ class MyApi {
       console.log("[MyApi] set token: " + JSON.stringify(token));
     }
     // your post-process logic. e.g. calculate who's the election winner and add a tag to it.
-    return response
+    return response;
   }
 
   async deleteLogin(): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/authentication/',
-      method: 'DELETE',
+      url: "/authentication/",
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
-    localStorage.remove(TOKEN);
+    localStorage.removeItem(TOKEN);
     const response = await this.request(params);
     return response;
   }
 
   // '/positions/'
   async getPositions(): Promise<Response<PositionDetail[]>> {
-    const params: AxiosRequestConfig = { url: '/positions/', method: 'GET' };
+    const params: AxiosRequestConfig = { url: "/positions/", method: "GET" };
     const response: Response<PositionDetail[]> = await this.request(params);
     if (response.success && response.data) {
-      response.data = response.data.map((pd) => calcVotePercentAndWinner(pd))
+      response.data = response.data.map((pd) => calcVotePercentAndWinner(pd));
     }
     return response;
   }
-  async createPosition(positionData: Position): Promise<Response<PositionDetail>> {
+  async createPosition(
+    positionData: Position
+  ): Promise<Response<PositionDetail>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/positions/',
-      method: 'POST',
+      url: "/positions/",
+      method: "POST",
       data: positionData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
-    console.log('[myAPI] createPosition', params);
+    console.log("[myAPI] createPosition", params);
     const response = await this.request(params);
     return response;
   }
-  async updatePosition(query: { positionData: Position, positionId: string }): Promise<Response<PositionDetail>> {
+  async updatePosition(query: {
+    positionData: Position;
+    positionId: string;
+  }): Promise<Response<PositionDetail>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/positions/${query.positionId}/`,
-      method: 'PATCH',
+      method: "PATCH",
       data: query.positionData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -135,61 +175,73 @@ class MyApi {
   async deletePosition(positionId: string): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/positions/${positionId}/`, method: 'DELETE',
+      url: `/positions/${positionId}/`,
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
   async getPosition(positionId: string): Promise<Response<PositionDetail>> {
-    const params: AxiosRequestConfig = { url: `/positions/${positionId}/`, method: 'GET' };
+    const params: AxiosRequestConfig = {
+      url: `/positions/${positionId}/`,
+      method: "GET",
+    };
     const response: Response<PositionDetail> = await this.request(params);
     if (response.success && response.data) {
-      response.data = calcVotePercentAndWinner(response.data)
+      response.data = calcVotePercentAndWinner(response.data);
     }
     return response;
   }
-  async updateputPosition(query: { positionData: Position, positionId: string }): Promise<Response<PositionDetail>> {
+  async updateputPosition(query: {
+    positionData: Position;
+    positionId: string;
+  }): Promise<Response<PositionDetail>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/positions/${query.positionId}/`,
-      method: 'PUT',
+      method: "PUT",
       data: query.positionData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
 
   // '/elections/'
-  async createElection(electionData: Election): Promise<Response<ElectionDetail>> {
+  async createElection(
+    electionData: Election
+  ): Promise<Response<ElectionDetail>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/elections/',
-      method: 'POST',
+      url: "/elections/",
+      method: "POST",
       data: electionData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
-    console.log("[myapi] createElection")
+    console.log("[myapi] createElection");
     const response = await this.request(params);
     return response;
   }
-  async updateElection(query: { electionData: Election, electionId: string }): Promise<Response<ElectionDetail>> {
+  async updateElection(query: {
+    electionData: Election;
+    electionId: string;
+  }): Promise<Response<ElectionDetail>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/elections/${query.electionId}/`,
-      method: 'PATCH',
+      method: "PATCH",
       data: query.electionData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
       },
-      maxRedirects: 0
+      maxRedirects: 0,
     };
     const response = await this.request(params);
     return response;
@@ -197,45 +249,57 @@ class MyApi {
   async deleteElection(electionId: string): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/elections/${electionId}/`, method: 'DELETE', headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+      url: `/elections/${electionId}/`,
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
   async getElection(electionId: string): Promise<Response<ElectionDetail>> {
-    const params: AxiosRequestConfig = { url: `/elections/${electionId}/`, method: 'GET' };
+    const params: AxiosRequestConfig = {
+      url: `/elections/${electionId}/`,
+      method: "GET",
+    };
     const response: Response<ElectionDetail> = await this.request(params);
     if (response.success && response.data) {
-      response.data.positions = response.data.positions.map((p) => calcVotePercentAndWinner(p))
+      response.data.positions = response.data.positions.map((p) =>
+        calcVotePercentAndWinner(p)
+      );
     }
     return response;
   }
   //for this endpoint, the returned response only contains each position's winner's information. please check response json for details
   async getElections(): Promise<Response<ElectionDetail[]>> {
-    const params: AxiosRequestConfig = { url: `/elections/`, method: 'GET' };
+    const params: AxiosRequestConfig = { url: `/elections/`, method: "GET" };
     const response: Response<ElectionDetail[]> = await this.request(params);
 
     if (response.success && response.data) {
       response.data = response.data.map((electionDetail) => ({
         ...electionDetail,
-        positions: electionDetail.positions.map((p) => calcVotePercentAndWinner(p))
-      }))
+        positions: electionDetail.positions.map((p) =>
+          calcVotePercentAndWinner(p)
+        ),
+      }));
       return response;
     }
     return response;
   }
-  async updateputElection(query: { electionData: Election, electionId: string }): Promise<Response<ElectionDetail>> {
+  async updateputElection(query: {
+    electionData: Election;
+    electionId: string;
+  }): Promise<Response<ElectionDetail>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
 
     const params: AxiosRequestConfig = {
       url: `/elections/${query.electionId}/`,
-      method: 'PUT',
+      method: "PUT",
       data: query.electionData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
 
     const response = await this.request(params);
@@ -244,32 +308,37 @@ class MyApi {
 
   // '/candidates/'
   async getCandidates(): Promise<Response<Candidate[]>> {
-    const params: AxiosRequestConfig = { url: '/candidates/', method: 'GET' };
+    const params: AxiosRequestConfig = { url: "/candidates/", method: "GET" };
     const response = await this.request(params);
     return response;
   }
-  async createCandidate(candidateData: Candidate): Promise<Response<Candidate>> {
+  async createCandidate(
+    candidateData: Candidate
+  ): Promise<Response<Candidate>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/candidates/',
-      method: 'POST',
+      url: "/candidates/",
+      method: "POST",
       data: candidateData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
-  async updateCandidate(query: { candidateData: Candidate, candidateId: string }): Promise<Response<Candidate>> {
+  async updateCandidate(query: {
+    candidateData: Candidate;
+    candidateId: string;
+  }): Promise<Response<Candidate>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/candidates/${query.candidateId}/`,
-      method: 'PATCH',
+      method: "PATCH",
       data: query.candidateData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -277,28 +346,35 @@ class MyApi {
   async deleteCandidate(candidateId: string): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/candidates/${candidateId}/`, method: 'DELETE',
+      url: `/candidates/${candidateId}/`,
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
   async getCandidate(candidateId: string): Promise<Response<Candidate>> {
-    const params: AxiosRequestConfig = { url: `/candidates/${candidateId}/`, method: 'GET' };
+    const params: AxiosRequestConfig = {
+      url: `/candidates/${candidateId}/`,
+      method: "GET",
+    };
     const response = await this.request(params);
     return response;
   }
-  async updateputCandidate(query: { candidateData: Candidate, candidateId: string }): Promise<Response<Candidate>> {
+  async updateputCandidate(query: {
+    candidateData: Candidate;
+    candidateId: string;
+  }): Promise<Response<Candidate>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/candidates/${query.candidateId}/`,
-      method: 'PUT',
+      method: "PUT",
       data: query.candidateData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -308,15 +384,19 @@ class MyApi {
   async getVotes(): Promise<Response<VoteDetail[]>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/votes/', method: 'GET',
+      url: "/votes/",
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response: Response<VoteDetail[]> = await this.request(params);
     if (response.success && response.data) {
       for (let i = 0; i < response.data?.length; i++) {
-        response.data[i].votes = response.data[i].votes.map((v) => ({ ...v, position: calcVotePercentAndWinner(v.position) }))
+        response.data[i].votes = response.data[i].votes.map((v) => ({
+          ...v,
+          position: calcVotePercentAndWinner(v.position),
+        }));
       }
     }
     return response;
@@ -324,12 +404,12 @@ class MyApi {
   async createVote(voteData: Vote): Promise<Response<Vote>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/votes/',
-      method: 'POST',
+      url: "/votes/",
+      method: "POST",
       data: voteData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -339,19 +419,22 @@ class MyApi {
   async getUsers(): Promise<Response<User[]>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/users/', method: 'GET',
+      url: "/users/",
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
-  async createUser(userData: CreateUserParams): Promise<Response<LoginResponse>> {
+  async createUser(
+    userData: CreateUserParams
+  ): Promise<Response<LoginResponse>> {
     const params: AxiosRequestConfig = {
-      url: '/users/',
-      method: 'POST',
-      data: userData
+      url: "/users/",
+      method: "POST",
+      data: userData,
     };
     const response = await this.request(params);
     // set token
@@ -364,10 +447,11 @@ class MyApi {
   async getUser(userId: string): Promise<Response<User>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/users/${userId}/`, method: 'GET',
+      url: `/users/${userId}/`,
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -375,23 +459,27 @@ class MyApi {
   async deleteUser(userId: string): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/users/${userId}/`, method: 'DELETE',
+      url: `/users/${userId}/`,
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
-  async updateUser(query: { userData: CreateUserParams, userId: string }): Promise<Response<User>> {
+  async updateUser(query: {
+    userData: CreateUserParams;
+    userId: string;
+  }): Promise<Response<User>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
       url: `/users/${query.userId}/`,
-      method: 'PATCH',
+      method: "PATCH",
       data: query.userData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -402,10 +490,11 @@ class MyApi {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     console.log("[MyApi] getMe with token: " + token);
     const params: AxiosRequestConfig = {
-      url: '/me/', method: 'GET',
+      url: "/me/",
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -413,10 +502,11 @@ class MyApi {
   async deleteMe(): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/me/`, method: 'DELETE',
+      url: `/me/`,
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -424,12 +514,12 @@ class MyApi {
   async updateMe(userData: CreateUserParams): Promise<Response<User>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: '/me/',
-      method: 'PATCH',
+      url: "/me/",
+      method: "PATCH",
       data: userData,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
@@ -437,7 +527,7 @@ class MyApi {
 
   // '/university/'
   async getUniversities(): Promise<Response<University[]>> {
-    const params: AxiosRequestConfig = { url: '/university/', method: 'GET' };
+    const params: AxiosRequestConfig = { url: "/university/", method: "GET" };
     const response = await this.request(params);
     return response;
   }
@@ -445,32 +535,38 @@ class MyApi {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const data = { name };
     const params: AxiosRequestConfig = {
-      url: '/university/', method: 'POST', data,
+      url: "/university/",
+      method: "POST",
+      data,
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
   // '/university/${universityId}/'
   async getUniversity(universityId: string): Promise<Response> {
-    const params: AxiosRequestConfig = { url: `/university/${universityId}/`, method: 'GET' };
+    const params: AxiosRequestConfig = {
+      url: `/university/${universityId}/`,
+      method: "GET",
+    };
     const response = await this.request(params);
     return response;
   }
   async deleteUniversity(universityId: string): Promise<Response> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const params: AxiosRequestConfig = {
-      url: `/university/${universityId}/`, method: 'DELETE',
+      url: `/university/${universityId}/`,
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}` // Add the token to the Authorization header
-      }
+        Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+      },
     };
     const response = await this.request(params);
     return response;
   }
 }
 
-const myApi = new MyApi()
-export default myApi
+const myApi = new MyApi();
+export default myApi;

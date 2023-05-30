@@ -1,4 +1,4 @@
-import User, { LoginResponse, Token, University } from "../Interfaces/User";
+import User, { LoginResponse, Token, University } from "./Interfaces/User";
 import myApi from "../service/MyApi";
 
 class CurrentUser implements LoginResponse {

@@ -1,4 +1,4 @@
-import { CandidateDetail, PositionDetail } from "../Interfaces/Election";
+import { CandidateDetail, PositionDetail } from "./Interfaces/Election";
 
 class Position implements PositionDetail {
     id: number;

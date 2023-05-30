@@ -5,7 +5,7 @@ import User, {
   CreateUserParams,
   LoginResponse,
   University,
-} from "../../Interfaces/User";
+} from "../../model/Interfaces/User";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
 

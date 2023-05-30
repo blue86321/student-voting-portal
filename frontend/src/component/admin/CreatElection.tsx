@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from "react";
 import myApi from "../../service/MyApi";
-import { Election as ElectionInterface, ElectionDetail } from "../../Interfaces/Election";
+import { Election as ElectionInterface, ElectionDetail } from "../../model/Interfaces/Election";
 import Election from "../../model/Election.model";
 import DateTimeUtils from "../utils/DateTimeUtil";
 

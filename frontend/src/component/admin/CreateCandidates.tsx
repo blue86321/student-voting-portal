@@ -4,7 +4,7 @@ import {
   Candidate,
   CandidateDetail,
   PositionDetail,
-} from "../../Interfaces/Election";
+} from "../../model/Interfaces/Election";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
 
@@ -98,7 +98,7 @@ function CandidateComponent({
       onDelete(index);
     } else {
       // delete position from server
-      const result = await myApi.deletePosition(candidate.id);
+      const result = await myApi.deleteCandidate(candidate.id);
       if (!result.success) {
         console.log(
           "[CreateCandidates] Error deleting position id",

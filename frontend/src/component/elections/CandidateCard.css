@@ -3,3 +3,14 @@
     height: 400px;
     object-fit: cover;
 }
+
+.card-winner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+    background-color: red;
+    color: white;
+
+    transform: rotate(30deg);
+}

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 
-function DeleteModal({ userToDelete, deleteUser, closeModal }) {
+function DeleteModal({ target, targetName, shouldShow, deleteFunc, closeModal }) {
 
   console.log("[delete modal]:", true)
   return (
     <>
       <Modal
         // {...props}
-        show={deleteUser}
+        show={shouldShow}
         onHide={closeModal}
         backdrop="static"
         keyboard={false}
@@ -16,7 +16,7 @@ function DeleteModal({ userToDelete, deleteUser, closeModal }) {
       >
         <Modal.Header closeButton>
           <Modal.Title className="text-center">
-            Are You Sure to Delete {userToDelete.email}?
+            Are You Sure to Delete {targetName}?
           </Modal.Title>
         </Modal.Header>
 
@@ -24,7 +24,7 @@ function DeleteModal({ userToDelete, deleteUser, closeModal }) {
           <Button variant="outline-secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={()=>deleteUser(userToDelete)}>Delete</Button>
+          <Button variant="danger" onClick={()=>deleteFunc(target)}>Delete</Button>
         </Modal.Footer>
       </Modal>
     </>

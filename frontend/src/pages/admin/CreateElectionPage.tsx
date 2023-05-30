@@ -1,6 +1,7 @@
 import { ProgressBar, Container, Button, Modal } from "react-bootstrap";
 import { useState } from "react";
 
+import "../../component/navigator/Header.css"
 import CreateElection from "../../component/admin/CreatElection";
 import CreatePositions from "../../component/admin/CreatePositions";
 import CreateCandidates from "../../component/admin/CreateCandidates";
@@ -34,7 +35,7 @@ function CreateElectionPage() {
     election ? election.positions : undefined
   );
   const handleNext = (value, e) => {
-    setProgress(value);
+    setProgress(Math.max(progress, value));
     console.log("[CreateElectionPage] create election: ", e.id);
     setElectionID(e.id);
     if (election) {
@@ -94,7 +95,7 @@ function CreateElectionPage() {
       <Container>
         {showFinishedModel()}
         <Container className="mx-2">
-          <ProgressBar now={progress} label={`${progress}%`} />
+          <ProgressBar variant="progbr-custom-color" now={progress} />
         </Container>
 
         {progress >= 0 && (

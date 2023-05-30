@@ -3,7 +3,6 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Header from "./component/navigator/Header";
 import Home from "./pages/user/Home";
-import ResultPage from "./pages/user/ResultPage";
 
 import ElectionRouter from "./component/elections/Elections.router";
 import CreateElectionPage from "./pages/admin/CreateElectionPage";
