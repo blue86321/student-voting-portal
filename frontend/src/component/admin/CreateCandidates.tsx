@@ -1,12 +1,12 @@
-import { Container, Form, Row, Col, Button, Alert } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import { Form, Row, Col, Button, Alert } from "react-bootstrap";
+import { useEffect, useState } from "react";
 import {
   Candidate,
   CandidateDetail,
-  PositionDetail,
 } from "../../model/Interfaces/Election";
 import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
+import Logger from "../utils/Logger";
 
 function CandidateComponent({
   index,
@@ -25,7 +25,7 @@ function CandidateComponent({
   const [saveButtonText, setSaveButtonText] = useState("Save");
 
   useEffect(() => {
-    console.log("[CreateCandidate] candidate updated:", candidate);
+    Logger.debug("[CreateCandidate] candidate updated:", candidate);
     setCandidateName(candidate.candidateName);
     setCandidateDesc(candidate.candidateDesc);
     setCandidateImg(candidate.photoUrl);
@@ -48,7 +48,7 @@ function CandidateComponent({
     handleOnChange();
   };
   const handleOnChangePositionID = (id) => {
-    console.log("[CreateCandidates] position ID: " + id);
+    Logger.debug("[CreateCandidates] position ID: " + id);
     setCandidatePosition(id);
     candidate.positionId = id;
     handleOnChange();
@@ -74,7 +74,7 @@ function CandidateComponent({
       candidateDesc: candidateDesc,
       photoUrl: candidateImg,
     };
-    console.log("[CreateCandidates] create", candidateData);
+    Logger.debug("[CreateCandidates] create", candidateData);
     const isCreate = candidate.id === 0;
     const result = isCreate
       ? await myApi.createCandidate(candidateData)
@@ -85,10 +85,9 @@ function CandidateComponent({
     if (result.success) {
       candidate.id = (result.data as CandidateDetail).id;
       updateCandidate(index, candidate);
-      // setShouldShowSave(false);
       setSaveButtonText("Saved");
     } else {
-      console.log("[CreateCandidates] Error creating position", result.msg);
+      Logger.error("[CreateCandidates] Error creating position", result.msg);
     }
   };
 
@@ -99,12 +98,12 @@ function CandidateComponent({
     } else {
       // delete position from server
       const result = await myApi.deleteCandidate(candidate.id);
-      if (!result.success) {
-        console.log(
-          "[CreateCandidates] Error deleting position id",
+      if (result.msg) {
+        Logger.error(
+          "[CreateCandidates] Error deleting candidate id",
           candidate.id,
           "with error:",
-          result.msg
+          result
         );
       }
       onDelete(index);
@@ -127,7 +126,6 @@ function CandidateComponent({
         </Col>
 
         <Col>
-          {/* TODO: connet to the position component */}
           <Form.Group className="mb-3" controlId="positionID">
             <Form.Label>Select a Position</Form.Label>
             <Form.Select
@@ -168,7 +166,6 @@ function CandidateComponent({
         />
       </Form.Group>
 
-      {/* <Button variant="outline-secondary">+ Upload Photo</Button> */}
       <div className="container d-flex justify-content-end">
         {shouldShowSave && (
           <Button
@@ -198,7 +195,7 @@ function CreateCandidates({ electionID, positions, onNext }) {
     return candidates;
   });
   const updateCandidate = (index, candidate) => {
-    console.log(
+    Logger.debug(
       "[CreateCandidates] update position: ",
       candidate,
       " for index",
@@ -209,11 +206,8 @@ function CreateCandidates({ electionID, positions, onNext }) {
         c = candidate;
       }
     });
-    console.log("[CreateCandidates] update candidates result:", candidates);
+    Logger.debug("[CreateCandidates] update candidates result:", candidates);
   };
-  useEffect(() => {
-    console.log("[CreateCandidates] candidates updated: ", candidates);
-  }, [candidates]);
 
   const handleAddCandidate = () => {
     const newCan: CandidateDetail = {
@@ -231,19 +225,17 @@ function CreateCandidates({ electionID, positions, onNext }) {
 
   if (candidates.length === 0) {
     handleAddCandidate();
-    console.log("[CreateCandidates] current candidates", candidates);
+    Logger.debug("[CreateCandidates] initial candidates", candidates);
   }
 
   const handleDeleteCandidate = (id) => {
-    console.log("[CreateCandidates] before delete: ", candidates);
+    Logger.debug("[CreateCandidates] before delete: ", candidates);
     if (candidates.length < 1) return;
-    console.log("[CreateCandidates] deleting position", id);
     setCandidates((prevCandidates) => {
       const updatedCandidates = prevCandidates.filter((_, index) => {
-        console.log("[CreateCandidates] checking index", index, "!==", id);
         return index !== id;
       });
-      console.log("[CreateCandidates] after delete: ", updatedCandidates);
+      Logger.debug("[CreateCandidates] after delete: ", updatedCandidates);
       return updatedCandidates;
     });
   };

@@ -1,11 +1,12 @@
 import { Button, Card, Modal, Row } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import "./CandidateCard.css";
 import { currentUser } from "../../model/User.model";
 import { VoteCandidateDetail } from "../../model/Interfaces/Election";
+import Logger from "../utils/Logger";
 
 function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
-  console.log("[CandidateCard]:", position);
+  Logger.debug("[CandidateCard]:", position);
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -39,7 +40,7 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
 
   const setUpVoteButton = (candidateID, positionID) => {
     const isClicked = (candidateID === selectedID)
-    console.log(
+    Logger.debug(
       "[CandidateCard] setUpVoteButton by electionStatus",
       electionStatus
     );
@@ -58,11 +59,10 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
       if (position !== undefined) {
         const candidateVote:VoteCandidateDetail|undefined = position.candidates.filter(
           (can) => {
-            console.log("[CandidateCard] filtering:", can.id, can.voteCount)
             return can.id === candidateID
           }
         )[0]
-        console.log("[CandidateCard] load votes for candidate:", candidateVote)
+        // Logger.debug("[CandidateCard] load votes for candidate:", candidateVote)
         c = candidateVote?.voteCount ?? 0
       }
       return (

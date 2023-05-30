@@ -1,10 +1,6 @@
-import React, { useEffect, useState, createContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import EmptyCards from "../navigator/EmptyCards";
-import Election from "../../model/Election.model";
-
-// export const ElectionContext = createContext<Election | null>(null);
 
 function ElectionCard({ elections }) {
   const navigate = useNavigate();
@@ -32,7 +28,6 @@ function ElectionCard({ elections }) {
               <Card.Img
                 variant="top"
                 src={require("../defaultImage.png")}
-                // style={{ width: "320px", height: "auto" }}
               />
               <Card.Body>
                 <Card.Text className="card-text-multiline">

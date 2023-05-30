@@ -8,14 +8,16 @@ import Navigation from "./Navigation";
 import { currentUser } from "../../model/User.model";
 import myApi from "../../service/MyApi";
 import { useNavigate } from "react-router-dom";
+import Logger from "../utils/Logger";
 
 function Header() {
+  const navigate = useNavigate();
+
   const [loginModalShow, setLoginModalShow] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [error, setError] = useState("");
   const [alertType, setAlertType] = useState("danger");
-  const navigate = useNavigate();
-  // TODO: connet to usertype and user status
+
   const isLoggedIn = currentUser.isLoggedIn();
 
   useEffect(() => {
@@ -41,32 +43,35 @@ function Header() {
 
   const logout = async () => {
     const result = await myApi.deleteLogin();
-    console.log("[Header] Logout", result);
     currentUser.removeUser();
-    if (!result.success) {
-      console.log("[Header] Logout error:", result.msg);
+    if (result.msg) {
+      Logger.error("[Header] Logout error:", result.msg);
     }
+    redirectToHome();
+    Logger.debug("[Header] Logout finished, set alert");
     setError("You have been logged out!");
     setAlertType("success");
     setShowError(true);
-    console.log("[Header] Logout reset navigate");
-    navigate("/");
   };
 
+  const redirectToHome = () => {
+    navigate("/");
+    Logger.debug("[Header] Reset navigate");
+  }
+
   const loadUserType = async () => {
-    console.log("[Header] loadUserType");
+    Logger.debug("[Header] loadUserType");
     let token = localStorage.getItem("token");
     if (!token) {
       //no token: no user logged in
-      console.log("[Header] no token: no user logged in");
+      Logger.debug("[Header] no token: no user logged in");
       setIsAdmin(false);
-      setShowError(false);
-      console.log("[Header] loadUserType(no token) reset navigate");
-      navigate("/");
+      // setShowError(false);
+      redirectToHome();
       return;
     }
     const user = await currentUser.getUser();
-    console.log("[Header] user: ", user);
+    Logger.debug("[Header] loaded user: ", user);
     if (user.email !== "") {
       setIsAdmin(user.staff || user.superuser);
       setShowError(false);
@@ -74,8 +79,7 @@ function Header() {
       setAlertType("danger");
       setError("Login expired!");
       setShowError(true);
-      console.log("[Header] loadUserType reset navigate");
-      navigate("/");
+      redirectToHome();
     }
   };
 

@@ -5,6 +5,7 @@ import Election from "../../model/Election.model";
 import myApi from "../../service/MyApi";
 import { ElectionDetail } from "../../model/Interfaces/Election";
 import { currentUser } from "../../model/User.model";
+import Logger from "../../component/utils/Logger";
 
 function Home({ type }) {
   const [data, setData] = useState<Election[]>([]);
@@ -19,20 +20,19 @@ function Home({ type }) {
         setData(electionDetails);
       } else {
         // Handle error
-        console.log("[Home] getElections failed: " + result.msg);
+        Logger.error("[Home] getElections failed: " + result.msg);
       }
     };
 
     fetchDataAsync();
   }, [currentUser]);
-  console.log("[Rendering] Home", contentType);
 
   const filterElections = (state, showCompletedOnly) => {
     const filteredData = data.filter(e => {
       const condition = e.state === state;
       return (showCompletedOnly && e.state !== 0) ? condition && e.isDataCompleted : condition
     })
-    console.log("[Home] filterElections", filteredData)
+    Logger.debug("[Home] filterElections", filteredData)
     return filteredData
   }
 

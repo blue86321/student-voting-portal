@@ -2,6 +2,7 @@ import { Alert, Button, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { Position, PositionDetail } from "../../model/Interfaces/Election";
 import myApi from "../../service/MyApi";
+import Logger from "../utils/Logger";
 
 function PositionComponent({ index, position, onDelete, updatePosition }) {
   const [positionName, setPositionName] = useState(position.positionName);
@@ -10,7 +11,6 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
   const [saveButtonText, setSaveButtonText] = useState("Save");
 
   useEffect(() => {
-    console.log("[CreatePosition] position updated: ", position);
     setPositionName(position.positionName);
     setPositionDesc(position.positionDesc);
   }, [position]);
@@ -32,7 +32,6 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
   };
 
   const onSave = async (index) => {
-    console.log("[CreatePositions] create", position);
     const positionData: Position = {
       electionId: Number(position.electionId),
       positionName: positionName,
@@ -41,7 +40,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
       maxVotesPerCandidate: 9,
     };
     const isCreate = position.id === 0;
-    console.log("[CreatePosition] creating position", positionData);
+    Logger.debug("[CreatePosition] creating position", positionData);
     const result = isCreate
       ? await myApi.createPosition(positionData)
       : await myApi.updatePosition({
@@ -54,7 +53,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
       // setShouldShowSave(false);
       setSaveButtonText("Saved");
     } else {
-      console.log("[CreatePosition] Error creating position", result.msg);
+      Logger.error("[CreatePosition] Error creating position", result.msg);
     }
   };
 
@@ -66,7 +65,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
       // delete position from server
       const result = await myApi.deletePosition(position.id);
       if (!result.success) {
-        console.log(
+        Logger.debug(
           "[CreatePosition] Error deleting position id",
           position.id,
           "with error:",
@@ -123,7 +122,7 @@ let positionCount = 1; // need to set at least 1 position
 function CreatePositions({ electionID, prePositions, onNext }) {
   const [positions, setPositions] = useState<PositionDetail[]>(prePositions??[]);
   const updatePosition = (index, position) => {
-    console.log(
+    Logger.debug(
       "[CreatePositions] update position: ",
       position,
       " for index",
@@ -134,11 +133,8 @@ function CreatePositions({ electionID, prePositions, onNext }) {
         p = position;
       }
     });
-    console.log("[CreatePositions] update position result:", positions);
+    Logger.debug("[CreatePositions] update position result:", positions);
   };
-  useEffect(() => {
-    console.log("[CreatePositions] positions updated: ", positions);
-  }, [positions]);
 
   const handleAddPosition = () => {
     const newPos: PositionDetail = {
@@ -151,25 +147,23 @@ function CreatePositions({ electionID, prePositions, onNext }) {
       id: 0,
       candidates: [],
     };
-    console.log("[CreatePositions] handleAddPosition: ", newPos);
+    Logger.debug("[CreatePositions] handleAddPosition: ", newPos);
     setPositions([...positions, newPos]);
   };
 
   if (positions.length === 0) {
     handleAddPosition();
-    console.log("[CreatePositions] current positions", positions);
+    Logger.debug("[CreatePositions] initial positions", positions);
   }
 
   const handleDeletePosition = (id) => {
-    console.log("[CreatePositions] before delete: ", positions);
+    Logger.debug("[CreatePositions] before delete: ", positions);
     if (positions.length < 1) return;
-    console.log("[CreatePositions] deleting position", id);
     setPositions((prevPositions) => {
       const updatedPositions = prevPositions.filter((_, index) => {
-        console.log("[CreatePositions] checking index", index, "!==", id);
         return index !== id;
       });
-      console.log("[CreatePositions] after delete: ", updatedPositions);
+      Logger.debug("[CreatePositions] after delete: ", updatedPositions);
       return updatedPositions;
     });
   };

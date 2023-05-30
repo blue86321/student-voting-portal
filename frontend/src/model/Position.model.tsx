@@ -1,3 +1,4 @@
+import Logger from "../component/utils/Logger";
 import { CandidateDetail, PositionDetail } from "./Interfaces/Election";
 
 class Position implements PositionDetail {
@@ -22,7 +23,7 @@ class Position implements PositionDetail {
     }
 
     isDataCompleted(): boolean {
-      console.log('[Position model] candidates', this.candidates);
+      Logger.debug('[PositionModel] candidates', this.candidates);
       return this.candidates.length > 0;
     }
 }

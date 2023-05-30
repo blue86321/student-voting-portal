@@ -1,13 +1,9 @@
-import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 
 function DeleteModal({ target, targetName, shouldShow, deleteFunc, closeModal }) {
-
-  console.log("[delete modal]:", true)
   return (
     <>
       <Modal
-        // {...props}
         show={shouldShow}
         onHide={closeModal}
         backdrop="static"

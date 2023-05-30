@@ -8,16 +8,14 @@ import ResultChart from "../../component/elections/ElectionResultChart";
 import Election, { ElectionState } from "../../model/Election.model";
 import myApi from "../../service/MyApi";
 import {
-  CandidateDetail,
-  PositionDetail,
   Vote,
   VotePosition,
   VoteCandidate,
-  VoteDetail,
 } from "../../model/Interfaces/Election";
 import { currentUser } from "../../model/User.model";
 import { PositionVote } from "../../model/Position.model";
 import DeleteModal from "../../component/utils/DeleteModal";
+import Logger from "../../component/utils/Logger";
 
 function ElectionDetailsPage() {
   const location = useLocation();
@@ -36,15 +34,15 @@ function ElectionDetailsPage() {
         (position) => position.electionId === election?.id
       );
       setPositions(positions);
-      console.log("[ElectionDetailsPage] position data:", positions);
+      Logger.debug("[ElectionDetailsPage] position data:", positions);
     } else {
       // Handle error
-      console.log("[ElectionDetailsPage] position data error:", positionResult);
+      Logger.error("[ElectionDetailsPage] position data error:", positionResult);
     }
   };
 
   const isElectionFinished = (candidateID, positionID) => {
-    console.log(
+    Logger.debug(
       "[ElectionDetailsPage] user submitting vote:",
       candidateID,
       positionID
@@ -68,7 +66,7 @@ function ElectionDetailsPage() {
       if (!positionVoted) {
         return [...positions, votePosition];
       }
-      console.log("[ElectionDetailsPage] update vote position", positions);
+      Logger.debug("[ElectionDetailsPage] update vote position", positions);
       return positions;
     });
     setPositions((positions) => {
@@ -78,7 +76,7 @@ function ElectionDetailsPage() {
         }
         return p;
       });
-      console.log("[ElectionDetailsPage] update positions", updatedPositions);
+      Logger.debug("[ElectionDetailsPage] update positions", updatedPositions);
       return updatedPositions;
     });
   };
@@ -90,10 +88,10 @@ function ElectionDetailsPage() {
     };
     const result = await myApi.createVote(postVote);
     if (result.success) {
-      console.log("[ElectionDetailsPage] Successfully created vote", result);
+      Logger.debug("[ElectionDetailsPage] Successfully created vote", result);
       showModalWithMessage("Vote Success", "Thank you for your perticiption!");
     } else {
-      console.error("[ElectionDetailsPage] Failed to create vote", result);
+      Logger.error("[ElectionDetailsPage] Failed to create vote", result);
       showModalWithMessage("Submit failed!", result.msg, "danger");
     }
   };
@@ -165,8 +163,6 @@ function ElectionDetailsPage() {
       );
     }
   }, []);
-
-  console.log("[ElectionDetailsPage] election:", election);
   
   const navigate = useNavigate();
   const goBack = () => {
@@ -180,7 +176,7 @@ function ElectionDetailsPage() {
     if (election) {
       const result = await myApi.deleteElection(String(election.id))
       if (!result.success) {
-        console.log(
+        Logger.debug(
           "[ElectionDetailsPage] Error deleting election",
           election.id,
           "with error:",
@@ -249,7 +245,6 @@ function ElectionDetailsPage() {
             ) : null}
             <Container>
               <CandidateCard
-                // candidates={getCandidates(position.id)}
                 position={position}
                 selectedID={position.selectedCandidate}
                 electionStatus={election?.state}

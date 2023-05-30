@@ -1,37 +1,28 @@
-import { useEffect, useState } from "react";
 import { Container, Nav } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import Logger from "../utils/Logger";
 
 function Navigation({ isAdmin }) {
-  const [activeKey, setActiveKey] = useState("/");
+  let activeKey = "/"
+  const location = useLocation()
+  activeKey = location.pathname
 
-  const handleSelect = (selectedKey) => {
-    setActiveKey(selectedKey);
-  };
   if (isAdmin) {
+    Logger.debug("[Navigation] render admin", activeKey);
     return (
       <Container>
         <Nav
           activeKey={activeKey}
           variant="tabs"
           defaultActiveKey="/"
-          onSelect={handleSelect}
         >
           <Nav.Item>
-            <Nav.Link
-              as={Link}
-              to="/manage_elections"
-              eventKey="/"
-            >
+            <Nav.Link as={Link} to="/" eventKey="/">
               Manage Elections
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link
-              as={Link}
-              to="/create"
-              eventKey="/create_new_elections"
-            >
+            <Nav.Link as={Link} to="/create" eventKey="/create">
               Create New Elections
             </Nav.Link>
           </Nav.Item>
@@ -45,10 +36,14 @@ function Navigation({ isAdmin }) {
     );
   } else {
     // to be updated: log in status
-    console.log("render user");
+    Logger.debug("[Navigation] render user", activeKey);
     return (
       <Container>
-        <Nav variant="tabs" defaultActiveKey="/">
+        <Nav
+          activeKey={activeKey}
+          variant="tabs"
+          defaultActiveKey="/"
+        >
           <Nav.Item>
             <Nav.Link eventKey="/" as={Link} to="/">
               On-going Elections
@@ -68,12 +63,6 @@ function Navigation({ isAdmin }) {
               Upcoming Elections
             </Nav.Link>
           </Nav.Item>
-          {/* check the log in status */}
-          {/* <Nav.Item>
-            <Nav.Link eventKey="/your_votes" as={Link} to="/your_votes">
-              Your Votes
-            </Nav.Link>
-          </Nav.Item> */}
         </Nav>
       </Container>
     );
