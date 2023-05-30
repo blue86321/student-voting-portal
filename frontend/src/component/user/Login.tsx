@@ -21,11 +21,8 @@ function Login(props) {
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
   const navigate = useNavigate();
-  const validate = () => {
-    return email.length !== 0 && password.length !== 0;
-  };
   useEffect(() => {
-    const isValid = validate();
+    const isValid = email.length !== 0 && password.length !== 0;;
     setValid(isValid);
   }, [email, password]);
 

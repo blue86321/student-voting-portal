@@ -25,27 +25,26 @@ export interface Response<T = any> {
 const HOST_URL = "http://localhost:8080";
 const TOKEN = "token";
 
-const calcVotePercentAndWinner = (position: PositionDetail): PositionDetail => {
+const calcVotePercentAndWinner = (position: PositionDetail, electionEnd: boolean = false): PositionDetail => {
   // copy
-  const positionTemp = JSON.parse(JSON.stringify(position));
+  const positionTemp: PositionDetail = JSON.parse(JSON.stringify(position));
   // Find the candidate with the highest voteCount for each position
   let highestVoteCount = 0;
   let winnerId = -1;
+  let winnerCount = 0;
   for (const candidate of positionTemp.candidates) {
     if (candidate.voteCount > highestVoteCount) {
       highestVoteCount = candidate.voteCount;
       winnerId = candidate.id;
+      winnerCount = 1;
+    } else if (candidate.voteCount === highestVoteCount) {
+      winnerCount += 1;
     }
   }
-  // Whether there is only one winner for the position
-  const oneWinner =
-    positionTemp.candidates.filter(
-      (candidate) => candidate.voteCount === highestVoteCount
-    )!.length === 1;
 
   positionTemp.candidates = positionTemp.candidates.map((candidate) => ({
     ...candidate,
-    winner: oneWinner ? candidate.id === winnerId : false,
+    winner: winnerCount === 1 && electionEnd ? candidate.id === winnerId : false,
     votePercentage: +(
       (candidate.voteCount / position.totalVoteCount) *
       100
@@ -79,17 +78,17 @@ class MyApi {
       };
       if (e instanceof AxiosError) {
         const resData: Response | undefined = e.response?.data;
-        if (resData?.code == 401) {
+        if (resData?.code === 401) {
           console.log("[MyApi] Toen expired");
           localStorage.removeItem(TOKEN);
         }
         return resData
           ? {
-              data: resData.data,
-              msg: resData.msg,
-              code: resData.code,
-              success: false,
-            }
+            data: resData.data,
+            msg: resData.msg,
+            code: resData.code,
+            success: false,
+          }
           : defaultFailResp;
       }
       return defaultFailResp;
@@ -265,8 +264,9 @@ class MyApi {
     };
     const response: Response<ElectionDetail> = await this.request(params);
     if (response.success && response.data) {
+      const electionEnd = new Date(response.data.endTime).getTime() < new Date().getTime();
       response.data.positions = response.data.positions.map((p) =>
-        calcVotePercentAndWinner(p)
+        calcVotePercentAndWinner(p, electionEnd)
       );
     }
     return response;
@@ -280,7 +280,7 @@ class MyApi {
       response.data = response.data.map((electionDetail) => ({
         ...electionDetail,
         positions: electionDetail.positions.map((p) =>
-          calcVotePercentAndWinner(p)
+          calcVotePercentAndWinner(p, new Date(electionDetail.endTime).getTime() < new Date().getTime())
         ),
       }));
       return response;
@@ -392,10 +392,10 @@ class MyApi {
     };
     const response: Response<VoteDetail[]> = await this.request(params);
     if (response.success && response.data) {
-      for (let i = 0; i < response.data?.length; i++) {
+      for (let i = 0; i < response.data.length; i++) {
         response.data[i].votes = response.data[i].votes.map((v) => ({
           ...v,
-          position: calcVotePercentAndWinner(v.position),
+          position: calcVotePercentAndWinner(v.position, new Date(response.data![i].election.endTime).getTime() < new Date().getTime()),
         }));
       }
     }

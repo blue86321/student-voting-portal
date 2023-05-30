@@ -1,4 +1,4 @@
-import User, { LoginResponse, Token, University } from "./Interfaces/User";
+import { LoginResponse, Token, University } from "./Interfaces/User";
 import myApi from "../service/MyApi";
 import Logger from "../component/utils/Logger";
 

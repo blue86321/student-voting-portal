@@ -28,21 +28,22 @@ function CreateElection({ electionForUpdate, onNext }) {
   // Form control
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
-  const validate = () => {
-    Logger.debug('[CreateElection] electionName: ', eUpdate);
-    return (
-      electionName.length !== 0 &&
-      description.length !== 0 &&
-      startTime !== null &&
-      endTime !== null
-    );
-  };
+  
 
   useEffect(() => {
     Logger.debug("[CreateElectron] useEffect triggered");
+    const validate = () => {
+      Logger.debug('[CreateElection] electionName: ', eUpdate);
+      return (
+        electionName.length !== 0 &&
+        description.length !== 0 &&
+        startTime !== null &&
+        endTime !== null
+      );
+    };
     const isValid = validate();
     setValid(isValid);
-  }, [electionName, description]);
+  }, [electionName, description, startTime, endTime, eUpdate]);
 
   // Error alert
   const [showError, setShowError] = useState(false);

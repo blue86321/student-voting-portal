@@ -64,7 +64,7 @@ function CandidateComponent({
       candidatePosition === 0
         ? positions[0]
         : positions.filter((position) => {
-            return position.id == candidatePosition;
+            return position.id === candidatePosition;
           })[0];
     const candidateData: Candidate = {
       userId: currentUser.id,
@@ -201,12 +201,7 @@ function CreateCandidates({ electionID, positions, onNext }) {
       " for index",
       index
     );
-    candidates.map((c, i) => {
-      if (i === index) {
-        c = candidate;
-      }
-    });
-    Logger.debug("[CreateCandidates] update candidates result:", candidates);
+    Logger.debug("[CreateCandidates] update candidates result:", candidates.map((c, i) => i === index ? candidate : c));
   };
 
   const handleAddCandidate = () => {

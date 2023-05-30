@@ -1,4 +1,4 @@
-import { Container, Image } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 function ElectionDetail({ election }) {
   return (

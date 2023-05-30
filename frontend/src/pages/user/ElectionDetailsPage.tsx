@@ -1,5 +1,5 @@
 import { Container, Button, Alert, Modal } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import CandidateCard from "../../component/elections/CandidateCard";
 import ElectionDetail from "../../component/elections/ElectionDetail";
@@ -19,27 +19,17 @@ import Logger from "../../component/utils/Logger";
 
 function ElectionDetailsPage() {
   const location = useLocation();
-  const election: Election | null = location.state
-    ? new Election(location.state, false)
-    : null;
+  const election: Election | null = useMemo(() => {
+    return location.state
+      ? new Election(location.state, false)
+      : null;
+  }, [location.state])
 
   const [positions, setPositions] = useState<PositionVote[]>([]);
   // votePosition for submit vote
   const [votePosition, setVotePosition] = useState<VotePosition[]>([]);
 
-  const fetchDataAsync = async () => {
-    const positionResult = await myApi.getPositions();
-    if (positionResult.success) {
-      const positions = (positionResult.data as PositionVote[]).filter(
-        (position) => position.electionId === election?.id
-      );
-      setPositions(positions);
-      Logger.debug("[ElectionDetailsPage] position data:", positions);
-    } else {
-      // Handle error
-      Logger.error("[ElectionDetailsPage] position data error:", positionResult);
-    }
-  };
+
 
   const isElectionFinished = (candidateID, positionID) => {
     Logger.debug(
@@ -151,6 +141,19 @@ function ElectionDetailsPage() {
   };
 
   useEffect(() => {
+    const fetchDataAsync = async () => {
+      const positionResult = await myApi.getPositions();
+      if (positionResult.success) {
+        const positions = (positionResult.data as PositionVote[]).filter(
+          (position) => position.electionId === election?.id
+        );
+        setPositions(positions);
+        Logger.debug("[ElectionDetailsPage] position data:", positions);
+      } else {
+        // Handle error
+        Logger.error("[ElectionDetailsPage] position data error:", positionResult);
+      }
+    };
     fetchDataAsync();
     if (election && !election.isDataCompleted) {
       showErrorWithMessage(
@@ -162,8 +165,8 @@ function ElectionDetailsPage() {
           : ""
       );
     }
-  }, []);
-  
+  }, [election]);
+
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
@@ -202,7 +205,7 @@ function ElectionDetailsPage() {
                   variant="primary"
                   className="ml-2"
                   onClick={onClickEdit}
-                  // disabled={election?.state === 1}
+                // disabled={election?.state === 1}
                 >
                   Edit
                 </Button>
@@ -212,19 +215,19 @@ function ElectionDetailsPage() {
               <Button
                 variant="danger"
                 className="ml-auto"
-                onClick={()=>setShowDeleteModal(true)}
+                onClick={() => setShowDeleteModal(true)}
                 disabled={election?.state !== ElectionState.upComing && election?.isDataCompleted}
               >
                 Delete
               </Button>
             )}
             <DeleteModal
-        target={election}
-        targetName={election?.electionName}
-        shouldShow={showDeleteModal}
-        deleteFunc={onClickDelete}
-        closeModal={() => setShowDeleteModal(false)}
-      />
+              target={election}
+              targetName={election?.electionName}
+              shouldShow={showDeleteModal}
+              deleteFunc={onClickDelete}
+              closeModal={() => setShowDeleteModal(false)}
+            />
           </Container>
         </div>
         {showErrorAlert()}

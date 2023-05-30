@@ -15,7 +15,7 @@ function Home({ type }) {
       const result = await myApi.getElections();
       if (result.success) {
         const electionDetails = (result.data as ElectionDetail[]).map(election => {
-          return new Election(election);
+          return new Election(election, false);
         });
         setData(electionDetails);
       } else {
@@ -25,7 +25,7 @@ function Home({ type }) {
     };
 
     fetchDataAsync();
-  }, [currentUser]);
+  }, []);
 
   const filterElections = (state, showCompletedOnly) => {
     const filteredData = data.filter(e => {
