@@ -1,6 +1,6 @@
 .card-img {
-    width: 320px;
-    height: 400px;
+    width: auto;
+    height: 320px;
     object-fit: cover;
 }
 

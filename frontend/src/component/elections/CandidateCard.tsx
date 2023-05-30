@@ -87,9 +87,10 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
               <Card.Title className="text-center">
                 {candidate.candidateName}
               </Card.Title>
+              </Card.Body>
               <Card.Img className="card-image" src={candidate.photoUrl} />
+              <Card.Body>
               <Card.Text className="card-text-multiline">
-                Introduction: <br />
                 {candidate.candidateDesc}
               </Card.Text>
               {/* TODO: to vote the candidate, add 1 for total votes. */}
