@@ -28,7 +28,7 @@ class PositionView(ModelViewSet):
 class CandidateView(ModelViewSet):
     serializer_class = CandidateSerializer
     queryset = Candidate.objects.all()
-    permission_classes = [Get | (IsOwnerOrAdmin & IsSameUniversity)]
+    permission_classes = [Get | (IsAdminUser & IsSameUniversity)]
 
 
 class VoteCandidateView(APIView):

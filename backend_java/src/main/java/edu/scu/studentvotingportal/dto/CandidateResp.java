@@ -9,7 +9,6 @@ public class CandidateResp {
     Long id;
     Long electionId;
     Long positionId;
-    Long userId;
     Integer voteCount;
     String candidateName;
     String candidateDesc;
@@ -19,7 +18,6 @@ public class CandidateResp {
         this.id = candidates.getId();
         this.electionId = candidates.getElection().getId();
         this.positionId = candidates.getPosition().getId();
-        this.userId = candidates.getUser().getId();
         this.voteCount = candidates.getVoteCount();
         this.candidateName = candidates.getCandidateName();
         this.candidateDesc = candidates.getCandidateDesc();

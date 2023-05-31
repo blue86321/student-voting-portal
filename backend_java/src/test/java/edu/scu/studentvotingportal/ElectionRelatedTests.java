@@ -99,19 +99,16 @@ class ElectionRelatedTests {
         .maxVotesPerCandidate(1)
         .build();
     Candidates candidate = Candidates.builder()
-        .user(user)
         .election(election)
         .position(position)
         .candidateName("Allen")
         .build();
     Candidates candidate1 = Candidates.builder()
-        .user(user1)
         .election(election)
         .position(position1)
         .candidateName("Tim")
         .build();
     Candidates candidate2 = Candidates.builder()
-        .user(user2)
         .election(election)
         .position(position1)
         .candidateName("Mark")
@@ -484,7 +481,6 @@ class ElectionRelatedTests {
     @Nested
     class CandidateTestCases {
         CandidateParams newCandidateParams = CandidateParams.builder()
-            .userId(user.getId())
             .electionId(election.getId())
             .positionId(position.getId())
             .candidateName("SCU club president")

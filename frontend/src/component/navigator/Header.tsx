@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Nav, Navbar, NavDropdown, Container, Alert } from "react-bootstrap";
 import "./Header.css"
 
@@ -6,7 +6,7 @@ import logo from "../../logo.svg";
 import Login from "../user/Login";
 import Navigation from "./Navigation";
 import { currentUser } from "../../model/User.model";
-import myApi from "../../service/MyApi";
+import myApi, { TOKEN } from "../../service/MyApi";
 import { useNavigate } from "react-router-dom";
 import Logger from "../utils/Logger";
 
@@ -20,9 +20,39 @@ function Header() {
 
   const isLoggedIn = currentUser.isLoggedIn();
 
+
+  const redirectToHome = useCallback(() => {
+    navigate("/");
+    Logger.debug("[Header] Reset navigate");
+  }, [navigate])
+
+
   useEffect(() => {
+    const loadUserType = async () => {
+      Logger.debug("[Header] loadUserType");
+      let token = localStorage.getItem(TOKEN);
+      if (!token) {
+        //no token: no user logged in
+        Logger.debug("[Header] no token: no user logged in");
+        setIsAdmin(false);
+        // setShowError(false);
+        // redirectToHome();
+        return;
+      }
+      const user = await currentUser.getUser();
+      Logger.debug("[Header] loaded user: ", user);
+      if (user.email !== "") {
+        setIsAdmin(user.staff || user.superuser);
+        setShowError(false);
+      } else {
+        setAlertType("danger");
+        setError("Login expired!");
+        setShowError(true);
+        redirectToHome();
+      }
+    };
     loadUserType();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, redirectToHome]);
 
   // Error alert
   const [showError, setShowError] = useState(false);
@@ -55,34 +85,6 @@ function Header() {
     setShowError(true);
   };
 
-  const redirectToHome = () => {
-    navigate("/", {state: "header"});
-    Logger.debug("[Header] Reset navigate");
-  }
-
-  // Loading user with token in localStorage, as currentUser will be empty when page refresh
-  const loadUserType = async () => {
-    Logger.debug("[Header] loadUserType");
-    let token = localStorage.getItem("token");
-    if (!token) {
-      //no token: no user logged in
-      Logger.debug("[Header] no token: no user logged in");
-      setIsAdmin(false);
-      return;
-    }
-    const user = await currentUser.getUser();
-    Logger.debug("[Header] loaded user: ", user);
-    if (user.email !== "") {
-      setIsAdmin(user.staff || user.superuser);
-      setShowError(false);
-    } else {
-      setAlertType("danger");
-      setError("Login expired!");
-      setShowError(true);
-      redirectToHome();
-    }
-  };
-
   return (
     <div>
       <Navbar expand="lg">
@@ -97,9 +99,9 @@ function Header() {
               <NavDropdown title="Account" id="basic-nav-dropdown">
                 {isLoggedIn ? (
                   <>
-                  <NavDropdown.Item disabled className="custom-disabled-item">{currentUser.email}</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item onClick={logout}>Log Out</NavDropdown.Item>
+                    <NavDropdown.Item disabled className="custom-disabled-item">{currentUser.email}</NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item onClick={logout}>Log Out</NavDropdown.Item>
                   </>
                 ) : (
                   <NavDropdown.Item onClick={() => setLoginModalShow(true)}>

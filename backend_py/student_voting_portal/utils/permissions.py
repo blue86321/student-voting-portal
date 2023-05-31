@@ -35,9 +35,7 @@ class IsOwnerOrAdmin(permissions.IsAuthenticated):
 
 class IsSameUniversity(permissions.BasePermission):
     def has_object_permission(self, request: Request, view: views.View, obj: models.Model):
-        if isinstance(obj, Candidate):
-            return User.objects.get(id=obj.user_id).university_id == request.user.university_id
-        if isinstance(obj, Position):
+        if isinstance(obj, Position) or isinstance(obj, Candidate):
             return Election.objects.get(id=obj.election_id).university_id == request.user.university_id
         return obj.university_id == request.user.university_id
 

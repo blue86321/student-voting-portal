@@ -6,12 +6,13 @@ import myApi from "../../service/MyApi";
 import { Election as ElectionInterface, ElectionDetail } from "../../model/Interfaces/Election";
 import Election from "../../model/Election.model";
 import Logger from "../utils/Logger";
+import DateTimeUtils from "../utils/DateTimeUtil";
 
 function CreateElection({ electionForUpdate, onNext }) {
-  const eUpdate = electionForUpdate as Election|null;
+  const eUpdate = electionForUpdate as Election | null;
   const [electionName, setElectionName] = useState(eUpdate ? eUpdate.electionName : "");
-  const [startTime, setStartTime] = useState<Date | null>(eUpdate ? eUpdate.startDate : null);
-  const [endTime, setEndTime] = useState<Date | null>(eUpdate ? eUpdate.endDate : null);
+  const [startTime, setStartTime] = useState<Date | null>(eUpdate ? DateTimeUtils.convertToGMT(eUpdate.startDate) : null);
+  const [endTime, setEndTime] = useState<Date | null>(eUpdate ? DateTimeUtils.convertToGMT(eUpdate.endDate) : null);
   const [description, setDescription] = useState(eUpdate ? eUpdate.electionDesc : "");
   const [electionID, setElectionID] = useState<Number | null>(eUpdate ? eUpdate.id : null);
 
@@ -28,21 +29,21 @@ function CreateElection({ electionForUpdate, onNext }) {
   // Form control
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
-  const validate = () => {
-    Logger.debug('[CreateElection] electionName: ', eUpdate);
-    return (
-      electionName.length !== 0 &&
-      description.length !== 0 &&
-      startTime !== null &&
-      endTime !== null
-    );
-  };
+
 
   useEffect(() => {
     Logger.debug("[CreateElectron] useEffect triggered");
-    const isValid = validate();
-    setValid(isValid);
-  }, [electionName, description]);
+    const isValid = () => {
+      Logger.debug('[CreateElection] electionName: ', eUpdate);
+      return (
+        electionName.length !== 0 &&
+        description.length !== 0 &&
+        startTime !== null &&
+        endTime !== null
+      );
+    };
+    setValid(isValid());
+  }, [electionName, description, startTime, endTime, eUpdate]);
 
   // Error alert
   const [showError, setShowError] = useState(false);
@@ -75,9 +76,9 @@ function CreateElection({ electionForUpdate, onNext }) {
     const result = isCreate
       ? await myApi.createElection(election)
       : await myApi.updateElection({
-          electionData: election,
-          electionId: electionID.toString(),
-        });
+        electionData: election,
+        electionId: electionID.toString(),
+      });
     Logger.debug("[CreatElection] is create event", isCreate, "with result:", result);
     if (result.success) {
       const electionDetail = new Election(result.data as ElectionDetail);

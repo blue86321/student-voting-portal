@@ -17,10 +17,6 @@ public class Candidates extends BaseEntity {
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    Users user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "elections_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     Elections election;
 
@@ -43,8 +39,7 @@ public class Candidates extends BaseEntity {
     @Column(nullable = false)
     Integer voteCount = 0;
 
-    public Candidates(CandidateParams params, Elections election, Users user, Positions position) {
-        this.user = user;
+    public Candidates(CandidateParams params, Elections election, Positions position) {
         this.election = election;
         this.position = position;
         this.candidateName = params.getCandidateName();

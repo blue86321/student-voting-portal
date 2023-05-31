@@ -32,7 +32,6 @@ export interface VoteCandidateDetail {
 }
 
 export interface Candidate {
-  userId: number;
   electionId: number;
   positionId: number;
   candidateName: string;
@@ -81,7 +80,6 @@ export interface CandidateDetail {
   id: number;
   electionId: number;
   positionId: number;
-  userId: number;
   voteCount: number;
   candidateName: string;
   candidateDesc: string;

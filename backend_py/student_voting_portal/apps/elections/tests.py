@@ -107,7 +107,6 @@ class AbstractTestCase(APITestCase):
         cls.another_user = serializer.save()
 
         new_candidate_data = {
-            "user_id": cls.new_user.id,
             "election_id": cls.new_election.id,
             "position_id": cls.new_position.id,
             "candidate_name": "John Miller",
@@ -115,7 +114,6 @@ class AbstractTestCase(APITestCase):
         }
         cls.new_candidate = Candidate.objects.create(**new_candidate_data)
         another_candidate_data = {
-            "user_id": cls.another_user.id,
             "election_id": cls.another_election.id,
             "position_id": cls.another_position.id,
             "candidate_name": "John Miller",
@@ -302,7 +300,6 @@ class CandidateTestCase(AbstractTestCase):
         candidate_count = Candidate.objects.count()
         existing_candidate = CandidateSerializer(instance=self.new_candidate, context=context).data
         new_candidate = existing_candidate
-        new_candidate["user_id"] = self.another_user.id
         new_candidate["candidate_name"] = "Silvia"
 
         # no login
@@ -311,12 +308,7 @@ class CandidateTestCase(AbstractTestCase):
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
         res = self.client.post("/candidates/", data=new_candidate)
-        self.assertFalse(res.exception)
-        # post again
-        res_again = self.client.post("/candidates/", data=new_candidate)
-        self.assertTrue(res_again.status_code, status.HTTP_400_BAD_REQUEST)
-        Candidate.objects.get(id=res.json().get("data").get("id")).delete()
-        # another university
+        self.assertTrue(res.exception)
         self.client.logout()
 
         # admin
@@ -355,11 +347,7 @@ class CandidateTestCase(AbstractTestCase):
 
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
-        res_json = self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).json().get("data")
-        self.assertDictEqual(res_json, modified_candidate)
-        # normal user (put another candidate in the same university)
-        res = self.client.put(f"/candidates/{another_candidate['id']}/", data=another_candidate)
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(self.client.put(f"/candidates/{self.new_candidate.id}/", data=modified_candidate).exception)
         self.client.logout()
         Candidate.objects.get(id=another_candidate.get("id")).delete()
 
@@ -382,17 +370,16 @@ class CandidateTestCase(AbstractTestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         # normal user
         self.client.login(email=self.new_user.email, password=self.new_user_pwd)
-        self.assertFalse(self.client.delete(f"/candidates/{self.new_candidate.id}/").exception)
+        self.assertTrue(self.client.delete(f"/candidates/{self.new_candidate.id}/").exception)
         # diff university
         res = self.client.delete(f"/candidates/{self.another_candidate.id}/")
         self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
         del existing_candidate["url"]
-        new_candidate = Candidate.objects.create(**existing_candidate)
 
         # admin
         self.client.login(email=self.new_admin.email, password=self.new_admin_pwd)
-        self.assertFalse(self.client.delete(f"/candidates/{new_candidate.id}/").exception)
+        self.assertFalse(self.client.delete(f"/candidates/{self.new_candidate.id}/").exception)
         # diff university
         res = self.client.delete(f"/candidates/{self.another_candidate.id}/")
         self.assertTrue(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -499,7 +486,6 @@ class VoteTestCase(AbstractTestCase):
 
     def test_api_vote_multiple_candidates(self):
         new_candidate_data = {
-            "user_id": self.new_user2.id,
             "election_id": self.new_election.id,
             "position_id": self.new_position.id,
             "candidate_name": "Tim Cook",

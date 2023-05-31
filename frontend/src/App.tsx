@@ -7,7 +7,6 @@ import ElectionRouter from "./component/elections/Elections.router";
 import CreateElectionPage from "./pages/admin/CreateElectionPage";
 import ManageUsers from "./pages/admin/ManageUsers";
 import Logger from "./component/utils/Logger";
-import { currentUser } from "./model/User.model";
 
 function App() {
   Logger.debug('[Router] token', localStorage.getItem('token'));

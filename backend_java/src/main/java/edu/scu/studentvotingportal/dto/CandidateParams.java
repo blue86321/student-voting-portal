@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CandidateParams {
-    Long userId;
     Long electionId;
     Long positionId;
     String candidateName;

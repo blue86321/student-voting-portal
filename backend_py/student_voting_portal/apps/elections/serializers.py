@@ -34,12 +34,11 @@ class CandidateSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
     election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
     position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
-    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source="user")
     vote_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Candidate
-        exclude = ["create_time", "update_time", "election", "position", "user"]
+        exclude = ["create_time", "update_time", "election", "position"]
 
 
 class ElectionSerializer(serializers.HyperlinkedModelSerializer):
