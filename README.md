@@ -1,5 +1,12 @@
 # student-voting-portal
 
+## Preview
+### Admin
+<img width="800" src="./imgs/admin.gif">
+
+### User (vote)
+<img width="800" src="./imgs/user.gif">
+
 ## Docker
 
 ### Run
