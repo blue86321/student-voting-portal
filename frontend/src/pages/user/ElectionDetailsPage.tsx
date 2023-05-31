@@ -21,7 +21,7 @@ function ElectionDetailsPage() {
   const location = useLocation();
   const election: Election | null = useMemo(() => {
     return location.state
-      ? new Election(location.state, false)
+      ? new Election(location.state, true)
       : null;
   }, [location.state])
 

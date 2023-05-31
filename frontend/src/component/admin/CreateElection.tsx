@@ -9,27 +9,27 @@ import Logger from "../utils/Logger";
 import DateTimeUtils from "../utils/DateTimeUtil";
 
 function CreateElection({ electionForUpdate, onNext }) {
-  const eUpdate = electionForUpdate as Election|null;
+  const eUpdate = electionForUpdate as Election | null;
   const [electionName, setElectionName] = useState(eUpdate ? eUpdate.electionName : "");
-  const [startTime, setStartTime] = useState<Date | null>(eUpdate ? eUpdate.startDate : null);
-  const [endTime, setEndTime] = useState<Date | null>(eUpdate ? eUpdate.endDate : null);
+  const [startTime, setStartTime] = useState<Date | null>(eUpdate ? DateTimeUtils.convertToGMT(eUpdate.startDate) : null);
+  const [endTime, setEndTime] = useState<Date | null>(eUpdate ? DateTimeUtils.convertToGMT(eUpdate.endDate) : null);
   const [description, setDescription] = useState(eUpdate ? eUpdate.electionDesc : "");
   const [electionID, setElectionID] = useState<Number | null>(eUpdate ? eUpdate.id : null);
 
   const handleStartTime = (date: Date) => {
-    setStartTime(DateTimeUtils.convertToGMT(date));
+    setStartTime(date);
     const newDate = new Date(date.getTime() + 86400000);
     Logger.debug("[CreateElection] date: ", date, ", newDate: ", newDate);
     setEndTime(newDate);
   };
   const handleEndTime = (date) => {
-    setEndTime(DateTimeUtils.convertToGMT(date));
+    setEndTime(date);
   };
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
   const [isValid, setValid] = useState(false);
-  
+
 
   useEffect(() => {
     Logger.debug("[CreateElectron] useEffect triggered");
@@ -77,9 +77,9 @@ function CreateElection({ electionForUpdate, onNext }) {
     const result = isCreate
       ? await myApi.createElection(election)
       : await myApi.updateElection({
-          electionData: election,
-          electionId: electionID.toString(),
-        });
+        electionData: election,
+        electionId: electionID.toString(),
+      });
     Logger.debug("[CreatElection] is create event", isCreate, "with result:", result);
     if (result.success) {
       const electionDetail = new Election(result.data as ElectionDetail);
@@ -114,7 +114,7 @@ function CreateElection({ electionForUpdate, onNext }) {
               <Form.Group controlId="formDate">
                 <Form.Label>Start Date</Form.Label>
                 <DatePicker
-                  selected={startTime && DateTimeUtils.convertFromGMT(startTime)}
+                  selected={startTime}
                   onChange={(date) => handleStartTime(date)}
                   className="form-control"
                   showTimeSelect
@@ -128,7 +128,7 @@ function CreateElection({ electionForUpdate, onNext }) {
               <Form.Group controlId="formDate">
                 <Form.Label>End Date</Form.Label>
                 <DatePicker
-                  selected={endTime && DateTimeUtils.convertFromGMT(endTime)}
+                  selected={endTime}
                   onChange={(date) => handleEndTime(date)}
                   className="form-control"
                   showTimeSelect

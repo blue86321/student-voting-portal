@@ -2,7 +2,7 @@ import { ProgressBar, Container, Button, Modal } from "react-bootstrap";
 import { useState } from "react";
 
 import "../../component/navigator/Header.css"
-import CreateElection from "../../component/admin/CreatElection";
+import CreateElection from "../../component/admin/CreateElection";
 import CreatePositions from "../../component/admin/CreatePositions";
 import CreateCandidates from "../../component/admin/CreateCandidates";
 import { useLocation, useNavigate } from "react-router-dom";

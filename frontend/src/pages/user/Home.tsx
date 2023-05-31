@@ -15,7 +15,7 @@ function Home({ type }) {
       const result = await myApi.getElections();
       if (result.success) {
         const electionDetails = (result.data as ElectionDetail[]).map(election => {
-          return new Election(election, false);
+          return new Election(election, true);
         });
         setData(electionDetails);
       } else {
