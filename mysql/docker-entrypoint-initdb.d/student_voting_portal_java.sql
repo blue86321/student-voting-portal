@@ -42,7 +42,6 @@ CREATE TABLE `candidates` (
   `vote_count` int NOT NULL,
   `elections_id` bigint DEFAULT NULL,
   `positions_id` bigint DEFAULT NULL,
-  `users_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -53,7 +52,7 @@ CREATE TABLE `candidates` (
 
 LOCK TABLES `candidates` WRITE;
 /*!40000 ALTER TABLE `candidates` DISABLE KEYS */;
-INSERT INTO `candidates` VALUES (1,'2023-05-20 19:16:13.814992','2023-05-20 19:42:01.569579','Tim Cook','I like Apple','https://upload.wikimedia.org/wikipedia/commons/e/e1/%D0%A2%D0%B8%D0%BC_%D0%9A%D1%83%D0%BA_%2802-09-2021%29.jpg',3,1,1,4),(2,'2023-05-20 19:20:29.548349','2023-05-20 19:42:23.011922','Joey Tribbiani','whatever','https://i.guim.co.uk/img/media/513976d50736695ee8bd5014175e007f9980531f/0_289_2980_1788/master/2980.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=77863ec7b2622437668af3ff9ecd7ae6',1,1,1,5),(3,'2023-05-20 19:23:39.475300','2023-05-20 19:42:23.015220','Shohei Ohtani','Pitcher and designated hitter','https://upload.wikimedia.org/wikipedia/commons/a/a4/Shohei_Ohtani_%2852251723213%29_%28cropped_2%29.jpg',2,1,2,6),(4,'2023-05-20 19:25:35.517045','2023-05-20 19:42:23.017541','Lionel Messi','desc','https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg',4,1,2,7),(5,'2023-05-20 19:29:07.917116','2023-05-20 19:42:23.020065','Philip Zimbardo','Psychologist, conducted Stanford prison experiment','https://m.media-amazon.com/images/I/A1otGkzWlSL.jpg',4,1,3,8);
+INSERT INTO `candidates` VALUES (1,'2023-05-20 19:16:13.814992','2023-05-20 19:42:01.569579','Tim Cook','I like Apple','https://upload.wikimedia.org/wikipedia/commons/e/e1/%D0%A2%D0%B8%D0%BC_%D0%9A%D1%83%D0%BA_%2802-09-2021%29.jpg',3,1,1),(2,'2023-05-20 19:20:29.548349','2023-05-20 19:42:23.011922','Joey Tribbiani','whatever','https://i.guim.co.uk/img/media/513976d50736695ee8bd5014175e007f9980531f/0_289_2980_1788/master/2980.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=77863ec7b2622437668af3ff9ecd7ae6',1,1,1),(3,'2023-05-20 19:23:39.475300','2023-05-20 19:42:23.015220','Shohei Ohtani','Pitcher and designated hitter','https://upload.wikimedia.org/wikipedia/commons/a/a4/Shohei_Ohtani_%2852251723213%29_%28cropped_2%29.jpg',2,1,2),(4,'2023-05-20 19:25:35.517045','2023-05-20 19:42:23.017541','Lionel Messi','desc','https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg',4,1,2),(5,'2023-05-20 19:29:07.917116','2023-05-20 19:42:23.020065','Philip Zimbardo','Psychologist, conducted Stanford prison experiment','https://m.media-amazon.com/images/I/A1otGkzWlSL.jpg',4,1,3);
 /*!40000 ALTER TABLE `candidates` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -5,7 +5,6 @@ import {
   CandidateDetail,
 } from "../../model/Interfaces/Election";
 import myApi from "../../service/MyApi";
-import { currentUser } from "../../model/User.model";
 import Logger from "../utils/Logger";
 
 function CandidateComponent({
@@ -67,7 +66,6 @@ function CandidateComponent({
             return position.id === candidatePosition;
           })[0];
     const candidateData: Candidate = {
-      userId: currentUser.id,
       electionId: position.electionId,
       positionId: position.id,
       candidateName: candidateName,
@@ -209,7 +207,6 @@ function CreateCandidates({ electionID, positions, onNext }) {
       electionId: electionID,
       id: 0,
       positionId: 0,
-      userId: 0,
       voteCount: 0,
       candidateName: "",
       candidateDesc: "",
