@@ -28,12 +28,11 @@ function CreateElection({ electionForUpdate, onNext }) {
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
-  const [isValid, setValid] = useState(false);
 
 
   useEffect(() => {
     Logger.debug("[CreateElectron] useEffect triggered");
-    const validate = () => {
+    const isValid = () => {
       Logger.debug('[CreateElection] electionName: ', eUpdate);
       return (
         electionName.length !== 0 &&
@@ -42,8 +41,7 @@ function CreateElection({ electionForUpdate, onNext }) {
         endTime !== null
       );
     };
-    const isValid = validate();
-    setValid(isValid);
+    setIsClicked(!isValid());
   }, [electionName, description, startTime, endTime, eUpdate]);
 
   // Error alert
@@ -156,9 +154,9 @@ function CreateElection({ electionForUpdate, onNext }) {
               variant="primary"
               type="submit"
               onClick={handleClick}
-              disabled={(electionID === null && isClicked) || !isValid}
+              disabled={(electionID === null && isClicked) || isClicked}
             >
-              {electionID === null ? (isClicked ? "Saved" : "Next") : "Update"}
+              {isClicked ? "Saved" : (electionID === null ? "Next" : "Update")}
             </Button>
           </div>
         </Form>

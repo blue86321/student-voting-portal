@@ -14,6 +14,7 @@ import User, {
   LoginResponse,
   University,
 } from "../model/Interfaces/User";
+import Logger from "../component/utils/Logger";
 
 export interface Response<T = any> {
   data: T | undefined;
@@ -66,10 +67,10 @@ class MyApi {
         ...params,
         method: params.method,
       });
-      console.log("[MyApi] response: " + JSON.stringify(res));
+      // Logger.debug("[MyApi] response: " + JSON.stringify(res));
       return res.data;
     } catch (e) {
-      console.log("[MyApi] error: " + e);
+      Logger.error("[MyApi] error: " + e);
       const defaultFailResp = {
         data: undefined,
         msg: "",
@@ -79,7 +80,7 @@ class MyApi {
       if (e instanceof AxiosError) {
         const resData: Response | undefined = e.response?.data;
         if (resData?.code === 401) {
-          console.log("[MyApi] Toen expired");
+          Logger.debug("[MyApi] Toen expired");
           localStorage.removeItem(TOKEN);
         }
         return resData
@@ -110,7 +111,7 @@ class MyApi {
       const token = response.data.token;
       // Store the token in localStorage
       localStorage.setItem(TOKEN, token.access);
-      console.log("[MyApi] set token: " + JSON.stringify(token));
+      Logger.debug("[MyApi] set token: " + JSON.stringify(token));
     }
     // your post-process logic. e.g. calculate who's the election winner and add a tag to it.
     return response;
@@ -151,7 +152,7 @@ class MyApi {
         Authorization: `Bearer ${token}`, // Add the token to the Authorization header
       },
     };
-    console.log("[myAPI] createPosition", params);
+    Logger.debug("[myAPI] createPosition", params);
     const response = await this.request(params);
     return response;
   }
@@ -224,7 +225,7 @@ class MyApi {
         Authorization: `Bearer ${token}`, // Add the token to the Authorization header
       },
     };
-    console.log("[myapi] createElection");
+    Logger.debug("[myapi] createElection");
     const response = await this.request(params);
     return response;
   }
@@ -420,7 +421,7 @@ class MyApi {
     return response;
   }
   async createUser(
-    userData: CreateUserParams
+    userData: CreateUserParams, shouldRefreshToken: boolean = true
   ): Promise<Response<LoginResponse>> {
     const params: AxiosRequestConfig = {
       url: "/users/",
@@ -429,7 +430,7 @@ class MyApi {
     };
     const response = await this.request(params);
     // set token
-    if (response.success) {
+    if (shouldRefreshToken && response.success) {
       const token = response.data.token;
       localStorage.setItem(TOKEN, token.access);
     }
@@ -479,7 +480,7 @@ class MyApi {
   // '/me/'
   async getMe(): Promise<Response<User>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
-    console.log("[MyApi] getMe with token: " + token);
+    Logger.debug("[MyApi] getMe with token: " + token);
     const params: AxiosRequestConfig = {
       url: "/me/",
       method: "GET",

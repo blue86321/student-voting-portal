@@ -10,7 +10,7 @@ import myApi from "../../service/MyApi";
 import { currentUser } from "../../model/User.model";
 import Logger from "../utils/Logger";
 
-function Register(props) {
+function Register({show, onHide, shouldRefreshToken }) {
   const [isClicked, setIsClicked] = useState(false);
   const [dob, setDob] = useState(
     new Date().setFullYear(new Date().getFullYear() - 18)
@@ -24,7 +24,7 @@ function Register(props) {
   const handleDob = (date) => {
     setDob(date);
   };
-
+  Logger.debug("[Register]shouldRefreshToken", shouldRefreshToken)
   useEffect(() => {
     const fetchDataAsync = async () => {
       const universityResult = await myApi.getUniversities();
@@ -56,12 +56,14 @@ function Register(props) {
     setShowError(false);
     Logger.debug("[Register] submit register event", user);
     event.preventDefault();
-    const result = await myApi.createUser(user);
+    const result = await myApi.createUser(user, shouldRefreshToken);
     if (result.success) {
       Logger.debug("[Register] result success:", result);
-      currentUser.setUser(result.data as LoginResponse);
+      if (shouldRefreshToken) {
+        currentUser.setUser(result.data as LoginResponse);
+      }
       setIsClicked(false);
-      props.onHide();
+      onHide();
     } else {
       Logger.error("[Register] error with msg:", result.msg);
       setError(result.msg);
@@ -85,7 +87,8 @@ function Register(props) {
 
   return (
     <Modal
-      {...props}
+      show={show}
+      onHide={onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -120,7 +123,7 @@ function Register(props) {
               }}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Group className="mb-3" controlId="formConfirmPassword">
             <Form.Label>Confirm Password</Form.Label>
             <Form.Control
               type="password"

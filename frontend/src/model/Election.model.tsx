@@ -1,6 +1,5 @@
 import { ElectionDetail } from "./Interfaces/Election";
 import { University } from "./Interfaces/User";
-import DateTimeUtils from "../component/utils/DateTimeUtil";
 import Position from "./Position.model";
 import Logger from "../component/utils/Logger";
 
@@ -21,7 +20,7 @@ class Election implements ElectionDetail {
   startDate: Date;
   endDate: Date;
 
-  constructor(e: ElectionDetail, convertTime: boolean = true) {
+  constructor(e: ElectionDetail) {
     this.id = e.id;
     this.positions = e.positions.map((p) => {
       return new Position(p);
@@ -29,9 +28,8 @@ class Election implements ElectionDetail {
     this.university = e.university;
     this.electionName = e.electionName;
     this.electionDesc = e.electionDesc;
-    // convert server time (GMT) to local timezone
-    this.startDate = convertTime ? DateTimeUtils.convertFromGMT(new Date(e.startTime)) : new Date(e.startTime);
-    this.endDate = convertTime ? DateTimeUtils.convertFromGMT(new Date(e.endTime)) : new Date(e.endTime);
+    this.startDate = new Date(e.startTime);
+    this.endDate = new Date(e.endTime);
     this.startTime = this.startDate.toLocaleString("en-US", {
       year: "numeric",
       month: "2-digit",
@@ -46,6 +44,8 @@ class Election implements ElectionDetail {
       hour: "2-digit",
       minute: "2-digit",
     });
+    // Logger.debug("[ElectionModel] startDate", e.startTime, this.startTime)
+    // Logger.debug("[ElectionModel] endDate", e.endTime, this.endTime)
   }
 
   get state(): ElectionState {

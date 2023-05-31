@@ -78,6 +78,7 @@ function Header() {
       Logger.error("[Header] Logout error:", result.msg);
     }
     redirectToHome();
+    // window.location.reload();
     Logger.debug("[Header] Logout finished, set alert");
     setError("You have been logged out!");
     setAlertType("success");
