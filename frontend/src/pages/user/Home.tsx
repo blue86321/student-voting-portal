@@ -6,10 +6,14 @@ import myApi from "../../service/MyApi";
 import { ElectionDetail } from "../../model/Interfaces/Election";
 import { currentUser } from "../../model/User.model";
 import Logger from "../../component/utils/Logger";
+import { useLocation } from "react-router-dom";
 
 function Home({ type }) {
   const [data, setData] = useState<Election[]>([]);
-  const contentType = currentUser.isAdmin ? "admin" : type
+  const location = useLocation();
+  let stateString = location.state;
+  let contentType = currentUser.isAdmin ? "admin" : type
+  console.log("[Home] contentType: " + contentType, stateString)
   useEffect(() => {
     const fetchDataAsync = async () => {
       const result = await myApi.getElections();

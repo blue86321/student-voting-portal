@@ -16,7 +16,7 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
     if (!currentUser.isLoggedIn()) {
       handleShow();
     } else {
-      isCompleted(candidateID, positionID)
+      isCompleted(candidateID, positionID);
     }
   };
 
@@ -39,7 +39,7 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
   };
 
   const setUpVoteButton = (candidateID, positionID) => {
-    const isClicked = (candidateID === selectedID)
+    const isClicked = candidateID === selectedID;
     Logger.debug(
       "[CandidateCard] setUpVoteButton by electionStatus",
       electionStatus
@@ -48,7 +48,7 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
       return (
         <Button
           variant="primary"
-          onClick={()=>handleClick(candidateID, positionID)}
+          onClick={() => handleClick(candidateID, positionID)}
           disabled={isClicked || currentUser.isAdmin}
         >
           {isClicked ? "VOTED" : "VOTE"}
@@ -57,13 +57,12 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
     } else if (electionStatus === 2) {
       let c = 0;
       if (position !== undefined) {
-        const candidateVote:VoteCandidateDetail|undefined = position.candidates.filter(
-          (can) => {
-            return can.id === candidateID
-          }
-        )[0]
+        const candidateVote: VoteCandidateDetail | undefined =
+          position.candidates.filter((can) => {
+            return can.id === candidateID;
+          })[0];
         // Logger.debug("[CandidateCard] load votes for candidate:", candidateVote)
-        c = candidateVote?.voteCount ?? 0
+        c = candidateVote?.voteCount ?? 0;
       }
       return (
         <Button variant="secondary" size="lg" disabled>
@@ -82,19 +81,21 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
       {position.candidates.map((candidate) => (
         <div style={{ margin: "10px", padding: "20px" }}>
           <Card key={candidate.id} style={{ width: "22rem" }}>
-            {candidate.winner && (<div className="card-winner"> Winner </div>)}
+            {candidate.winner && <div className="card-winner"> Winner </div>}
             <Card.Body>
               <Card.Title className="text-center">
                 {candidate.candidateName}
               </Card.Title>
-              </Card.Body>
-              <Card.Img className="card-image" src={candidate.photoUrl} />
-              <Card.Body>
+            </Card.Body>
+            <Card.Img className="card-image" src={candidate.photoUrl} />
+            <Card.Body>
               <Card.Text className="card-text-multiline">
                 {candidate.candidateDesc}
               </Card.Text>
               {/* TODO: to vote the candidate, add 1 for total votes. */}
-              <div className="text-center">{setUpVoteButton(candidate.id,candidate.positionId)}</div>
+              <div className="text-center">
+                {setUpVoteButton(candidate.id, candidate.positionId)}
+              </div>
             </Card.Body>
           </Card>
         </div>

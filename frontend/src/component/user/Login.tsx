@@ -46,9 +46,9 @@ function Login(props) {
   
       setIsClicked(false);
       props.onHide();
-      currentUser.staff || currentUser.superuser
-        ? navigate("/manage_elections")
-        : navigate("/");
+      if (currentUser.isAdmin) { // only redirect admin to home page on login
+        navigate("/", { state: "login" });
+      }
     } else {
       setError(result.msg);
       setIsClicked(false);
@@ -138,6 +138,7 @@ function Login(props) {
               setRegisterModalShow(false);
               props.onHide();
             }}
+            shouldRefreshToken={true}
           />
         </Form>
       </Modal.Body>

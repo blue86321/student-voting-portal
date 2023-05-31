@@ -74,6 +74,31 @@
   border-color: #E85B81;
 }
 
+.btn-outline-primary {
+  --bs-btn-color: #E85B81;
+  border-color: #E85B81;
+}
+
+.btn-outline-primary:hover {
+  background-color: #E85B81;
+  border-color: #E85B81;
+}
+.btn-outline-primary:focus {
+  border-color: #E85B81;
+}
+
+.btn-outline-primary:active {
+  --bs-btn-active-bg: #E85B81;
+  --bs-btn-active-border-color: #E85B81;
+}
+
+
+.btn-outline-primary:not(:active),
+.btn-outline-primary:focus {
+  border-color: #E85B81;
+}
+
+
 .nav-tabs {
   --bs-nav-tabs-link-active-color: #E85B81;
 }

@@ -7,6 +7,7 @@ import ElectionRouter from "./component/elections/Elections.router";
 import CreateElectionPage from "./pages/admin/CreateElectionPage";
 import ManageUsers from "./pages/admin/ManageUsers";
 import Logger from "./component/utils/Logger";
+import { currentUser } from "./model/User.model";
 
 function App() {
   Logger.debug('[Router] token', localStorage.getItem('token'));
@@ -19,7 +20,6 @@ function App() {
         
         <Route path="past_elections" element={<Home type={"past"} />} />
         <Route path="upcoming_elections" element={<Home type={"upComing"} />} />
-        <Route path="manage_elections" element={<Home type={"admin"} />} />
         <Route path="/" element={<Home type={"onGoing"} />} />
 
         <Route path="/create" element={<CreateElectionPage />} />

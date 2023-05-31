@@ -48,6 +48,7 @@ function Header() {
       Logger.error("[Header] Logout error:", result.msg);
     }
     redirectToHome();
+    // window.location.reload();
     Logger.debug("[Header] Logout finished, set alert");
     setError("You have been logged out!");
     setAlertType("success");
@@ -55,10 +56,11 @@ function Header() {
   };
 
   const redirectToHome = () => {
-    navigate("/");
+    navigate("/", {state: "header"});
     Logger.debug("[Header] Reset navigate");
   }
 
+  // Loading user with token in localStorage, as currentUser will be empty when page refresh
   const loadUserType = async () => {
     Logger.debug("[Header] loadUserType");
     let token = localStorage.getItem("token");
@@ -66,8 +68,6 @@ function Header() {
       //no token: no user logged in
       Logger.debug("[Header] no token: no user logged in");
       setIsAdmin(false);
-      // setShowError(false);
-      redirectToHome();
       return;
     }
     const user = await currentUser.getUser();
