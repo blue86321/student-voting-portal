@@ -25,7 +25,7 @@ export interface Response<T = any> {
 const HOST_URL = "http://localhost:8080";
 export const TOKEN = "token";
 
-const calcVotePercentAndWinner = (position: PositionDetail, electionEnd: boolean = false): PositionDetail => {
+const calcVotePercentAndWinner = (position: PositionDetail): PositionDetail => {
   // copy
   const positionTemp: PositionDetail = JSON.parse(JSON.stringify(position));
   // Find the candidate with the highest voteCount for each position
@@ -44,7 +44,7 @@ const calcVotePercentAndWinner = (position: PositionDetail, electionEnd: boolean
 
   positionTemp.candidates = positionTemp.candidates.map((candidate) => ({
     ...candidate,
-    winner: winnerCount === 1 && electionEnd ? candidate.id === winnerId : false,
+    winner: winnerCount === 1 ? candidate.id === winnerId : false,
     votePercentage: +(
       (candidate.voteCount / position.totalVoteCount) *
       100
@@ -264,9 +264,8 @@ class MyApi {
     };
     const response: Response<ElectionDetail> = await this.request(params);
     if (response.success && response.data) {
-      const electionEnd = new Date(response.data.endTime).getTime() < new Date().getTime();
       response.data.positions = response.data.positions.map((p) =>
-        calcVotePercentAndWinner(p, electionEnd)
+        calcVotePercentAndWinner(p)
       );
     }
     return response;
@@ -280,7 +279,7 @@ class MyApi {
       response.data = response.data.map((electionDetail) => ({
         ...electionDetail,
         positions: electionDetail.positions.map((p) =>
-          calcVotePercentAndWinner(p, new Date(electionDetail.endTime).getTime() < new Date().getTime())
+          calcVotePercentAndWinner(p)
         ),
       }));
       return response;
