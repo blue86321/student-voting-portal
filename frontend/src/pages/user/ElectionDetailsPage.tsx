@@ -194,7 +194,7 @@ function ElectionDetailsPage() {
     <div style={{ margin: "10px" }}>
       {showSuccessModal()}
       <Container>
-        <div className="mb-2">
+        <div className="mb-4">
           <Container className="d-flex justify-content-between">
             <div>
               <Button variant="outline-secondary" onClick={goBack}>
