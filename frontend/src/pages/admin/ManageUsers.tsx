@@ -27,7 +27,7 @@ function ManageUsers() {
       const filtered = (userResult.data as CurrentUser[]).filter((user) => {
         const u = new CurrentUser();
         u.setUser(user);
-        return u.university.id === currentUser.university.id && !u.isAdmin;
+        return (currentUser.superuser && !u.superuser) || (u.university.id === currentUser.university.id && !u.isAdmin);
       });
       Logger.debug("[ManageUser] data:", filtered);
       setManagedUsers(filtered);
