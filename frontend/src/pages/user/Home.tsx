@@ -13,13 +13,13 @@ function Home({ type }) {
   const location = useLocation();
   let stateString = location.state;
   let contentType = currentUser.isAdmin ? "admin" : type
-  console.log("[Home] contentType: " + contentType, stateString)
+  Logger.debug("[Home] contentType: " + contentType, stateString)
   useEffect(() => {
     const fetchDataAsync = async () => {
       const result = await myApi.getElections();
       if (result.success) {
         const electionDetails = (result.data as ElectionDetail[]).map(election => {
-          return new Election(election, true);
+          return new Election(election);
         });
         setData(electionDetails);
       } else {

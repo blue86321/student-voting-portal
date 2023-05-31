@@ -67,10 +67,10 @@ class MyApi {
         ...params,
         method: params.method,
       });
-      Logger.debug("[MyApi] response: " + JSON.stringify(res));
+      // Logger.debug("[MyApi] response: " + JSON.stringify(res));
       return res.data;
     } catch (e) {
-      Logger.debug("[MyApi] error: " + e);
+      Logger.error("[MyApi] error: " + e);
       const defaultFailResp = {
         data: undefined,
         msg: "",
