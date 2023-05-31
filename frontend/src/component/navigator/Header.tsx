@@ -98,7 +98,7 @@ function Header() {
             <Nav>
               <Nav.Link href="/">Elections</Nav.Link>
               <NavDropdown title="Account" id="basic-nav-dropdown">
-                {isLoggedIn ? (
+                {isLoggedIn || currentUser.isLoggedIn() ? (
                   <>
                     <NavDropdown.Item disabled className="custom-disabled-item">{currentUser.email}</NavDropdown.Item>
                     <NavDropdown.Divider />
