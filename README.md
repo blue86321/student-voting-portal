@@ -2,7 +2,7 @@
 
 ## Introduction
 The Student Voting Portal is a full-stack project utilizing Python and SpringBoot for the backend and React for the frontend.
-The portal caters to two distinct user types: normal user and admin.
+The portal caters to three distinct user types: normal user, admin, and superuser.
 
 - **Normal user**
   - Register/Login with email
@@ -14,6 +14,9 @@ The portal caters to two distinct user types: normal user and admin.
 - **Admin**
   - Create/Edit/Delete elections/positions/candidates
   - Add/Remove students in their university
+
+- **Superuser**
+  - All rights as admin, but not just limited to their university
 
 ## Preview
 ### Admin
