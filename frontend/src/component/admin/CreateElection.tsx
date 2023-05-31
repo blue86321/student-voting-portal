@@ -28,7 +28,6 @@ function CreateElection({ electionForUpdate, onNext }) {
 
   // Form control
   const [isClicked, setIsClicked] = useState(false);
-  const [isValid, setValid] = useState(false);
 
 
   useEffect(() => {
@@ -42,7 +41,7 @@ function CreateElection({ electionForUpdate, onNext }) {
         endTime !== null
       );
     };
-    setValid(isValid());
+    setIsClicked(!isValid());
   }, [electionName, description, startTime, endTime, eUpdate]);
 
   // Error alert
@@ -155,9 +154,9 @@ function CreateElection({ electionForUpdate, onNext }) {
               variant="primary"
               type="submit"
               onClick={handleClick}
-              disabled={(electionID === null && isClicked) || !isValid}
+              disabled={(electionID === null && isClicked) || isClicked}
             >
-              {electionID === null ? (isClicked ? "Saved" : "Next") : "Update"}
+              {isClicked ? "Saved" : (electionID === null ? "Next" : "Update")}
             </Button>
           </div>
         </Form>

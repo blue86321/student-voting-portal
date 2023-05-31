@@ -1,6 +1,5 @@
 import { ElectionDetail } from "./Interfaces/Election";
 import { University } from "./Interfaces/User";
-import DateTimeUtils from "../component/utils/DateTimeUtil";
 import Position from "./Position.model";
 import Logger from "../component/utils/Logger";
 

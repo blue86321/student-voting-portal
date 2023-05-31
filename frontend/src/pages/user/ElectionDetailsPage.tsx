@@ -205,7 +205,6 @@ function ElectionDetailsPage() {
                   variant="primary"
                   className="ml-2"
                   onClick={onClickEdit}
-                // disabled={election?.state === 1}
                 >
                   Edit
                 </Button>
@@ -239,7 +238,7 @@ function ElectionDetailsPage() {
             <h5>{position.positionName}</h5>
             <p>{position.positionDesc}</p>
             {/* if past election, show the result chart */}
-            {election?.state === 2 ? (
+            {(election?.state === 2 && election?.isDataCompleted) ? (
               <Container>
                 <ResultChart
                   position={position}

@@ -41,11 +41,6 @@
   --bs-primary: #E85B81;
 }
 
-.btn-primary {
-  background-color: #E85B81;
-  border-color: #E85B81;
-}
-
 .btn-link {
   color: #E85B81;
 }
@@ -56,10 +51,17 @@
   text-decoration: none;
 }
 
+.btn-primary {
+  background-color: #E85B81;
+  border-color: #E85B81;
+}
+
 .btn-primary:active,
 .btn-primary:focus {
   background-color: #E85B81;
   border-color: #E85B81;
+  --bs-btn-active-bg: #c43d61;
+  --bs-btn-active-border-color: #c43d61;
 }
 
 .btn-primary:hover,

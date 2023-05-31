@@ -63,7 +63,7 @@ function CandidateComponent({
       candidatePosition === 0
         ? positions[0]
         : positions.filter((position) => {
-          Logger.debug("[CreateCandidates] filtering candidate position:", position.id, candidatePosition, position.id == candidatePosition);
+          // eslint-disable-next-line
             return position.id == candidatePosition;
           })[0];
     Logger.debug("[CreateCandidates] onSave position:", position, candidatePosition);
