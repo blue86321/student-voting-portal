@@ -1,5 +1,12 @@
 # student-voting-portal
 
+## Introduction
+The Student Voting Portal is a full-stack project utilizing Python and SpringBoot for the backend and React for the frontend.
+The portal caters to two distinct user types: normal user and admin.
+
+- **Normal user**: Can view elections within their university and vote for their preferred candidates on various positions.
+- **Admin**: Managing the overall election process, including the ability to create, edit, and delete elections/positions/candidates. Additionally, admin can manage users, such as creating new user accounts and removing existing ones as needed.
+
 ## Preview
 ### Admin
 <img width="800" src="./imgs/admin.gif">
@@ -7,11 +14,11 @@
 ### User (vote)
 <img width="800" src="./imgs/user.gif">
 
-## Docker
+## Run the Project
 
-### Run
+### Docker Run
 ```shell
-# env is setup, no need to change
+# env is out-of-box, no need to change
 cp .env.example .env
 # Ctrl-C to stop
 docker compose up
