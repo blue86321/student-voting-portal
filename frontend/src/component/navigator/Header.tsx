@@ -17,8 +17,7 @@ function Header() {
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [error, setError] = useState("");
   const [alertType, setAlertType] = useState("danger");
-
-  const isLoggedIn = currentUser.isLoggedIn();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
   const redirectToHome = useCallback(() => {
@@ -41,6 +40,7 @@ function Header() {
       }
       const user = await currentUser.getUser();
       Logger.debug("[Header] loaded user: ", user);
+      setIsLoggedIn(currentUser.isLoggedIn())
       if (user.email !== "") {
         setIsAdmin(user.staff || user.superuser);
         setShowError(false);
@@ -52,7 +52,7 @@ function Header() {
       }
     };
     loadUserType();
-  }, [isLoggedIn, redirectToHome]);
+  }, [redirectToHome]);
 
   // Error alert
   const [showError, setShowError] = useState(false);
@@ -74,6 +74,7 @@ function Header() {
   const logout = async () => {
     const result = await myApi.deleteLogin();
     currentUser.removeUser();
+    setIsLoggedIn(currentUser.isLoggedIn())
     if (result.msg) {
       Logger.error("[Header] Logout error:", result.msg);
     }
@@ -97,7 +98,7 @@ function Header() {
             <Nav>
               <Nav.Link href="/">Elections</Nav.Link>
               <NavDropdown title="Account" id="basic-nav-dropdown">
-                {isLoggedIn ? (
+                {isLoggedIn || currentUser.isLoggedIn() ? (
                   <>
                     <NavDropdown.Item disabled className="custom-disabled-item">{currentUser.email}</NavDropdown.Item>
                     <NavDropdown.Divider />
