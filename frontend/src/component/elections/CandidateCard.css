@@ -2,6 +2,7 @@
     width: auto;
     height: 320px;
     object-fit: cover;
+    object-position: 0% 10%;
 }
 
 .card-winner {
