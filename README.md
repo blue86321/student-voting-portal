@@ -16,27 +16,29 @@ docker compose up
 - backend (java): http://localhost:8080/swagger-ui.html
 
 #### Default Data
+
+##### User
 | User Type   | University                           | Email             | Password     | Comment    |
 | ----------- | ------------------------------------ | ----------------- | ------------ | ---------- |
 | Superuser   | Santa Clara University (meaningless) | `super@gmail.com` | `super`      |            |
 | Admin       | Santa Clara University               | `admin@scu.edu`   | `admin_scu`  |            |
-| Normal User | Santa Clara University               | `user1@scu.edu`   | `user1_scu`  | candidate  |
-| Normal User | Santa Clara University               | `user2@scu.edu`   | `user2_scu`  | candidate  |
-| Normal User | Santa Clara University               | `user3@scu.edu`   | `user3_scu`  | candidate  |
-| Normal User | Santa Clara University               | `user4@scu.edu`   | `user4_scu`  | candidate  |
-| Normal User | Santa Clara University               | `user5@scu.edu`   | `user5_scu`  | candidate  |
+| Normal User | Santa Clara University               | `user1@scu.edu`   | `user1_scu`  | voted user |
+| Normal User | Santa Clara University               | `user2@scu.edu`   | `user2_scu`  | voted user |
+| Normal User | Santa Clara University               | `user3@scu.edu`   | `user3_scu`  | voted user |
+| Normal User | Santa Clara University               | `user4@scu.edu`   | `user4_scu`  | voted user |
+| Normal User | Santa Clara University               | `user5@scu.edu`   | `user5_scu`  |            |
 | Normal User | Santa Clara University               | `user6@scu.edu`   | `user6_scu`  | voted user |
 | Normal User | Santa Clara University               | `user7@scu.edu`   | `user7_scu`  | voted user |
 | Normal User | Santa Clara University               | `user8@scu.edu`   | `user8_scu`  | voted user |
 | Normal User | Santa Clara University               | `user9@scu.edu`   | `user9_scu`  | voted user |
 | Admin       | San Jose State University            | `admin@sjsu.edu`  | `admin_sjsu` |            |
-| Normal User | San Jose State University            | `user1@sjsu.edu`  | `user1_sjsu` |
-| Normal User | San Jose State University            | `user2@sjsu.edu`  | `user2_sjsu` |
+| Normal User | San Jose State University            | `user1@sjsu.edu`  | `user1_sjsu` |            |
+| Normal User | San Jose State University            | `user2@sjsu.edu`  | `user2_sjsu` |            |
 
 ### Destroy
 ```shell
-# destroy docker container and volume
-docker compose down -v
+# destroy docker container, volume, and relevant images
+docker compose down -v --rmi all
 ```
 
 ## Develop Guidelines
