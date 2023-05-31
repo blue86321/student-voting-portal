@@ -6,6 +6,7 @@ import myApi from "../../service/MyApi";
 import { Election as ElectionInterface, ElectionDetail } from "../../model/Interfaces/Election";
 import Election from "../../model/Election.model";
 import Logger from "../utils/Logger";
+import DateTimeUtils from "../utils/DateTimeUtil";
 
 function CreateElection({ electionForUpdate, onNext }) {
   const eUpdate = electionForUpdate as Election|null;
@@ -16,13 +17,13 @@ function CreateElection({ electionForUpdate, onNext }) {
   const [electionID, setElectionID] = useState<Number | null>(eUpdate ? eUpdate.id : null);
 
   const handleStartTime = (date: Date) => {
-    setStartTime(date);
+    setStartTime(DateTimeUtils.convertToGMT(date));
     const newDate = new Date(date.getTime() + 86400000);
     Logger.debug("[CreateElection] date: ", date, ", newDate: ", newDate);
     setEndTime(newDate);
   };
   const handleEndTime = (date) => {
-    setEndTime(date);
+    setEndTime(DateTimeUtils.convertToGMT(date));
   };
 
   // Form control
@@ -113,7 +114,7 @@ function CreateElection({ electionForUpdate, onNext }) {
               <Form.Group controlId="formDate">
                 <Form.Label>Start Date</Form.Label>
                 <DatePicker
-                  selected={startTime}
+                  selected={startTime && DateTimeUtils.convertFromGMT(startTime)}
                   onChange={(date) => handleStartTime(date)}
                   className="form-control"
                   showTimeSelect
@@ -127,7 +128,7 @@ function CreateElection({ electionForUpdate, onNext }) {
               <Form.Group controlId="formDate">
                 <Form.Label>End Date</Form.Label>
                 <DatePicker
-                  selected={endTime}
+                  selected={endTime && DateTimeUtils.convertFromGMT(endTime)}
                   onChange={(date) => handleEndTime(date)}
                   className="form-control"
                   showTimeSelect
