@@ -24,8 +24,8 @@ class Position(BaseModel, models.Model):
 
 class Candidate(BaseModel, models.Model):
     """Candidate of an election for a position"""
-    election = models.ForeignKey(Election, on_delete=models.DO_NOTHING, related_name="candidates")
-    position = models.ForeignKey(Position, on_delete=models.DO_NOTHING)
+    election = models.ForeignKey(Election, on_delete=models.DO_NOTHING)
+    position = models.ForeignKey(Position, on_delete=models.DO_NOTHING, related_name="candidates")
     candidate_name = models.CharField(default="", max_length=255)
     candidate_desc = models.TextField(default="", blank=True)
     photo_url = models.CharField(default="", max_length=255, blank=True)
