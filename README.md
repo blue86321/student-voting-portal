@@ -1,17 +1,25 @@
-# student-voting-portal
+# Student Voting Portal
 
 ## Introduction
 The Student Voting Portal is a full-stack project utilizing Python and SpringBoot for the backend and React for the frontend.
 The portal caters to two distinct user types: normal user and admin.
 
-- **Normal user**: Can view elections within their university and vote for their preferred candidates on various positions.
-- **Admin**: Managing the overall election process, including the ability to create, edit, and delete elections/positions/candidates. Additionally, admin can manage users, such as creating new user accounts and removing existing ones as needed.
+- **Normal user**
+  - Register/Login with email
+  - Browse all elections
+  - Vote for elections (only their university)
+  - Vote for multiple candidates for different positions
+  - See election results, including votes cast, winner, and percentage of votes
+
+- **Admin**
+  - Create/Edit/Delete elections/positions/candidates
+  - Add/Remove students in their university
 
 ## Preview
 ### Admin
 <img width="800" src="./imgs/admin.gif">
 
-### User (vote)
+### User
 <img width="800" src="./imgs/user.gif">
 
 ## Run the Project
@@ -25,9 +33,22 @@ docker compose up
 ```
 
 ### Visit
-- frontend: http://localhost:3000
-- backend (python): http://localhost:8000
-- backend (java): http://localhost:8080/swagger-ui.html
+- Frontend (default backend is Java): http://localhost:3000
+- Backend API docs
+  - Java: http://localhost:8080/swagger-ui.html
+  - Python: http://localhost:8000
+
+### Expected Results
+#### Frontend
+<img width="700" src="./imgs/frontend-home-page.jpg">
+
+#### Backend
+##### Java
+<img width="700" src="./imgs/api-docs-java-spring-boot-swagger.jpg">
+
+##### Python
+<img width="700" src="./imgs/api-docs-py-django-restful-framework.jpg">
+
 
 #### Default Data
 
