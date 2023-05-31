@@ -236,7 +236,7 @@ class PositionTestCase(AbstractTestCase):
         self.assertEqual(res.normal_user.status_code, status.HTTP_403_FORBIDDEN)
         # admin
         res_json = {**res.admin.json().get("data")}
-        remove_col = ["id", "url"]
+        remove_col = ["id", "url", "candidates"]
         for col in remove_col:
             del res_json[col]
             del existing_position[col]

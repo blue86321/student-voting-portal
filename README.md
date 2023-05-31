@@ -35,8 +35,8 @@ docker compose up
 ### Visit
 - Frontend (default backend is Java): http://localhost:3000
 - Backend API docs
-  - Java: http://localhost:8080/swagger-ui.html
-  - Python: http://localhost:8000
+  - Java (API fields are camelCase): http://localhost:8080/swagger-ui.html
+  - Python (API fields are snake_case): http://localhost:8000
 
 ### Expected Results
 #### Frontend

@@ -8,9 +8,25 @@ from users.models import University, User
 from users.serializers import UniversitySerializer
 
 
+class CandidateSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
+    position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
+    vote_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Candidate
+        exclude = ["create_time", "update_time", "election", "position"]
+
+
 class PositionSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
     election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
+    candidates = CandidateSerializer(many=True, read_only=True)
+    total_vote_count = serializers.SerializerMethodField(read_only=True)
+
+    def get_total_vote_count(self, obj: Position):
+        return sum(c.vote_count for c in obj.candidates.all())
 
     class Meta:
         model = Position
@@ -30,21 +46,9 @@ class PositionSerializer(serializers.HyperlinkedModelSerializer):
         return attrs
 
 
-class CandidateSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    election_id = serializers.PrimaryKeyRelatedField(queryset=Election.objects.all(), source="election")
-    position_id = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all(), source="position")
-    vote_count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = Candidate
-        exclude = ["create_time", "update_time", "election", "position"]
-
-
 class ElectionSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
     positions = PositionSerializer(many=True, read_only=True)
-    candidates = CandidateSerializer(many=True, read_only=True)
     university_id = serializers.PrimaryKeyRelatedField(queryset=University.objects.all(), source="university",
                                                        write_only=True)
     university = UniversitySerializer(read_only=True)
