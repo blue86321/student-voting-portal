@@ -82,7 +82,7 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
       {position.candidates.map((candidate) => (
         <div style={{ margin: "10px", padding: "20px" }}>
           <Card key={candidate.id} style={{ width: "22rem" }}>
-            {candidate.winner && (<div className="card-winner"> Winner </div>)}
+            {electionStatus === 2 && candidate.winner && (<div className="card-winner"> Winner </div>)}
             <Card.Body>
               <Card.Title className="text-center">
                 {candidate.candidateName}

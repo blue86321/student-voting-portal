@@ -64,13 +64,10 @@ public class CandidateServiceImpl implements CandidateService {
         // validate
         validate(candidateParams, sourceUser, election.getUniversity().getId(), false);
 
-        Users user = userRepository
-            .findById(candidateParams.getUserId())
-            .orElseThrow(() -> new DataNotExistsException("User not found"));
         Positions position = positionRepository
             .findById(candidateParams.getPositionId())
             .orElseThrow(() -> new DataNotExistsException("Position not found"));
-        Candidates candidates = new Candidates(candidateParams, election, user, position);
+        Candidates candidates = new Candidates(candidateParams, election, position);
         Candidates savedCandidates = candidateRepository.save(candidates);
         return new CandidateResp(savedCandidates);
     }
@@ -93,11 +90,6 @@ public class CandidateServiceImpl implements CandidateService {
             candidates.setElection(electionRepository
                 .findById(candidateParams.getElectionId())
                 .orElseThrow(() -> new DataNotExistsException("Election not found")));
-        }
-        if (candidateParams.getUserId() != null) {
-            candidates.setUser(userRepository
-                .findById(candidateParams.getUserId())
-                .orElseThrow(() -> new DataNotExistsException("User not found")));
         }
         if (candidateParams.getPositionId() != null) {
             candidates.setPosition(positionRepository
@@ -122,7 +114,6 @@ public class CandidateServiceImpl implements CandidateService {
             !partial && (
                 candidateParams.getElectionId() == null ||
                     candidateParams.getPositionId() == null ||
-                    candidateParams.getUserId() == null ||
                     candidateParams.getCandidateName() == null
             )
         ) {

@@ -14,10 +14,11 @@ function ElectionCard({ elections }) {
   };
 
   const getImagePath = (election) => {
+    console.log(election.electionName, election.state)
     if (election.state === 0) {
       return comingImg;
     } else if (election.state === 1) {
-      const month = election.endDate.getMonth();
+      const month = election.endDate.getMonth() + 1;
       console.log("Elections card: ", month);
       if (month === 5) {
         return mayImg;

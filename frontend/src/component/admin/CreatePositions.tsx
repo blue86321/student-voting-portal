@@ -117,7 +117,7 @@ function PositionComponent({ index, position, onDelete, updatePosition }) {
     </div>
   );
 }
-let positionCount = 1; // need to set at least 1 position
+// let positionCount = 1; // need to set at least 1 position
 
 function CreatePositions({ electionID, prePositions, onNext }) {
   const [positions, setPositions] = useState<PositionDetail[]>(prePositions??[]);
@@ -128,12 +128,7 @@ function CreatePositions({ electionID, prePositions, onNext }) {
       " for index",
       index
     );
-    positions.map((p, i) => {
-      if (i === index) {
-        p = position;
-      }
-    });
-    Logger.debug("[CreatePositions] update position result:", positions);
+    Logger.debug("[CreatePositions] update position result:", positions.map((p, i) => i === index ? position : p));
   };
 
   const handleAddPosition = () => {
