@@ -14,7 +14,7 @@ function Header() {
   const navigate = useNavigate();
 
   const [loginModalShow, setLoginModalShow] = React.useState(false);
-  const [isAdmin, setIsAdmin] = React.useState(false);
+  // const [isAdmin, setIsAdmin] = React.useState(false);
   const [error, setError] = useState("");
   const [alertType, setAlertType] = useState("danger");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,7 +33,7 @@ function Header() {
       if (!token) {
         //no token: no user logged in
         Logger.debug("[Header] no token: no user logged in");
-        setIsAdmin(false);
+        // setIsAdmin(false);
         // setShowError(false);
         // redirectToHome();
         return;
@@ -42,7 +42,7 @@ function Header() {
       Logger.debug("[Header] loaded user: ", user);
       setIsLoggedIn(currentUser.isLoggedIn())
       if (user.email !== "") {
-        setIsAdmin(user.staff || user.superuser);
+        // setIsAdmin(user.staff || user.superuser);
         setShowError(false);
       } else {
         setAlertType("danger");
@@ -74,6 +74,7 @@ function Header() {
   const logout = async () => {
     const result = await myApi.deleteLogin();
     currentUser.removeUser();
+    Logger.debug("[Header] Logout current user", currentUser, currentUser.isAdmin);
     setIsLoggedIn(currentUser.isLoggedIn())
     if (result.msg) {
       Logger.error("[Header] Logout error:", result.msg);
@@ -119,7 +120,7 @@ function Header() {
         <h1>Student Voting</h1>
       </Container>
       <Container>
-        <Navigation isAdmin={isAdmin} />
+        <Navigation isAdmin={currentUser.isAdmin} />
       </Container>
       <Login show={loginModalShow} onHide={() => setLoginModalShow(false)} />
       {/* <main>
