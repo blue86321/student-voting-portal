@@ -54,6 +54,12 @@ function Header() {
     loadUserType();
   }, [redirectToHome]);
 
+  useEffect(() => {
+    if (currentUser.isLoggedIn()) {
+      setShowError(false);
+    }
+  },[currentUser.isLoggedIn()]);
+
   // Error alert
   const [showError, setShowError] = useState(false);
 
