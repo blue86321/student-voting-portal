@@ -69,8 +69,8 @@ services:
       - "24850:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
-      interval: 3s
-      retries: 5
+      interval: 5s
+      retries: 10
       start_period: 30s
 
 networks:
