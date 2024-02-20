@@ -24,6 +24,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,8 +86,8 @@ class ElectionRelatedTests {
     Elections election = Elections.builder()
         .university(university)
         .electionName("SCU club president election")
-        .startTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse("2023-05-20 12:00:00.000000"))
-        .endTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse("2023-06-20 12:00:00.000000"))
+        .startTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)))
+        .endTime(Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
         .build();
     Positions position = Positions.builder()
         .election(election)
@@ -187,8 +190,8 @@ class ElectionRelatedTests {
         ElectionParams newElectionParams = ElectionParams.builder()
             .universityId(university.getId())
             .electionName("Another elections")
-            .startTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse("2023-05-20 12:00:00.000000"))
-            .endTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse("2023-06-20 12:00:00.000000"))
+            .startTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)))
+            .endTime(Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
             .build();
 
         Long newElectionId;
@@ -694,7 +697,6 @@ class ElectionRelatedTests {
         @Test
         public void postVotesUserDiffUniversity() throws Exception {
             String token = loginHelper(userAnotherUniv.getEmail());
-            mapper.writeValueAsString(newVoteParams);
             mvc.perform(MockMvcRequestBuilders.post("/votes/")
                     .header("Authorization", "Bearer " + token)
                     .content(mapper.writeValueAsString(newVoteParams))
