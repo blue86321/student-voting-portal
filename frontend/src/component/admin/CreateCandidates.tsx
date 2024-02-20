@@ -135,7 +135,7 @@ function CandidateComponent({
             >
               {positions.map((position, index) => {
                 return (
-                  <option key={index} value={position.id}>
+                  <option key={position.id} value={position.id}>
                     {position.positionName}
                   </option>
                 );
@@ -267,7 +267,7 @@ function CreateCandidates({ electionID, positions, onNext }) {
         {/* <ProgressBar now={33} /> */}
         {candidates.map((candidate, index) => (
           <CandidateComponent
-            key={index}
+            key={candidate.id}
             index={index}
             candidate={candidate}
             positions={positions}

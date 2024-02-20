@@ -234,7 +234,7 @@ function ElectionDetailsPage() {
 
         <h5> </h5>
         {positions.map((position) => (
-          <div>
+          <div key={position.id}>
             <h5>{position.positionName}</h5>
             <p>{position.positionDesc}</p>
             {/* if past election, show the result chart */}

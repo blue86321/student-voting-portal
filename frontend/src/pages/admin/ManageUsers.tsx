@@ -92,8 +92,8 @@ function ManageUsers() {
             </tr>
           </thead>
           {managedUsers.map((user, index) => (
-            <tbody className="striped">
-              <tr key={index}>
+            <tbody key={user.id} className="striped">
+              <tr>
                 <td className="align-middle">{index + 1}</td>
                 <td className="align-middle" colSpan={5}>
                   {user.email}

@@ -79,8 +79,8 @@ function CandidateCard({ position, selectedID, electionStatus, isCompleted }) {
     <Row xs={1} md={2} lg={3} className="g-4">
       {showErrorModal()}
       {position.candidates.map((candidate) => (
-        <div className="mb-4">
-          <Card key={candidate.id} style={{ width: "22rem" }}>
+        <div key={candidate.id} className="mb-4">
+          <Card style={{ width: "22rem" }}>
             {/* winner banner */}
             {electionStatus === 2 && candidate.winner && (<div className="card-winner"> Winner </div>)}
             <Card.Body>

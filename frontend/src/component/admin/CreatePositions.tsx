@@ -195,7 +195,7 @@ function CreatePositions({ electionID, prePositions, onNext }) {
       <div style={{ margin: "20px" }}>
         {positions.map((pos, index) => (
           <PositionComponent
-            key={index}
+            key={pos.id}
             index={index}
             position={pos}
             onDelete={handleDeletePosition} // Pass the delete handler
