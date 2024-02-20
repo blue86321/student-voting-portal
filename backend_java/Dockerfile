@@ -3,10 +3,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the Maven project files to the container
-COPY pom.xml .
-COPY src ./src
-COPY .mvn ./.mvn
-COPY mvnw ./mvnw
+COPY . .
 
 # Build the Maven project
 RUN ./mvnw package -DskipTests
