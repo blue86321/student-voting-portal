@@ -1,38 +1,41 @@
-import {
-  XYPlot,
-  XAxis,
-  VerticalBarSeries,
-  LabelSeries,
-} from "react-vis";
+import { Bar, BarChart, XAxis, YAxis } from 'recharts';
 import Logger from "../utils/Logger";
+
+const CustomizedLabel = ({ x, y, value, width }) => {
+  return (
+    <text
+      x={x + width / 2}
+      y={y}
+      dy={-16}
+      textAnchor="middle"
+    >
+      {value}%
+    </text>
+  )
+};
 
 function ResultChart({ position }) {
   Logger.debug("[ResultChart] position", position);
-  let votesPercentage;
-  if (position !== undefined) {
-    votesPercentage = position.candidates.map((vote) => {
-      Logger.debug("[ResultChart] candidates.map: ", vote);
-      return {
-        x: vote.candidateName,
-        y: vote.votePercentage,
-      };
-    });
-  }
-
-  const labels = votesPercentage?.map((data) => ({
-    x: data.x,
-    y: data.y + 0.15 * data.y, // set the yOffset of the labels to the bars
-    label: String(data.y + "%"),
-    style: { textAnchor: "middle" },
-  }));
+  const nonNan = position?.candidates.every((vote) => !isNaN(vote.votePercentage))
+  const votesData = position?.candidates.map((vote) => {
+    Logger.debug("[ResultChart] candidates.map: ", vote);
+    return {
+      candidateName: vote.candidateName,
+      votePercentage: vote.votePercentage,
+    };
+  });
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-40">
-      <XYPlot xType="ordinal" height={300} width={500}>
-        <VerticalBarSeries data={votesPercentage} color="#E85B81" />
-        <XAxis />
-        <LabelSeries animation allowOffsetToBeReversed data={labels} />
-      </XYPlot>
+      {
+        nonNan && (
+          <BarChart width={500} height={400} data={votesData} margin={{ top: 30, bottom: 10 }}>
+            <XAxis dataKey="candidateName" />
+            <YAxis hide />
+            <Bar dataKey="votePercentage" fill="#E85B81" label={CustomizedLabel} />
+          </BarChart>
+        )
+      }
     </div>
   );
 }
