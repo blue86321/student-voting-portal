@@ -2,7 +2,7 @@ asgiref==3.6.0
 Django==4.2.15
 django-cors-headers==4.0.0
 django-filter==23.2
-djangorestframework==3.14.0
+djangorestframework==3.15.2
 djangorestframework-simplejwt==5.2.2
 mysqlclient==2.1.1
 PyJWT==2.6.0
