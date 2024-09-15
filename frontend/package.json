@@ -3,23 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.2.1",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.19",
-    "@types/react": "^18.2.57",
-    "@types/react-dom": "^18.2.19",
     "axios": "^1.7.4",
-    "bootstrap": "^5.2.3",
-    "react": "^18.2.0",
-    "react-bootstrap": "^2.10.1",
-    "react-datepicker": "^6.1.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.1",
-    "recharts": "^2.12.0",
-    "typescript": "^5.3.3",
-    "web-vitals": "^3.5.2"
+    "bootstrap": "^5.3.3",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-datepicker": "^6.9.0",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7"
   },
   "scripts": {
     "start": "r3f-pack start",
@@ -46,6 +37,10 @@
     ]
   },
   "devDependencies": {
-    "r3f-pack": "^2.7.2"
+    "r3f-pack": "^2.7.2",
+    "@types/node": "^22.5.5",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.2"
   }
 }
