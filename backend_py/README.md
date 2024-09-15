@@ -1,9 +1,9 @@
 # Backend of Student Voting Portal (Python)
 
-
 ## Run
 
 ### Activate venv and install dependencies
+
 ```shell
 # activate venv
 python -m venv venv
@@ -13,6 +13,7 @@ python -m pip install -r requirements.txt
 ```
 
 ### Sync database
+
 - Database settings
   - Run a mysql database locally
   - Create a mysql user
@@ -30,17 +31,20 @@ python manage.py migrate
 ```
 
 ### Test
+
 ```shell
 python manage.py test
 ```
 
 ### Create superuser
+
 ```shell
 python manage.py createsuperuser --email super@gmail.com
 # Then set password for superuser
 ```
 
 ### Run the server
+
 ```shell
 python manage.py runserver
 ```
@@ -53,6 +57,7 @@ python manage.py runserver
 <img width="700" src="../imgs/api-docs-py-django-restful-framework.jpg">
 
 ### Exit venv
+
 ```shell
 deactivate
 ```

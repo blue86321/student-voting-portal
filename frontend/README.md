@@ -1,6 +1,7 @@
 # Frontend of Student Voting Portal
 
 ## Run
+
 ```shell
 pnpm install
 pnpm dev
