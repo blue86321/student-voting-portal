@@ -32,5 +32,5 @@ export interface CreateUserParams {
   passwordConfirm: string,
   universityId: number,
   dob: Date,
-  admin: Boolean
+  admin: boolean
 }

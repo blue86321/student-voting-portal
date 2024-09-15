@@ -29,7 +29,7 @@ function Header() {
   useEffect(() => {
     const loadUserType = async () => {
       Logger.debug("[Header] loadUserType");
-      let token = localStorage.getItem(TOKEN);
+      const token = localStorage.getItem(TOKEN);
       if (!token) {
         //no token: no user logged in
         Logger.debug("[Header] no token: no user logged in");

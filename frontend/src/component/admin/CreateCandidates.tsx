@@ -63,7 +63,7 @@ function CandidateComponent({
       candidatePosition === 0
         ? positions[0]
         : positions.filter((position) => {
-          // eslint-disable-next-line
+           
             return position.id == candidatePosition;
           })[0];
     Logger.debug("[CreateCandidates] onSave position:", position, candidatePosition);
@@ -187,7 +187,7 @@ function CandidateComponent({
 
 function CreateCandidates({ electionID, positions, onNext }) {
   const [candidates, setCandidates] = useState<CandidateDetail[]>(() => {
-    let candidates: CandidateDetail[] = [];
+    const candidates: CandidateDetail[] = [];
     positions.forEach((position) => {
       const cs: CandidateDetail[] = position.candidates;
       candidates.push(...cs);
