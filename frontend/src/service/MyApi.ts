@@ -523,7 +523,7 @@ class MyApi {
     const response = await this.request(params);
     return response;
   }
-  async createUniversity(name: String): Promise<Response<University>> {
+  async createUniversity(name: string): Promise<Response<University>> {
     const token = localStorage.getItem(TOKEN); // Retrieve the token from localStorage
     const data = { name };
     const params: AxiosRequestConfig = {

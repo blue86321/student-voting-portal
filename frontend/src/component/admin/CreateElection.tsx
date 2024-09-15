@@ -14,7 +14,7 @@ function CreateElection({ electionForUpdate, onNext }) {
   const [startTime, setStartTime] = useState<Date | null>(eUpdate ? DateTimeUtils.convertToGMT(eUpdate.startDate) : null);
   const [endTime, setEndTime] = useState<Date | null>(eUpdate ? DateTimeUtils.convertToGMT(eUpdate.endDate) : null);
   const [description, setDescription] = useState(eUpdate ? eUpdate.electionDesc : "");
-  const [electionID, setElectionID] = useState<Number | null>(eUpdate ? eUpdate.id : null);
+  const [electionID, setElectionID] = useState<number | null>(eUpdate ? eUpdate.id : null);
 
   const handleStartTime = (date: Date) => {
     setStartTime(date);

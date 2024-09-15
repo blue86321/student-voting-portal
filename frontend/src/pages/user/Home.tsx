@@ -11,8 +11,8 @@ import { useLocation } from "react-router-dom";
 function Home({ type }) {
   const [data, setData] = useState<Election[]>([]);
   const location = useLocation();
-  let stateString = location.state;
-  let contentType = currentUser.isAdmin ? "admin" : type
+  const stateString = location.state;
+  const contentType = currentUser.isAdmin ? "admin" : type
   Logger.debug("[Home] contentType: " + contentType, stateString)
   useEffect(() => {
     const fetchDataAsync = async () => {

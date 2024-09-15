@@ -40,7 +40,7 @@ class CurrentUser implements LoginResponse {
   }
 
   async refreshUserIfNeeded() {
-    let token = localStorage.getItem(TOKEN);
+    const token = localStorage.getItem(TOKEN);
     if (this.email !== "") {
       Logger.debug("[UserModel] no need to refresh user (email: " + this.email);
       return;
