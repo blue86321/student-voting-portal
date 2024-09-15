@@ -36,7 +36,7 @@ docker compose up
 ```
 
 ### Visit
-- Frontend (default backend is Java): http://localhost:3000
+- Frontend (default backend is Java): http://localhost:5173
 - Backend API docs
   - Java (API fields are camelCase): http://localhost:8080/swagger-ui.html
   - Python (API fields are snake_case): http://localhost:8000
@@ -105,5 +105,3 @@ docker compose down -v --rmi all
     git push origin NEW_BRANCH_NAME
     ```
 - Create a new `Pull Request` on GitHub GUI
-
-Note: Since this is a small project, we just push to `origin` with different branches. No need to fork.

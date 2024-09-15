@@ -1,13 +1,16 @@
-FROM node:lts-alpine3.16
+FROM node:20-slim AS base
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY . /app
 WORKDIR /app
 
-COPY . .
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# ==== BUILD =====
-# Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
-RUN npm ci
+EXPOSE 5173
 
-EXPOSE 3000
-
-CMD [ "npm", "start" ]
+# For dev only
+CMD [ "pnpm", "dev" ]

@@ -2,6 +2,13 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "axios": "^1.7.4",
     "bootstrap": "^5.3.3",
@@ -12,35 +19,19 @@
     "react-router-dom": "^6.26.2",
     "recharts": "^2.12.7"
   },
-  "scripts": {
-    "start": "r3f-pack start",
-    "build": "r3f-pack build",
-    "test": "r3f-pack test",
-    "eject": "r3f-pack eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "r3f-pack": "^2.7.2",
+    "@eslint/js": "^9.9.0",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.6.2"
-  }
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1"
+  },
+  "packageManager": "pnpm@9.10.0+sha512.73a29afa36a0d092ece5271de5177ecbf8318d454ecd701343131b8ebc0c1a91c487da46ab77c8e596d6acf1461e3594ced4becedf8921b074fbd8653ed7051c"
 }
